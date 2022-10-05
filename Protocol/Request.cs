@@ -1,4 +1,5 @@
 using System;
+using OcppSharp.Server;
 
 namespace OcppSharp.Protocol
 {
@@ -6,9 +7,7 @@ namespace OcppSharp.Protocol
     {
         public string BaseJson { get; set; } = string.Empty;
         public ProtocolVersion ProtocolVersion { get; set; }
-
-        //public Station? Sender { get; set; }
-
+        
         public int MessageKind { get; private set; }
         public string MessageId { get; private set; }
         public string MessageType { get; private set; }

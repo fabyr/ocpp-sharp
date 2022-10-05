@@ -78,5 +78,23 @@ namespace OcppSharp
         {
             return typeof(T).GetCustomAttribute<Protocol.OcppMessageAttribute>()?.Name;
         }
+
+        public static string? GetMessageIdentifier(Type t)
+        {
+            return t.GetCustomAttribute<Protocol.OcppMessageAttribute>()?.Name;
+        }
+
+        public static string GetWebSocketSubProtocol(this ProtocolVersion ver)
+        {
+            switch (ver)
+            {
+                case ProtocolVersion.OCPP16:
+                    return "ocpp1.6";
+                case ProtocolVersion.OCPP201:
+                    return "ocpp2.0.1";
+                default:
+                    throw new ArgumentException();
+            }
+        }
     }
 }

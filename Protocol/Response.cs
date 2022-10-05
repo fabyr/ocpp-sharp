@@ -1,10 +1,10 @@
 using System;
+using OcppSharp.Server;
 
 namespace OcppSharp.Protocol
 {
     public class Response
     {
-        //public Station? Sender { get; set; }
         public string BaseJson { get; set; } = string.Empty;
         public ProtocolVersion ProtocolVersion { get; set; }
 
