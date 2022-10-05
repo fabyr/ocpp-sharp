@@ -33,6 +33,7 @@ namespace OcppSharp.Server
         public delegate void ResponseHandler(OcppSharpServer server, OcppClientConnection sender, Response resp);
         public event ResponseHandler? ResponseReceived;
         public event EventHandler<Request>? RequestReceived;
+        public event EventHandler<OcppClientConnection>? WebSocketAccepted;
 
         private List<RequestHandler> handlers = new List<RequestHandler>();
         
@@ -89,6 +90,18 @@ namespace OcppSharp.Server
             Log?.WriteLine("Server Loop stop.");
         }
 
+        public void Start()
+        {
+            _server.Start();
+            StartLoop();
+        }
+
+        public void Stop()
+        {
+            StopLoop();
+            _server.Stop();
+        }
+
         /// <summary>
         /// Stops the asynchronous Loop
         /// </summary>
@@ -111,11 +124,16 @@ namespace OcppSharp.Server
                 throw new Exception("The requested Station does not exist.");
         }
 
-        public RequestHandler RegisterHandler<T>(RequestHandler.RequestHandlerDelegate handler) where T : RequestPayload
+        public RequestHandler RegisterHandler(Type type, RequestHandler.RequestHandlerDelegate handler)
         {
-            RequestHandler result = new RequestHandler(typeof(T), handler);
+            RequestHandler result = new RequestHandler(type, handler);
             handlers.Add(result);
             return result;
+        }
+
+        public RequestHandler RegisterHandler<T>(RequestHandler.RequestHandlerDelegate handler) where T : RequestPayload
+        {
+            return RegisterHandler(typeof(T), handler);
         }
 
         public void UnregisterHandler(RequestHandler handler)
@@ -209,6 +227,8 @@ namespace OcppSharp.Server
             string statId = Util.IdFromRequestLine(requestUri);
             OcppClientConnection s = RegisterStation(statId);
             s.Socket = webSocket;
+
+            WebSocketAccepted?.Invoke(this, s);
             
             try
             {
@@ -261,7 +281,7 @@ namespace OcppSharp.Server
                 result = stationMap[stationId];
             } else
             {
-                if(!stationMap.TryAdd(stationId, result = new OcppClientConnection(OcppVersion, stationId)))
+                if(!stationMap.TryAdd(stationId, result = new OcppClientConnection(this, OcppVersion, stationId)))
                     throw new Exception("Could not register station.");
             }
             return result;
