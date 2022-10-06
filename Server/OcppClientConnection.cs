@@ -10,6 +10,10 @@ namespace OcppSharp.Server
         public WebSocket? Socket { get; set; }
         public System.Net.IPEndPoint? EndPoint { get; set; }
         public ProtocolVersion OcppVersion { get; }
+
+        /// <summary>
+        /// The ID the Station identifies with.
+        /// </summary>
         public string ID { get; private set; }
         public DateTime LastCommunication { get; set; }
 

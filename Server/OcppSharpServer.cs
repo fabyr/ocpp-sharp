@@ -35,8 +35,11 @@ namespace OcppSharp.Server
         public delegate void RequestHandlerDelegate(OcppSharpServer server, OcppClientConnection sender, Request req);
 
         public event ResponseHandlerDelegate? ResponseReceived;
+        public event ResponseHandlerDelegate? ResponseSent;
         private event ResponseHandlerDelegateInternal? ResponseReceivedInternal;
+
         public event RequestHandlerDelegate? RequestReceived;
+        public event RequestHandlerDelegate? RequestSent;
         public event EventHandler<OcppClientConnection>? WebSocketAccepted;
 
         private List<RequestHandler> handlers = new List<RequestHandler>();
@@ -137,6 +140,8 @@ namespace OcppSharp.Server
 
         public RequestHandler RegisterHandler(Type type, RequestHandler.RequestHandlerDelegate handler)
         {
+            if(handlers.Any(x => x.OnType == type))
+                throw new ArgumentException("A handler has already been registered for this type.", "type");
             RequestHandler result = new RequestHandler(type, handler);
             handlers.Add(result);
             return result;
@@ -173,6 +178,7 @@ namespace OcppSharp.Server
             req.Payload = payload;
 
             string json = OcppJson.SerializeRequest(req);
+            req.BaseJson = json;
             
             bool received = false;
             Response? resp = null;
@@ -198,6 +204,8 @@ namespace OcppSharp.Server
             byte[] bytes = Encoding.GetBytes(json);
 
             await station.Socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None); // Send the request
+
+            RequestSent?.Invoke(this, station, req);
 
             // Wait until it is received or abort if it takes too long
             long startTime = Environment.TickCount64;
@@ -325,9 +333,10 @@ namespace OcppSharp.Server
                     
                     Type t = req.Payload.GetType();
                     RequestHandler? handler = handlers.FirstOrDefault(x => x.OnType == t);
-                    if(handler == null)
+                    string? mIdent = Util.GetMessageIdentifier(t);
+                    if(mIdent == null || handler == null)
                     {
-                        Log?.WriteLineWarn($"No handler registered for {Util.GetMessageIdentifier(t)}.");
+                        Log?.WriteLineWarn($"No handler registered for {mIdent}.");
                         return;
                     }
 
@@ -340,12 +349,14 @@ namespace OcppSharp.Server
 
                     // Serialize to JSON
                     json = OcppJson.SerializeResponse(resp);
+                    resp.BaseJson = json;
                     
                     Log?.WriteLine($"Response (to {stationId}): {json}");
 
                     // Send json to station
                     byte[] bytes = Encoding.GetBytes(json);
                     await sock.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
+                    ResponseSent?.Invoke(this, stat, resp, mIdent);
                 } else
                 // Responses to our requests are handled differently
                 {
