@@ -1,6 +1,6 @@
 using System;
 
-namespace OcppSharp.Protocol.Version16.MessageConstants.ConfigurationEdit
+namespace OcppSharp.Protocol.Version16.Configuration
 {
     public enum ConfigKeyValue
     {
@@ -49,14 +49,14 @@ namespace OcppSharp.Protocol.Version16.MessageConstants.ConfigurationEdit
         MaxEnergyOnInvalidId,
 
         [ValueList]
-        [ValidValues(typeof(Measurand.Enum))]
+        [ValidValues(typeof(MessageConstants.Measurand.Enum))]
         MeterValuesAlignedData,
 
         [ValidValues(typeof(int))]
         MeterValuesAlignedDataMaxLength,
 
         [ValueList]
-        [ValidValues(typeof(Measurand.Enum))]
+        [ValidValues(typeof(MessageConstants.Measurand.Enum))]
         MeterValuesSampledData,
 
         [ValidValues(typeof(int))]
@@ -78,7 +78,7 @@ namespace OcppSharp.Protocol.Version16.MessageConstants.ConfigurationEdit
 
         [ValueIndexed]
         [ValueList]
-        [ValidValues(typeof(ConnectorPhaseRotation.Enum))]
+        [ValidValues(typeof(MessageConstants.ConnectorPhaseRotation.Enum))]
         ConnectorPhaseRotation,
         
         [ValidValues(typeof(int))]
@@ -91,21 +91,21 @@ namespace OcppSharp.Protocol.Version16.MessageConstants.ConfigurationEdit
         StopTransactionOnInvalidId,
 
         [ValueList]
-        [ValidValues(typeof(Measurand.Enum))]
+        [ValidValues(typeof(MessageConstants.Measurand.Enum))]
         StopTxnAlignedData,
 
         [ValidValues(typeof(int))]
         StopTxnAlignedDataMaxLength,
 
         [ValueList]
-        [ValidValues(typeof(Measurand.Enum))]
+        [ValidValues(typeof(MessageConstants.Measurand.Enum))]
         StopTxnSampledData,
         
         [ValidValues(typeof(int))]
         StopTxnSampledDataMaxLength,
 
         [ValueList]
-        [ValidValues(typeof(FeatureProfile.Enum))]
+        [ValidValues(typeof(MessageConstants.FeatureProfile.Enum))]
         SupportedFeatureProfiles,
 
         [ValidValues(typeof(int))]
@@ -153,7 +153,7 @@ namespace OcppSharp.Protocol.Version16.MessageConstants.ConfigurationEdit
         ChargeProfileMaxStackLevel,
 
         [ValueList]
-        [ValidValues(typeof(ChargingRateUnitType.QuantityEnum))]
+        [ValidValues(typeof(MessageConstants.ChargingRateUnitType.QuantityEnum))]
         ChargingScheduleAllowedChargingRateUnit,
 
         [ValidValues(typeof(int))]
