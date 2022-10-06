@@ -1,6 +1,6 @@
 using System;
 
-namespace OcppSharp.Protocol.Version16.Configuration
+namespace OcppSharp.Protocol.Version16.Standard
 {
     public enum ConfigKeyValue
     {
