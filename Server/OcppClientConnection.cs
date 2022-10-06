@@ -15,7 +15,7 @@ namespace OcppSharp.Server
         /// The ID the Station identifies with.
         /// </summary>
         public string ID { get; private set; }
-        public DateTime LastCommunication { get; set; }
+        public DateTime? LastCommunication { get; set; }
 
         public OcppClientConnection(OcppSharpServer server, WebSocket? sock, ProtocolVersion ver, string id)
         {
