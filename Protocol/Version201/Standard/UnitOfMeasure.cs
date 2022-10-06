@@ -37,7 +37,7 @@ namespace OcppSharp.Protocol.Version201.Standard
         [StringValue("kPa")]
         KiloPascal,
         [StringValue("Percent")]
-        Percentage,
+        Percent,
         [StringValue("RH")]
         RelativeHumidityPercent,
         [StringValue("RPM")]
@@ -45,7 +45,7 @@ namespace OcppSharp.Protocol.Version201.Standard
         [StringValue("s")]
         Seconds,
         [StringValue("V")]
-        Voltage,
+        Volt,
         [StringValue("VA")]
         VoltAmpere,
         [StringValue("kVA")]

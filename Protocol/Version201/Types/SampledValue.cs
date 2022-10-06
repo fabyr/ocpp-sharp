@@ -13,6 +13,6 @@ namespace OcppSharp.Protocol.Version201.Types
         public PhaseType.Enum? phase;
         public LocationType.Enum? location;
         public SignedMeterValue? signedMeterValue;
-        public UnitOfMeasure unitOfMeasure;
+        public UnitOfMeasure? unitOfMeasure;
     }
 }

@@ -26,8 +26,10 @@ namespace OcppSharp.Protocol.Version201.Standard
         /// Converts a String Unit to its corresponding <see cref="UnitOfMeasure"/> Value.<br/>
         /// Returns null if the string does not match any known unit. 
         /// </summary>
-        public static UnitOfMeasure? GetUnitFromString(string s)
+        public static UnitOfMeasure? GetUnitFromString(string? s)
         {
+            if(s == null)
+                return null;
             if(dict.ContainsKey(s))
                 return dict[s];
             return null;
