@@ -22,32 +22,32 @@ namespace OcppSharp
             return string.Empty;
         }
 
-        public void Write(string text)
+        public virtual void Write(string text)
         {
             if(EnableLogging)
                 @out.Write(text);
         }
 
-        public void WriteLine(string text, bool dateFormat = true) 
+        public virtual void WriteLine(string text, bool dateFormat = true) 
             => Write(GetDate(dateFormat) + text + @out.NewLine);
         
-        public void WriteErr(string text)
+        public virtual void WriteErr(string text)
         {
             if(EnableLogging)
                 err.Write(text);
         }
 
-        public void WriteLineErr(string text, bool dateFormat = true) 
+        public virtual void WriteLineErr(string text, bool dateFormat = true) 
             => WriteErr(GetDate(dateFormat) + text + err.NewLine);
 
-        public void WriteWarn(string text)
+        public virtual void WriteWarn(string text)
         {
             // Might add special formatting in future
             if(EnableLogging)
                 @out.Write(text);
         }
 
-        public void WriteLineWarn(string text, bool dateFormat = true) 
+        public virtual void WriteLineWarn(string text, bool dateFormat = true) 
             => WriteWarn(GetDate(dateFormat) + text + @out.NewLine);
     }
 }
