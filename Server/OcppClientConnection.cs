@@ -8,6 +8,7 @@ namespace OcppSharp.Server
     {
         public OcppSharpServer ParentServer { get; }
         public WebSocket? Socket { get; set; }
+        public System.Net.IPEndPoint? EndPoint { get; set; }
         public ProtocolVersion OcppVersion { get; }
         public string ID { get; private set; }
         public DateTime LastCommunication { get; set; }

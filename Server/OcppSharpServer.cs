@@ -30,15 +30,20 @@ namespace OcppSharp.Server
 
         private ConcurrentDictionary<string, OcppClientConnection> stationMap = new ConcurrentDictionary<string, OcppClientConnection>();
 
-        public delegate void ResponseHandler(OcppSharpServer server, OcppClientConnection sender, Response resp);
-        public event ResponseHandler? ResponseReceived;
-        public event EventHandler<Request>? RequestReceived;
+        public delegate void ResponseHandlerDelegate(OcppSharpServer server, OcppClientConnection sender, Response resp, string causeType);
+        private delegate void ResponseHandlerDelegateInternal(OcppSharpServer server, OcppClientConnection sender, Response resp);
+        public delegate void RequestHandlerDelegate(OcppSharpServer server, OcppClientConnection sender, Request req);
+
+        public event ResponseHandlerDelegate? ResponseReceived;
+        private event ResponseHandlerDelegateInternal? ResponseReceivedInternal;
+        public event RequestHandlerDelegate? RequestReceived;
         public event EventHandler<OcppClientConnection>? WebSocketAccepted;
 
         private List<RequestHandler> handlers = new List<RequestHandler>();
         
         /// <summary>
-        /// 
+        /// Sets up an OCPP-Server using an existing Http Listener.
+        /// Only call StartLoop and StopLoop to start and stop the message processing.
         /// </summary>
         public OcppSharpServer(string urlPrefix, HttpListener listener, ProtocolVersion proto)
         {
@@ -52,6 +57,12 @@ namespace OcppSharp.Server
             SubPath = urlPrefix;
         }
 
+        /// <summary>
+        /// Sets up an OCPP-Server to listen on Port 80.
+        /// </summary>
+        public OcppSharpServer(string urlPrefix, ProtocolVersion proto) : this(urlPrefix, proto, 80)
+        { }
+        
         public OcppSharpServer(string urlPrefix, ProtocolVersion proto, ushort port)
         {
             OcppVersion = proto;
@@ -166,7 +177,7 @@ namespace OcppSharp.Server
             bool received = false;
             Response? resp = null;
 
-            ResponseHandler handler = (server, sender, r) => // A temporary (local scope) event handler to wait for incoming packets
+            ResponseHandlerDelegateInternal handler = (server, sender, r) => // A temporary (local scope) event handler to wait for incoming packets
             {
                 // If the Stations match and the Ids match, the response was received
                 if(sender != null && sender.Equals(station) && r.MessageId.Equals(id))
@@ -174,9 +185,11 @@ namespace OcppSharp.Server
                     resp = r;
                     OcppJson.DecodeResponseFull(resp, payloadType); // We can now decode the full response payload because we know the payload type
                     received = true; // Set to true to exit while loop below
+
+                    ResponseReceived?.Invoke(server, sender, r, payloadType);
                 }
             };
-            ResponseReceived += handler;
+            ResponseReceivedInternal += handler;
             
             if(station.Socket == null || station.Socket.State != WebSocketState.Open)
                 throw new Exception("The specified station has not yet initialized a connection.");
@@ -190,7 +203,7 @@ namespace OcppSharp.Server
             long startTime = Environment.TickCount64;
             while(!received && Environment.TickCount64 - startTime < RequestResponseTimeoutMs)
                 await Task.Delay(20); // Wait until the loop condition terminates
-            ResponseReceived -= handler; // Important: unregister; otherwise they would stack the more Requests are sent
+            ResponseReceivedInternal -= handler; // Important: unregister; otherwise they would stack the more Requests are sent
             if(resp == null)
                 throw new Exception("Timeout: Station did not answer back.");
             return resp;
@@ -227,7 +240,7 @@ namespace OcppSharp.Server
             string statId = Util.IdFromRequestLine(requestUri);
             OcppClientConnection s = RegisterStation(statId);
             s.Socket = webSocket;
-
+            s.EndPoint = (System.Net.IPEndPoint)listenerContext.Request.RemoteEndPoint;
             WebSocketAccepted?.Invoke(this, s);
             
             try
@@ -305,7 +318,7 @@ namespace OcppSharp.Server
                     
                     OcppClientConnection stat = RegisterStation(stationId);
                     
-                    RequestReceived?.Invoke(this, req);
+                    RequestReceived?.Invoke(this, stat, req);
 
                     if(req.Payload == null)
                         throw new NullReferenceException("Payload was null");
@@ -343,7 +356,7 @@ namespace OcppSharp.Server
                     resp.BaseJson = json;
                     
                     // Invoke the event (Used in SendRequestAsync)
-                    ResponseReceived?.Invoke(this, RegisterStation(stationId), resp);
+                    ResponseReceivedInternal?.Invoke(this, RegisterStation(stationId), resp);
                 }
 
                 // If everything above succeeded
