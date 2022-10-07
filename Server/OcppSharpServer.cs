@@ -199,7 +199,7 @@ namespace OcppSharp.Server
             
             if(station.Socket == null || station.Socket.State != WebSocketState.Open)
                 throw new Exception("The specified station has not yet initialized a connection.");
-            Log?.WriteLine($"Request (to {station.ID}): {json}");
+            Log?.WriteVerboseLine($"Request (to {station.ID}): {json}");
             
             byte[] bytes = Encoding.GetBytes(json);
 
@@ -318,7 +318,7 @@ namespace OcppSharp.Server
 
                 if(OcppJson.IsRequest(json))
                 {
-                    Log?.WriteLine($"Request (from {stationId}): {json}");
+                    Log?.WriteVerboseLine($"Request (from {stationId}): {json}");
 
                     // Deserialize JSON to a request object
                     Request req = OcppJson.DecodeRequest(json, OcppVersion);
@@ -351,7 +351,7 @@ namespace OcppSharp.Server
                     json = OcppJson.SerializeResponse(resp);
                     resp.BaseJson = json;
                     
-                    Log?.WriteLine($"Response (to {stationId}): {json}");
+                    Log?.WriteVerboseLine($"Response (to {stationId}): {json}");
 
                     // Send json to station
                     byte[] bytes = Encoding.GetBytes(json);
@@ -360,7 +360,7 @@ namespace OcppSharp.Server
                 } else
                 // Responses to our requests are handled differently
                 {
-                    Log?.WriteLine($"Response (from {stationId}): {json}");
+                    Log?.WriteVerboseLine($"Response (from {stationId}): {json}");
 
                     // Just parse the Response "header" (everything except payload)
                     Response resp = OcppJson.DecodeResponseCrude(json, OcppVersion);

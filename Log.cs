@@ -7,6 +7,8 @@ namespace OcppSharp
     {
         private TextWriter @out, err;
 
+        public bool Verbose { get; set; } = false;
+
         public Log(TextWriter @out, TextWriter err)
         {
             this.@out = @out;
@@ -30,6 +32,15 @@ namespace OcppSharp
 
         public virtual void WriteLine(string text, bool dateFormat = true) 
             => Write(GetDate(dateFormat) + text + @out.NewLine);
+        
+        public virtual void WriteVerbose(string text)
+        {
+            if(EnableLogging)
+                @out.Write(text);
+        }
+
+        public virtual void WriteVerboseLine(string text, bool dateFormat = true) 
+            => WriteVerbose(GetDate(dateFormat) + text + @out.NewLine);
         
         public virtual void WriteErr(string text)
         {
