@@ -47,7 +47,8 @@ namespace OcppSharp
                 }
             }
             
-            return null;
+            throw new FormatException($"Invalid enum value for {objectType.Name}: {reader.Value}");
+            //return null;
         }
 
         public override bool CanConvert(Type objectType)
