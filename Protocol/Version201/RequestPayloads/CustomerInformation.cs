@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "CustomerInformation", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class CustomerInformation : RequestPayload
+    public class CustomerInformationRequest : RequestPayload
     {
         public long requestId;
         public bool report;

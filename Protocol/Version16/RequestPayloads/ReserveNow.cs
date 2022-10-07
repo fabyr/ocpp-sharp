@@ -3,7 +3,7 @@ using System;
 namespace OcppSharp.Protocol.Version16.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ReserveNow", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class ReserveNow : RequestPayload
+    public class ReserveNowRequest : RequestPayload
     {
         public ulong connectorId;
         public DateTime expiryDate;

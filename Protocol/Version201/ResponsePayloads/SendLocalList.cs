@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.Types;
 namespace OcppSharp.Protocol.Version201.ResponsePayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "SendLocalList", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class SendLocalList : ResponsePayload
+    public class SendLocalListResponse : ResponsePayload
     {
         public SendLocalListStatusType.Enum status;
         public StatusInfo? statusInfo;

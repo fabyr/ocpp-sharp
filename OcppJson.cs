@@ -139,6 +139,7 @@ namespace OcppSharp
             JsonSerializer jse = new JsonSerializer();
             
             req.Payload = (RequestPayload?)array[3].ToObject(GetMap(version, false)[messageType], jse);
+            if(req.Payload != null) req.Payload.FullRequest = req;
             req.ProtocolVersion = version;
             return req;
         }
@@ -168,6 +169,7 @@ namespace OcppSharp
             JsonSerializer jse = new JsonSerializer();
             
             crudeResponse.Payload = (ResponsePayload?)array[2].ToObject(GetMap(crudeResponse.ProtocolVersion, true)[requestMessageType], jse);
+            if(crudeResponse.Payload != null) crudeResponse.Payload.FullResponse = crudeResponse;
         }
 
         // Serialize Response object to JSON

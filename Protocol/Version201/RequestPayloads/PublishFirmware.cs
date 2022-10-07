@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "PublishFirmware", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class PublishFirmware : RequestPayload
+    public class PublishFirmwareRequest : RequestPayload
     {
         public string location = string.Empty;
         public int? retries;

@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "RequestStopTransaction", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class RequestStopTransaction : RequestPayload
+    public class RequestStopTransactionRequest : RequestPayload
     {
         public CiString transactionId;
         

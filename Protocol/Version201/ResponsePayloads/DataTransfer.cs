@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.Types;
 namespace OcppSharp.Protocol.Version201.ResponsePayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "DataTransfer", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class DataTransfer : ResponsePayload
+    public class DataTransferResponse : ResponsePayload
     {
         public DataTransferStatusType.Enum status;
         public object? data;

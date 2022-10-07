@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyCustomerInformation", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class NotifyCustomerInformation : RequestPayload
+    public class NotifyCustomerInformationRequest : RequestPayload
     {
         public string data = string.Empty;
         public bool? tbc;

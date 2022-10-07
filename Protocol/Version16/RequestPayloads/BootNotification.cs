@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version16.MessageConstants;
 namespace OcppSharp.Protocol.Version16.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "BootNotification", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class BootNotification : RequestPayload
+    public class BootNotificationRequest : RequestPayload
     {
         public CiString? chargeBoxSerialNumber;
         public CiString chargePointModel = string.Empty;

@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "SetMonitoringBase", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class SetMonitoringBase : RequestPayload
+    public class SetMonitoringBaseRequest : RequestPayload
     {
         public MonitoringBaseType.Enum monitoringBase;
         

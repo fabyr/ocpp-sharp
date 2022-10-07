@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.Types;
 namespace OcppSharp.Protocol.Version201.ResponsePayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "GetReport", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class GetReport : ResponsePayload
+    public class GetReportResponse : ResponsePayload
     {
         public GenericDeviceModelStatusType.Enum status;
         public StatusInfo? statusInfo;

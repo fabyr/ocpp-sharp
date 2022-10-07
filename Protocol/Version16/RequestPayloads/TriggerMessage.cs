@@ -4,7 +4,7 @@ using OcppSharp.Protocol.Version16.Types;
 namespace OcppSharp.Protocol.Version16.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "TriggerMessage", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class TriggerMessage : RequestPayload
+    public class TriggerMessageRequest : RequestPayload
     {
         /// <summary>
         /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.MessageTrigger"/>

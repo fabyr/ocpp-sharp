@@ -3,7 +3,7 @@ using System;
 namespace OcppSharp.Protocol.Version16.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ChangeAvailability", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class ChangeAvailability : RequestPayload
+    public class ChangeAvailabilityRequest : RequestPayload
     {
         public ulong connectorId;
         

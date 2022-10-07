@@ -4,7 +4,7 @@ using OcppSharp.Protocol.Version201.Types;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "Authorize", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class Authorize : RequestPayload
+    public class AuthorizeRequest : RequestPayload
     {
         public string? certificate;
         public IdToken idToken = IdToken.Empty;

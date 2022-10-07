@@ -29,10 +29,7 @@ namespace OcppSharp.Server
         public System.Text.Encoding Encoding => System.Text.Encoding.UTF8;
 
         private ConcurrentDictionary<string, OcppClientConnection> stationMap = new ConcurrentDictionary<string, OcppClientConnection>();
-
-        public delegate void ResponseHandlerDelegate(OcppSharpServer server, OcppClientConnection sender, Response resp, string causeType);
         private delegate void ResponseHandlerDelegateInternal(OcppSharpServer server, OcppClientConnection sender, Response resp);
-        public delegate void RequestHandlerDelegate(OcppSharpServer server, OcppClientConnection sender, Request req);
 
         public event ResponseHandlerDelegate? ResponseReceived;
         public event ResponseHandlerDelegate? ResponseSent;
@@ -138,7 +135,7 @@ namespace OcppSharp.Server
                 throw new Exception("The requested Station does not exist.");
         }
 
-        public RequestHandler RegisterHandler(Type type, RequestHandler.RequestHandlerDelegate handler)
+        public RequestHandler RegisterHandler(Type type, RequestPayloadHandlerDelegate handler)
         {
             if(handlers.Any(x => x.OnType == type))
                 throw new ArgumentException("A handler has already been registered for this type.", "type");
@@ -147,9 +144,12 @@ namespace OcppSharp.Server
             return result;
         }
 
-        public RequestHandler RegisterHandler<T>(RequestHandler.RequestHandlerDelegate handler) where T : RequestPayload
+        public RequestHandler RegisterHandler<T>(RequestPayloadHandlerDelegateGeneric<T> handler) where T : RequestPayload
         {
-            return RegisterHandler(typeof(T), handler);
+            return RegisterHandler(typeof(T), (server, sender, req) =>
+            {
+                return handler(server, sender, (T)req);
+            });
         }
 
         public void UnregisterHandler(RequestHandler handler)
@@ -176,6 +176,7 @@ namespace OcppSharp.Server
             // Create Request object from payload
             Request req = new Protocol.Request(2, id, payloadType);
             req.Payload = payload;
+            payload.FullRequest = req;
 
             string json = OcppJson.SerializeRequest(req);
             req.BaseJson = json;
@@ -341,11 +342,12 @@ namespace OcppSharp.Server
                     }
 
                     // Handle the request
-                    ResponsePayload payload = handler.Handle(this, stat, req);
+                    ResponsePayload payload = handler.Handle(this, stat, req.Payload);
                     
                     // Make and send Response
                     Response resp = new Response(3, req.MessageId);
                     resp.Payload = payload;
+                    payload.FullResponse = resp;
 
                     // Serialize to JSON
                     json = OcppJson.SerializeResponse(resp);

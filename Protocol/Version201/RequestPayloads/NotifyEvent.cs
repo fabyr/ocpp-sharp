@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyEvent", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class NotifyEvent : RequestPayload
+    public class NotifyEventRequest : RequestPayload
     {
         public DateTime generatedAt;
         public bool? tbc;

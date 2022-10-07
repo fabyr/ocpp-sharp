@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "TriggerMessage", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class TriggerMessage : RequestPayload
+    public class TriggerMessageRequest : RequestPayload
     {
         public MessageTriggerType.Enum requestedMessage;
         public EVSE? evse;

@@ -4,7 +4,7 @@ using OcppSharp.Protocol.Version16.Types;
 namespace OcppSharp.Protocol.Version16.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "StopTransaction", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class StopTransaction : RequestPayload
+    public class StopTransactionRequest : RequestPayload
     {
         public CiString? idTag;
         public long meterStop;

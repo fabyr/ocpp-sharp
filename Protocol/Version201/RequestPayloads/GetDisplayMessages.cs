@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetDisplayMessages", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class GetDisplayMessages : RequestPayload
+    public class GetDisplayMessagesRequest : RequestPayload
     {
         public long[]? id;
         public long requestId;

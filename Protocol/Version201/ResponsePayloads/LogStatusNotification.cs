@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.Types;
 namespace OcppSharp.Protocol.Version201.ResponsePayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "LogStatusNotification", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class LogStatusNotification : ResponsePayload
+    public class LogStatusNotificationResponse : ResponsePayload
     {
     }
 }

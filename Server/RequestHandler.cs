@@ -5,26 +5,19 @@ namespace OcppSharp.Server
 {
     public class RequestHandler
     {
-        public delegate ResponsePayload RequestHandlerDelegate(OcppSharpServer server, OcppClientConnection station, Request req);
-
         public Type OnType { get; }
-        public RequestHandlerDelegate Handler { get; }
+        public RequestPayloadHandlerDelegate Handler { get; }
 
         private long Identity { get; }
 
-        public RequestHandler(Type t, RequestHandlerDelegate handler)
+        public RequestHandler(Type t, RequestPayloadHandlerDelegate handler)
         {
             this.OnType = t;
             this.Handler = handler;
             Identity = Util.NewID64();
         }
 
-        public static implicit operator RequestHandlerDelegate(RequestHandler value)
-        {
-            return value.Handler;
-        }
-
-        public ResponsePayload Handle(OcppSharpServer server, OcppClientConnection station, Request req)
+        public ResponsePayload Handle(OcppSharpServer server, OcppClientConnection station, RequestPayload req)
         {
             return Handler(server, station, req);
         }

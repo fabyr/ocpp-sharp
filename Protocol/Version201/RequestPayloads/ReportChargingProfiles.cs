@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "ReportChargingProfiles", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class ReportChargingProfiles : RequestPayload
+    public class ReportChargingProfilesRequest : RequestPayload
     {
         public long requestId;
         public ChargingLimitSourceType.Enum chargingLimitSource;

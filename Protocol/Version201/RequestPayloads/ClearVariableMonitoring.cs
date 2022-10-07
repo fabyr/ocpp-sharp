@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "ClearVariableMonitoring", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class ClearVariableMonitoring : RequestPayload
+    public class ClearVariableMonitoringRequest : RequestPayload
     {
         public long[] id = new long[0];
 

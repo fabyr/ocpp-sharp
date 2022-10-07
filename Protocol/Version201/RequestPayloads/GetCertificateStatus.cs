@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetCertificateStatus", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class GetCertificateStatus : RequestPayload
+    public class GetCertificateStatusRequest : RequestPayload
     {
         public OCSPRequestData ocspRequestData = OCSPRequestData.Empty;
 

@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetLog", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class GetLog : RequestPayload
+    public class GetLogRequest : RequestPayload
     {
         public LogType.Enum logType;
         public long requestId;

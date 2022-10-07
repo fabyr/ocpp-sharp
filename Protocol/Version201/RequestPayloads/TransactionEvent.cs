@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "TransactionEvent", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class TransactionEvent : RequestPayload
+    public class TransactionEventRequest : RequestPayload
     {
         public TransactionEventType.Enum eventType;
         public DateTime timestamp;

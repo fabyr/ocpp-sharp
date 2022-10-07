@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetReport", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class GetReport : RequestPayload
+    public class GetReportRequest : RequestPayload
     {
         public long requestId;
 

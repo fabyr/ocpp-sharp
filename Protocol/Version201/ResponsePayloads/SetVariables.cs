@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.Types;
 namespace OcppSharp.Protocol.Version201.ResponsePayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "SetVariables", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class SetVariables : ResponsePayload
+    public class SetVariablesResponse : ResponsePayload
     {
         /// <summary>
         /// Must contain atleast one element.

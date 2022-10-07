@@ -3,7 +3,7 @@ using System;
 namespace OcppSharp.Protocol.Version16.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ClearChargingProfile", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class ClearChargingProfile : RequestPayload
+    public class ClearChargingProfileRequest : RequestPayload
     {
         public long? id;
         public long? connectorId;

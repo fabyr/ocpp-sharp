@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "UpdateFirmware", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class UpdateFirmware : RequestPayload
+    public class UpdateFirmwareRequest : RequestPayload
     {
         public int? retries;
         public int? retryInterval;

@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "ClearedChargingLimit", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class ClearedChargingLimit : RequestPayload
+    public class ClearedChargingLimitRequest : RequestPayload
     {
         public ChargingLimitSourceType.Enum chargingLimitSource;
         public long evseId;

@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "ReserveNow", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
-    public class ReserveNow : RequestPayload
+    public class ReserveNowRequest : RequestPayload
     {
         public long id;
         public DateTime expiryDateTime;

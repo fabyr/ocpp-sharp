@@ -5,7 +5,7 @@ using OcppSharp.Protocol.Version201.Types;
 namespace OcppSharp.Protocol.Version201.ResponsePayloads
 {
     [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "RequestStopTransaction", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
-    public class RequestStopTransaction : ResponsePayload
+    public class RequestStopTransactionResponse : ResponsePayload
     {
         public RequestStartStopStatusType.Enum status;
         public StatusInfo? statusInfo;
