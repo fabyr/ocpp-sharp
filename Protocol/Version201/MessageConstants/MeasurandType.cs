@@ -62,7 +62,7 @@ namespace OcppSharp.Protocol.Version201.MessageConstants
 
         public const string CurrentExport = "Current.Export";
         public const string CurrentImport = "Current.Import";
-        public const string CurrentOffered = "CurrentOffered";
+        public const string CurrentOffered = "Current.Offered";
         public const string EnergyActiveExportRegister = "Energy.Active.Export.Register";
         public const string EnergyActiveImportRegister = "Energy.Active.Import.Register";
         public const string EnergyReactiveExportRegister = "Energy.Reactive.Export.Register";
