@@ -1,6 +1,6 @@
 using System;
 
-namespace OcppSharp.Protocol
+namespace OcppSharp.Protocol.Version16.Standard
 {
     public static class ConfigKey<T> where T : struct, System.Enum
     {
@@ -53,36 +53,7 @@ namespace OcppSharp.Protocol
             }
         }
 
-        public static TypeEditInfo GetEditInfo(T v)
-        {
-            TypeEditInfo info = new TypeEditInfo()
-            {
-                Arbitrary = false,
-                IsList = IsList(v),
-                IsIndexedList = IsIndexedList(v),
-                ValidType = GetValidType(v),
-                Unit = GetUnit(v) ?? string.Empty,
-            };
-            long min, max;
-            if(IsRangeLimited(v, out min, out max))
-            {
-                info.IsRangeLimited = true;
-                info.RangeMin = min;
-                info.RangeMax = max;
-            }
-            return info;
-        }
-
-        public static TypeEditInfo GetEditInfo(CiString key)
-        {
-            if(IsCoreProfileValue(key))
-            {
-                return GetEditInfo(GetEnumValue(key));
-            }
-            return new TypeEditInfo() { Arbitrary = true };
-        }
-
-        public static bool IsCoreProfileValue(CiString key)
+        public static bool IsStandardValue(CiString key)
         {
             return NameToEnum.ContainsKey(key);
         }
