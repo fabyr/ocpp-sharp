@@ -1,5 +1,4 @@
 # ocpp-sharp
-
 An implementation of the Open Charge Point Protocol (OCPP).
 
 Supported Versions:
@@ -8,13 +7,17 @@ Supported Versions:
 
 ## Dependencies
 - Newtonsoft.Json
+- .NET 6
 
 ## Features
 - C# Classes for every aspect of the OCPP Protocol.
 - Easy to set up server and event system for processing messages
 
-## Example
-```C#
+## What it isn't
+It's not a ready-to-go backend server. You still have to implement what happens once an OCPP-Message has been received and how respond accordingly.
+
+## Example Server
+```cs
 using System;
 using OcppSharp;
 using OcppSharp.Server;
