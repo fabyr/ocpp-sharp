@@ -9,19 +9,21 @@ namespace OcppSharp
 {
     public static class OcppJson
     {
-        private static Dictionary<CiString, Type> messageRequestTypeMap16; // Requests from Station
-        private static Dictionary<CiString, Type> messageResponseTypeMap16; // Responses from Station
-
-        private static Dictionary<CiString, Type> messageRequestTypeMap201; // Requests from Station
-        private static Dictionary<CiString, Type> messageResponseTypeMap201; // Responses from Station
+        private static Dictionary<ProtocolVersion, Dictionary<CiString, Type>> messageRequestTypeMap; // Requests from Station
+        private static Dictionary<ProtocolVersion, Dictionary<CiString, Type>> messageResponseTypeMap; // Responses from Station
         
         static OcppJson()
         {
-            messageRequestTypeMap16 = new Dictionary<CiString, Type>();
-            messageResponseTypeMap16 = new Dictionary<CiString, Type>();
-            messageRequestTypeMap201 = new Dictionary<CiString, Type>();
-            messageResponseTypeMap201 = new Dictionary<CiString, Type>();
+            messageRequestTypeMap = new();
+            messageResponseTypeMap = new();
 
+            ProtocolVersion[] versions = Enum.GetValues<ProtocolVersion>();
+            foreach(ProtocolVersion version in versions)
+            {
+                messageRequestTypeMap.Add(version, new());
+                messageResponseTypeMap.Add(version, new());
+            }
+            
             Assembly currentAssembly = Assembly.GetExecutingAssembly();
             // Scan the assembly for Types having a "[OcppMessage(...)]", and add the appropriate ones to the dictionaries
             foreach(Type type in currentAssembly.GetTypes()) {
@@ -32,12 +34,10 @@ namespace OcppSharp
                         switch(attr.MsgType)
                         {
                             case OcppMessageAttribute.MessageType.Request:
-                                (attr.Version  == ProtocolVersion.OCPP16 ? messageRequestTypeMap16 : messageRequestTypeMap201)
-                                    .Add(attr.Name, type);
+                                messageRequestTypeMap[attr.Version].Add(attr.Name, type);
                                 break;
                             case OcppMessageAttribute.MessageType.Response:
-                                (attr.Version  == ProtocolVersion.OCPP16 ? messageResponseTypeMap16 : messageResponseTypeMap201)
-                                    .Add(attr.Name, type);
+                                messageResponseTypeMap[attr.Version].Add(attr.Name, type);
                                 break;
                         }
                 }
@@ -113,19 +113,7 @@ namespace OcppSharp
 
         private static Dictionary<CiString, Type> GetMap(ProtocolVersion version, bool responseMap)
         {
-            Dictionary<CiString, Type> map;
-            switch(version)
-            {
-                case ProtocolVersion.OCPP16:
-                    map = responseMap ? messageResponseTypeMap16 : messageRequestTypeMap16;
-                    break;
-                case ProtocolVersion.OCPP201:
-                    map = responseMap ? messageResponseTypeMap201 : messageRequestTypeMap201;
-                    break;
-                default:
-                    throw new Exception();
-            }
-            return map;
+            return responseMap ? messageResponseTypeMap[version] : messageRequestTypeMap[version];
         }
 
         // Decodes a Request JSON to the corresponding object, always of base type Request
