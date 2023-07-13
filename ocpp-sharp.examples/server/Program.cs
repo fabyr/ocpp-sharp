@@ -10,7 +10,7 @@ namespace OcppSharp.Examples.Server
     {
         public static void Main(string[] args)
         {
-            // set up a server to listen on port 80
+            // set up a server to listen on port 8000
             // Stations will be connecting to ws://<Hostname>/ocpp16/<Station ID>
             OcppSharpServer server = new OcppSharpServer("/ocpp16", ProtocolVersion.OCPP16, 8000);
             //server.Log = null; // Disable console logging
