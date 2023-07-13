@@ -4,7 +4,7 @@ using OcppSharp.Protocol.Version201.Types;
 
 namespace OcppSharp.Protocol.Version201.ResponsePayloads
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "ClearCache", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
+    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "ClearCache", OcppMessageAttribute.Direction.PointToCentral)]
     public class ClearCacheResponse : ResponsePayload
     {
         public ClearCacheStatusType.Enum status;

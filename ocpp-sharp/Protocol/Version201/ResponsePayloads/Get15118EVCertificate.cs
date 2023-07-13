@@ -4,7 +4,7 @@ using OcppSharp.Protocol.Version201.Types;
 
 namespace OcppSharp.Protocol.Version201.ResponsePayloads
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "Get15118EVCertificate", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
+    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "Get15118EVCertificate", OcppMessageAttribute.Direction.PointToCentral)]
     public class Get15118EVCertificateResponse : ResponsePayload
     {
         public Iso15118EVCertificateStatusType.Enum status;

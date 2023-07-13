@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ocpp-sharp", "ocpp-sharp\ocpp-sharp.csproj", "{FBD5619B-9ADB-4964-B679-C195BA64C7AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ocpp-sharp.examples", "ocpp-sharp.examples\ocpp-sharp.examples.csproj", "{FAE1FFE2-5207-4B41-9F85-F9ECC2945CC3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

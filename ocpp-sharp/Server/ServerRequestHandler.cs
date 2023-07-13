@@ -3,14 +3,14 @@ using OcppSharp.Protocol;
 
 namespace OcppSharp.Server
 {
-    public class RequestHandler
+    public class ServerRequestHandler
     {
         public Type OnType { get; }
         public RequestPayloadHandlerDelegate Handler { get; }
 
         private long Identity { get; }
 
-        public RequestHandler(Type t, RequestPayloadHandlerDelegate handler)
+        public ServerRequestHandler(Type t, RequestPayloadHandlerDelegate handler)
         {
             this.OnType = t;
             this.Handler = handler;
@@ -29,9 +29,9 @@ namespace OcppSharp.Server
 
         public override bool Equals(object? obj)
         {
-            if(obj == null || !(obj is RequestHandler))
+            if(obj == null || !(obj is ServerRequestHandler))
                 return false;
-            return ((RequestHandler)obj).Identity == Identity;
+            return ((ServerRequestHandler)obj).Identity == Identity;
         }
     }
 }

@@ -37,17 +37,15 @@ namespace OcppSharp.Protocol
         public Direction Dir { get; }
         public MessageType MsgType { get; }
         public string Name { get; }
-
-        public bool AddToMap { get; }
+        
         public ProtocolVersion Version { get; }
 
-        public OcppMessageAttribute(ProtocolVersion ver, MessageType messageType, string name, Direction direction, bool addToMap = false)
+        public OcppMessageAttribute(ProtocolVersion ver, MessageType messageType, string name, Direction direction)
         {
             this.Version = ver;
             this.MsgType = messageType;
             this.Dir = direction;
             this.Name = name;
-            this.AddToMap = addToMap;
         }
     }
 

@@ -2,7 +2,7 @@ using System;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "StatusNotification", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
+    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "StatusNotification", OcppMessageAttribute.Direction.PointToCentral)]
     public class StatusNotificationRequest : RequestPayload
     {
         public ulong connectorId;

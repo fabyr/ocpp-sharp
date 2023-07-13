@@ -4,7 +4,7 @@ using OcppSharp.Protocol.Version201.MessageConstants;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyMonitoringReport", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
+    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyMonitoringReport", OcppMessageAttribute.Direction.PointToCentral)]
     public class NotifyMonitoringReportRequest : RequestPayload
     {
         public long requestId;

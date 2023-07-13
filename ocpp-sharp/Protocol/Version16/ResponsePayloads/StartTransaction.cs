@@ -3,7 +3,7 @@ using OcppSharp.Protocol.Version16.Types;
 
 namespace OcppSharp.Protocol.Version16.ResponsePayloads
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "StartTransaction", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
+    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "StartTransaction", OcppMessageAttribute.Direction.CentralToPoint)]
     public class StartTransactionResponse : ResponsePayload
     {
         public IdTagInfo idTagInfo = IdTagInfo.Empty;

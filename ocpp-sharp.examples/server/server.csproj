@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\ocpp-sharp\ocpp-sharp.csproj" />
+    <ProjectReference Include="..\..\ocpp-sharp\ocpp-sharp.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

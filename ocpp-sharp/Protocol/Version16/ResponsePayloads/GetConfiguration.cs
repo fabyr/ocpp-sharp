@@ -3,7 +3,7 @@ using OcppSharp.Protocol.Version16.Types;
 
 namespace OcppSharp.Protocol.Version16.ResponsePayloads
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "GetConfiguration", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
+    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "GetConfiguration", OcppMessageAttribute.Direction.PointToCentral)]
     public class GetConfigurationResponse : ResponsePayload
     {
         public KeyValue[]? configurationKey;

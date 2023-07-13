@@ -2,7 +2,7 @@ using System;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ClearChargingProfile", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
+    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ClearChargingProfile", OcppMessageAttribute.Direction.CentralToPoint)]
     public class ClearChargingProfileRequest : RequestPayload
     {
         public long? id;

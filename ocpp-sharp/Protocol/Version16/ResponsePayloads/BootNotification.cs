@@ -2,7 +2,7 @@ using System;
 
 namespace OcppSharp.Protocol.Version16.ResponsePayloads
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "BootNotification", OcppMessageAttribute.Direction.CentralToPoint, addToMap: false)]
+    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "BootNotification", OcppMessageAttribute.Direction.CentralToPoint)]
     public class BootNotificationResponse : ResponsePayload
     {
         public DateTime currentTime;

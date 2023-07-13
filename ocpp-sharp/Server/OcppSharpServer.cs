@@ -17,6 +17,7 @@ namespace OcppSharp.Server
 
         public ProtocolVersion OcppVersion { get; }
         public string SubPath { get; }
+        public bool Active { get; private set; } = false;
 
         private bool _stopLoop = false;
 
@@ -39,7 +40,7 @@ namespace OcppSharp.Server
         public event RequestHandlerDelegate? RequestSent;
         public event EventHandler<OcppClientConnection>? WebSocketAccepted;
 
-        private List<RequestHandler> handlers = new List<RequestHandler>();
+        private List<ServerRequestHandler> handlers = new List<ServerRequestHandler>();
         
         /// <summary>
         /// Sets up an OCPP-Server using an existing Http Listener.
@@ -103,14 +104,20 @@ namespace OcppSharp.Server
 
         public void Start()
         {
+            if(Active)
+                throw new InvalidOperationException("Already started.");
             _server.Start();
             StartLoop();
+            Active = true;
         }
 
         public void Stop()
         {
+            if(!Active)
+                return;
             StopLoop();
             _server.Stop();
+            Active = false;
         }
 
         /// <summary>
@@ -135,16 +142,16 @@ namespace OcppSharp.Server
                 throw new Exception("The requested Station does not exist.");
         }
 
-        public RequestHandler RegisterHandler(Type type, RequestPayloadHandlerDelegate handler)
+        public ServerRequestHandler RegisterHandler(Type type, RequestPayloadHandlerDelegate handler)
         {
             if(handlers.Any(x => x.OnType == type))
                 throw new ArgumentException("A handler has already been registered for this type.", "type");
-            RequestHandler result = new RequestHandler(type, handler);
+            ServerRequestHandler result = new ServerRequestHandler(type, handler);
             handlers.Add(result);
             return result;
         }
 
-        public RequestHandler RegisterHandler<T>(RequestPayloadHandlerDelegateGeneric<T> handler) where T : RequestPayload
+        public ServerRequestHandler RegisterHandler<T>(RequestPayloadHandlerDelegateGeneric<T> handler) where T : RequestPayload
         {
             return RegisterHandler(typeof(T), (server, sender, req) =>
             {
@@ -152,7 +159,7 @@ namespace OcppSharp.Server
             });
         }
 
-        public void UnregisterHandler(RequestHandler handler)
+        public void UnregisterHandler(ServerRequestHandler handler)
         {
             handlers.Remove(handler);
         }
@@ -333,7 +340,7 @@ namespace OcppSharp.Server
                         throw new NullReferenceException("Payload was null");
                     
                     Type t = req.Payload.GetType();
-                    RequestHandler? handler = handlers.FirstOrDefault(x => x.OnType == t);
+                    ServerRequestHandler? handler = handlers.FirstOrDefault(x => x.OnType == t);
                     string? mIdent = Util.GetMessageIdentifier(t);
                     if(mIdent == null || handler == null)
                     {

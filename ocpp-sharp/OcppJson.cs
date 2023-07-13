@@ -30,7 +30,7 @@ namespace OcppSharp
                 OcppMessageAttribute[] attrs;
                 if ((attrs = (OcppMessageAttribute[])type.GetCustomAttributes(typeof(OcppMessageAttribute), true)).Length == 1) {
                     OcppMessageAttribute attr = attrs[0];
-                    if(attr.AddToMap && attr.Dir == OcppMessageAttribute.Direction.PointToCentral)
+                    //if(attr.AddToMap && attr.Dir == OcppMessageAttribute.Direction.PointToCentral)
                         switch(attr.MsgType)
                         {
                             case OcppMessageAttribute.MessageType.Request:

@@ -3,7 +3,7 @@ using OcppSharp.Protocol.Version16.Types;
 
 namespace OcppSharp.Protocol.Version16.ResponsePayloads
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "RemoteStartTransaction", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
+    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "RemoteStartTransaction", OcppMessageAttribute.Direction.PointToCentral)]
     public class RemoteStartTransactionResponse : ResponsePayload
     {
         /// <summary>

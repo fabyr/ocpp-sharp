@@ -2,7 +2,7 @@ using System;
 
 namespace OcppSharp.Protocol.Version16.ResponsePayloads
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "TriggerMessage", OcppMessageAttribute.Direction.PointToCentral, addToMap: true)]
+    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "TriggerMessage", OcppMessageAttribute.Direction.PointToCentral)]
     public class TriggerMessageResponse : ResponsePayload
     {
         /// <summary>
