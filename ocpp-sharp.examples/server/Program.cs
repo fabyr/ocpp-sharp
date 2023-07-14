@@ -8,11 +8,22 @@ namespace OcppSharp.Examples.Server
 {
     public class Program
     {
+        private static ManualResetEvent _closeEvent = new ManualResetEvent(false);
+
         public static void Main(string[] args)
         {
+            Console.CancelKeyPress += (s, e) =>
+            {
+                e.Cancel = true;
+                Console.WriteLine("Ctrl+C detected. Shutting down...");
+                _closeEvent.Set();
+            };
+
+            const int port = 8000;
+
             // set up a server to listen on port 8000
             // Stations will be connecting to ws://<Hostname>/ocpp16/<Station ID>
-            OcppSharpServer server = new OcppSharpServer("/ocpp16", ProtocolVersion.OCPP16, 8000);
+            OcppSharpServer server = new OcppSharpServer("/ocpp16", ProtocolVersion.OCPP16, port);
             //server.Log = null; // Disable console logging
             server.RegisterHandler<BootNotificationRequest>((server, sender, req) => {
 
@@ -30,8 +41,8 @@ namespace OcppSharp.Examples.Server
             });
 
             server.Start();
-            Console.WriteLine("Server started!");
-            Console.ReadLine();
+            Console.WriteLine($"Server started on port {port}!");
+            _closeEvent.WaitOne();
             server.Stop();
         }
     }

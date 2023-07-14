@@ -10,8 +10,17 @@ namespace OcppSharp.Examples.Client
 {
     public class Program
     {
+        private static ManualResetEvent _closeEvent = new ManualResetEvent(false);
+
         public static async Task Main(string[] args)
         {
+            Console.CancelKeyPress += (s, e) =>
+            {
+                e.Cancel = true;
+                Console.WriteLine("Ctrl+C detected. Shutting down...");
+                _closeEvent.Set();
+            };
+
             using(OcppSharpClient client = new OcppSharpClient("ws://localhost:8000/ocpp16/example_id_1234", ProtocolVersion.OCPP16))
             {
                 // Example handler
@@ -42,7 +51,7 @@ namespace OcppSharp.Examples.Client
                 // Example output of full json
                 Console.WriteLine($"Got BootNotification response: {resp.BaseJson}");
 
-                Console.ReadLine();
+                _closeEvent.WaitOne();
                 client.Disconnect();
                 Console.WriteLine("Stopped.");
             }
