@@ -1,5 +1,5 @@
 # ocpp-sharp
-An implementation of the Open Charge Point Protocol (OCPP).
+An implementation of the [Open Charge Point Protocol](https://www.openchargealliance.org/protocols/) (`OCPP`) in C#.
 
 Supported Versions:
 - Ocpp 1.6
@@ -10,11 +10,30 @@ Supported Versions:
 - .NET 6
 
 ## Features
-- C# Classes for every aspect of the OCPP Protocol.
-- Easy to set up server and event system for processing messages
+- C# Classes for all messages of the OCPP-Protocol.
+- Easy to set up server and event system for processing messages.
 
 ## What it isn't
 It's not a ready-to-go backend server. You still have to implement what happens once an OCPP-Message has been received and how respond accordingly.
+
+## Possible use cases
+- Automating certain ocpp-communication
+- Emulating a charge point
+- Implementation of a basic backend server for charge points
+
+## Examples
+A minimalistic client and server example can be found under [/ocpp-sharp.examples](/ocpp-sharp.examples)
+
+Running the functionality test (Single test message communication on `localhost`):
+```
+cd ./ocpp-sharp.examples/server
+dotnet run
+```
+
+```
+cd ./ocpp-sharp.examples/client
+dotnet run
+```
 
 ## Example Server
 ```cs
