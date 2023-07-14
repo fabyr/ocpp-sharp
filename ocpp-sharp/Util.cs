@@ -14,10 +14,7 @@ namespace OcppSharp
 
         public static long NewID64()
         {
-            byte[] data = new byte[8];
-            using(var rng = RandomNumberGenerator.Create())
-                rng.GetBytes(data);
-            return BitConverter.ToInt64(data, 0);
+            return BitConverter.ToInt64(Guid.NewGuid().ToByteArray(), 2);
         }
 
         public static long NewID32()
