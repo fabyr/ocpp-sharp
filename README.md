@@ -5,6 +5,15 @@ Supported Versions:
 - Ocpp 1.6
 - Ocpp 2.0.1
 
+## Table of contents
+- [Dependencies](#dependencies)
+- [Features](#features)
+- [What it isn't](#what-it-isnt)
+- [Possible use cases](#possible-use-cases)
+- [Running the Examples](#running-the-examples)
+- [Basic Server Code](#basic-server-code)
+- [Motivation](#motivation)
+
 ## Dependencies
 - Newtonsoft.Json
 - .NET 6
@@ -21,7 +30,7 @@ It's not a ready-to-go backend server. You still have to implement what happens 
 - Emulating a charge point
 - Implementation of a basic backend server for charge points
 
-## Examples
+## Running the Examples
 A minimalistic client and server example can be found under [/ocpp-sharp.examples](/ocpp-sharp.examples)
 
 Running the functionality test (Single test message communication on `localhost`):
@@ -35,7 +44,7 @@ cd ./ocpp-sharp.examples/client
 dotnet run
 ```
 
-## Example Server
+## Basic Server Code
 ```cs
 using System;
 using OcppSharp;
@@ -76,3 +85,7 @@ namespace OcppApp
     }
 }
 ```
+
+## Motivation
+This project was part of a private OCPP-Backend project.
+It was then split up into its own project here.
