@@ -6,8 +6,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>ocpp_sharp.examples</RootNamespace>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>OcppSharp.Examples.Server</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
