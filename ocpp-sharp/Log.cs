@@ -6,9 +6,7 @@ namespace OcppSharp
     public class Log
     {
         private TextWriter @out, err;
-
-        public bool Verbose { get; set; } = false;
-
+        
         public Log(TextWriter @out, TextWriter err)
         {
             this.@out = @out;
