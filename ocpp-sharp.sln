@@ -5,6 +5,12 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ocpp-sharp", "ocpp-sharp\ocpp-sharp.csproj", "{FBD5619B-9ADB-4964-B679-C195BA64C7AE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ocpp-sharp.examples", "ocpp-sharp.examples", "{CBA7312D-CDAB-4BBE-912A-AB1B7D91CA6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "client", "ocpp-sharp.examples\client\client.csproj", "{AAD2A570-DC0B-4C51-808A-2DDB9A978BB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "server", "ocpp-sharp.examples\server\server.csproj", "{68B7045E-F0B7-4563-8ADE-8E60A8EB4CFC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,5 +28,17 @@ Global
 		{FAE1FFE2-5207-4B41-9F85-F9ECC2945CC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAE1FFE2-5207-4B41-9F85-F9ECC2945CC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAE1FFE2-5207-4B41-9F85-F9ECC2945CC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAD2A570-DC0B-4C51-808A-2DDB9A978BB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAD2A570-DC0B-4C51-808A-2DDB9A978BB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAD2A570-DC0B-4C51-808A-2DDB9A978BB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAD2A570-DC0B-4C51-808A-2DDB9A978BB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68B7045E-F0B7-4563-8ADE-8E60A8EB4CFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68B7045E-F0B7-4563-8ADE-8E60A8EB4CFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68B7045E-F0B7-4563-8ADE-8E60A8EB4CFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68B7045E-F0B7-4563-8ADE-8E60A8EB4CFC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AAD2A570-DC0B-4C51-808A-2DDB9A978BB8} = {CBA7312D-CDAB-4BBE-912A-AB1B7D91CA6D}
+		{68B7045E-F0B7-4563-8ADE-8E60A8EB4CFC} = {CBA7312D-CDAB-4BBE-912A-AB1B7D91CA6D}
 	EndGlobalSection
 EndGlobal
