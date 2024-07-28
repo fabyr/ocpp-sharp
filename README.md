@@ -1,5 +1,5 @@
 # ocpp-sharp
-An implementation of the [Open Charge Point Protocol](https://www.openchargealliance.org/protocols/) (`OCPP`) in C#.
+An implementation of the [Open Charge Point Protocol](https://openchargealliance.org/protocols/open-charge-point-protocol/) (`OCPP`) in C#.
 
 Supported Versions:
 - Ocpp 1.6
@@ -16,7 +16,7 @@ Supported Versions:
 
 ## Dependencies
 - Newtonsoft.Json
-- .NET 6
+- .NET 8
 
 ## Features
 - C# Classes for all messages of the OCPP-Protocol.
