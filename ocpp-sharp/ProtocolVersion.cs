@@ -1,9 +1,7 @@
-using System;
-namespace OcppSharp
+namespace OcppSharp;
+
+public enum ProtocolVersion
 {
-    public enum ProtocolVersion
-    {
-        OCPP16,
-        OCPP201
-    }
+    OCPP16,
+    OCPP201
 }

@@ -1,14 +1,14 @@
-using System;
-using OcppSharp.Protocol.Version201.Types;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "CertificateSigned", OcppMessageAttribute.Direction.CentralToPoint)]
+public class CertificateSignedRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "CertificateSigned", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class CertificateSignedRequest : RequestPayload
-    {
-        public string certificateChain = string.Empty;
-        public CertificateSigningUseType.Enum certificateType;
+    [JsonProperty("certificateChain")]
+    public string CertificateChain { get; set; } = string.Empty;
 
-    }
+    [JsonProperty("certificateType")]
+    public CertificateSigningUseType.Enum CertificateType { get; set; }
 }

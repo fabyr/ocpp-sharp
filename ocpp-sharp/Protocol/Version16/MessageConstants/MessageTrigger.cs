@@ -1,32 +1,36 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.MessageConstants
+namespace OcppSharp.Protocol.Version16.MessageConstants;
+
+public static class MessageTrigger
 {
-    public static class MessageTrigger
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(MessageTrigger.BootNotification)]
-            BootNotification,
-            [StringValue(MessageTrigger.DiagnosticsStatusNotification)]
-            DiagnosticsStatusNotification,
-            [StringValue(MessageTrigger.FirmwareStatusNotification)]
-            FirmwareStatusNotification,
-            [StringValue(MessageTrigger.Heartbeat)]
-            Heartbeat,
-            [StringValue(MessageTrigger.MeterValues)]
-            MeterValues,
-            [StringValue(MessageTrigger.StatusNotification)]
-            StatusNotification
-        }
+        [StringValue(MessageTrigger.BootNotification)]
+        BootNotification,
 
-        public const string BootNotification = "BootNotification";
-        public const string DiagnosticsStatusNotification = "DiagnosticsStatusNotification";
-        public const string FirmwareStatusNotification = "FirmwareStatusNotification";
-        public const string Heartbeat = "Heartbeat";
-        public const string MeterValues = "MeterValues";
-        public const string StatusNotification = "StatusNotification";
+        [StringValue(MessageTrigger.DiagnosticsStatusNotification)]
+        DiagnosticsStatusNotification,
+
+        [StringValue(MessageTrigger.FirmwareStatusNotification)]
+        FirmwareStatusNotification,
+
+        [StringValue(MessageTrigger.Heartbeat)]
+        Heartbeat,
+
+        [StringValue(MessageTrigger.MeterValues)]
+        MeterValues,
+
+        [StringValue(MessageTrigger.StatusNotification)]
+        StatusNotification
     }
+
+    public const string BootNotification = "BootNotification";
+    public const string DiagnosticsStatusNotification = "DiagnosticsStatusNotification";
+    public const string FirmwareStatusNotification = "FirmwareStatusNotification";
+    public const string Heartbeat = "Heartbeat";
+    public const string MeterValues = "MeterValues";
+    public const string StatusNotification = "StatusNotification";
 }

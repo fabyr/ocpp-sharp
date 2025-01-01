@@ -1,14 +1,14 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "SetNetworkProfile", OcppMessageAttribute.Direction.CentralToPoint)]
+public class SetNetworkProfileRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "SetNetworkProfile", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class SetNetworkProfileRequest : RequestPayload
-    {
-        public int configurationSlot;
-        public NetworkConnectionProfile connectionData;
-        
-    }
+    [JsonProperty("configurationSlot")]
+    public int ConfigurationSlot { get; set; }
+
+    [JsonProperty("connectionData")]
+    public NetworkConnectionProfile ConnectionData { get; set; }
 }

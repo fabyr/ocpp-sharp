@@ -1,15 +1,17 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyEVChargingNeeds", OcppMessageAttribute.Direction.PointToCentral)]
+public class NotifyEVChargingNeedsRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyEVChargingNeeds", OcppMessageAttribute.Direction.PointToCentral)]
-    public class NotifyEVChargingNeedsRequest : RequestPayload
-    {
-        public int? maxScheduleTuples;
-        public long evseId;
-        public ChargingNeeds chargingNeeds;
+    [JsonProperty("maxScheduleTuples")]
+    public int? MaxScheduleTuples { get; set; }
 
-    }
+    [JsonProperty("evseId")]
+    public long EvseId { get; set; }
+
+    [JsonProperty("chargingNeeds")]
+    public ChargingNeeds ChargingNeeds { get; set; }
 }

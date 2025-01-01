@@ -1,22 +1,24 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class MutabilityType
 {
-    public static class MutabilityType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(MutabilityType.ReadOnly)]
-            ReadOnly,
-            [StringValue(MutabilityType.WriteOnly)]
-            WriteOnly,
-            [StringValue(MutabilityType.ReadWrite)]
-            ReadWrite
-        }
-        public const string ReadOnly = "ReadOnly";
-        public const string WriteOnly = "WriteOnly";
-        public const string ReadWrite = "ReadWrite";
+        [StringValue(MutabilityType.ReadOnly)]
+        ReadOnly,
+
+        [StringValue(MutabilityType.WriteOnly)]
+        WriteOnly,
+
+        [StringValue(MutabilityType.ReadWrite)]
+        ReadWrite
     }
+
+    public const string ReadOnly = "ReadOnly";
+    public const string WriteOnly = "WriteOnly";
+    public const string ReadWrite = "ReadWrite";
 }

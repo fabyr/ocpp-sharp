@@ -1,19 +1,24 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct ChargingProfileCriterion
 {
-    public struct ChargingProfileCriterion
-    {
-        public static readonly ChargingProfileCriterion Empty = new ChargingProfileCriterion();
+    public static readonly ChargingProfileCriterion Empty = new();
 
-        public ChargingProfilePurposeType.Enum? chargingProfilePurpose;
-        public int? stackLevel;
-        public int[]? chargingProfileId;
+    [JsonProperty("chargingProfilePurpose")]
+    public ChargingProfilePurposeType.Enum? ChargingProfilePurpose { get; set; }
 
-        /// <summary>
-        /// Array length must not exceed 4.
-        /// </summary>
-        public ChargingLimitSourceType.Enum[]? chargingLimitSource;
-    }
+    [JsonProperty("stackLevel")]
+    public int? StackLevel { get; set; }
+
+    [JsonProperty("chargingProfileId")]
+    public int[]? ChargingProfileId { get; set; }
+
+    /// <summary>
+    /// Array length must not exceed 4.
+    /// </summary>
+    [JsonProperty("chargingLimitSource")]
+    public ChargingLimitSourceType.Enum[]? ChargingLimitSource { get; set; }
 }

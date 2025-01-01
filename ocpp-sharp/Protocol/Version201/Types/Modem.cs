@@ -1,13 +1,14 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct Modem
 {
-    public struct Modem
-    {
-        public static readonly Modem Empty = new Modem();
+    public static readonly Modem Empty = new();
 
-        public CiString iccid;
-        public CiString imsi;
-    }
+    [JsonProperty("iccid")]
+    public CiString Iccid { get; set; }
+
+    [JsonProperty("imsi")]
+    public CiString Imsi { get; set; }
 }

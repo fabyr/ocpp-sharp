@@ -1,15 +1,17 @@
-using System;
-using OcppSharp.Protocol.Version201.Types;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "PublishFirmwareStatusNotification", OcppMessageAttribute.Direction.PointToCentral)]
+public class PublishFirmwareStatusNotificationRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "PublishFirmwareStatusNotification", OcppMessageAttribute.Direction.PointToCentral)]
-    public class PublishFirmwareStatusNotificationRequest : RequestPayload
-    {
-        public PublishFirmwareStatusType.Enum status;
-        public string[]? location;
-        public long? requestId;
-        
-    }
+    [JsonProperty("status")]
+    public PublishFirmwareStatusType.Enum Status { get; set; }
+
+    [JsonProperty("location")]
+    public string[]? Location { get; set; }
+
+    [JsonProperty("requestId")]
+    public long? RequestId { get; set; }
 }

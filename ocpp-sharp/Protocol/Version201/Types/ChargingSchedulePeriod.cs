@@ -1,15 +1,20 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct ChargingSchedulePeriod
 {
-    public struct ChargingSchedulePeriod
-    {
-        public static readonly ChargingSchedulePeriod Empty = new ChargingSchedulePeriod();
+    public static readonly ChargingSchedulePeriod Empty = new();
 
-        public long startPeriod;
-        public double limit;
-        public int? numberPhases;
-        public int? phaseToUse;
-    }
+    [JsonProperty("startPeriod")]
+    public long StartPeriod { get; set; }
+
+    [JsonProperty("limit")]
+    public double Limit { get; set; }
+
+    [JsonProperty("numberPhases")]
+    public int? NumberPhases { get; set; }
+
+    [JsonProperty("phaseToUse")]
+    public int? PhaseToUse { get; set; }
 }

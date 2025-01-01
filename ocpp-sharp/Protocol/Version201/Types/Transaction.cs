@@ -1,16 +1,24 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct Transaction
 {
-    public struct Transaction
-    {
-        public static readonly Transaction Empty = new Transaction();
+    public static readonly Transaction Empty = new();
 
-        public CiString transactionId;
-        public ChargingStateType.Enum? chargingState;
-        public int? timeSpentCharging;
-        public ReasonType.Enum? stoppedReason;
-        public long? remoteStartId;
-    }
+    [JsonProperty("transactionId")]
+    public CiString TransactionId { get; set; }
+
+    [JsonProperty("chargingState")]
+    public ChargingStateType.Enum? ChargingState { get; set; }
+
+    [JsonProperty("timeSpentCharging")]
+    public int? TimeSpentCharging { get; set; }
+
+    [JsonProperty("stoppedReason")]
+    public ReasonType.Enum? StoppedReason { get; set; }
+
+    [JsonProperty("remoteStartId")]
+    public long? RemoteStartId { get; set; }
 }

@@ -1,13 +1,17 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.Types
+namespace OcppSharp.Protocol.Version16.Types;
+
+public struct KeyValue
 {
-    public struct KeyValue
-    {
-        public static readonly KeyValue Empty = new KeyValue();
+    public static readonly KeyValue Empty = new();
 
-        public CiString key;
-        public bool @readonly;
-        public CiString? value;
-    }
+    [JsonProperty("key")]
+    public CiString Key { get; set; }
+
+    [JsonProperty("readonly")]
+    public bool ReadOnly { get; set; }
+
+    [JsonProperty("value")]
+    public CiString? Value { get; set; }
 }

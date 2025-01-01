@@ -1,19 +1,20 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.MessageConstants
+namespace OcppSharp.Protocol.Version16.MessageConstants;
+
+public static class CancelReservationStatus
 {
-    public static class CancelReservationStatus
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(CancelReservationStatus.Accepted)]
-            Accepted,
-            [StringValue(CancelReservationStatus.Rejected)]
-            Rejected
-        }
-        public const string Accepted = "Accepted";
-        public const string Rejected = "Rejected";
+        [StringValue(CancelReservationStatus.Accepted)]
+        Accepted,
+
+        [StringValue(CancelReservationStatus.Rejected)]
+        Rejected
     }
+
+    public const string Accepted = "Accepted";
+    public const string Rejected = "Rejected";
 }

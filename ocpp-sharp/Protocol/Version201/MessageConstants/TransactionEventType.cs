@@ -1,22 +1,24 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class TransactionEventType
 {
-    public static class TransactionEventType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(TransactionEventType.Ended)]
-            Ended,
-            [StringValue(TransactionEventType.Started)]
-            Started,
-            [StringValue(TransactionEventType.Updated)]
-            Updated
-        }
-        public const string Ended = "Ended";
-        public const string Started = "Started";
-        public const string Updated = "Updated";
+        [StringValue(TransactionEventType.Ended)]
+        Ended,
+
+        [StringValue(TransactionEventType.Started)]
+        Started,
+
+        [StringValue(TransactionEventType.Updated)]
+        Updated
     }
+
+    public const string Ended = "Ended";
+    public const string Started = "Started";
+    public const string Updated = "Updated";
 }

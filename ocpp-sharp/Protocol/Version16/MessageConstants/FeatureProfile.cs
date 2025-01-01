@@ -1,32 +1,36 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.MessageConstants
+namespace OcppSharp.Protocol.Version16.MessageConstants;
+
+public static class FeatureProfile
 {
-    public static class FeatureProfile
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(FeatureProfile.Core)]
-			Core,
-            [StringValue(FeatureProfile.FirmwareManagement)]
-			FirmwareManagement,
-            [StringValue(FeatureProfile.LocalAuthListManagement)]
-			LocalAuthListManagement,
-            [StringValue(FeatureProfile.Reservation)]
-			Reservation,
-            [StringValue(FeatureProfile.SmartCharging)]
-			SmartCharging,
-            [StringValue(FeatureProfile.RemoteTrigger)]
-			RemoteTrigger
-        }
+        [StringValue(FeatureProfile.Core)]
+        Core,
 
-        public const string Core = "Core";
-        public const string FirmwareManagement = "FirmwareManagement";
-        public const string LocalAuthListManagement = "LocalAuthListManagement";
-        public const string Reservation = "Reservation";
-        public const string SmartCharging = "SmartCharging";
-        public const string RemoteTrigger = "RemoteTrigger";
+        [StringValue(FeatureProfile.FirmwareManagement)]
+        FirmwareManagement,
+
+        [StringValue(FeatureProfile.LocalAuthListManagement)]
+        LocalAuthListManagement,
+
+        [StringValue(FeatureProfile.Reservation)]
+        Reservation,
+
+        [StringValue(FeatureProfile.SmartCharging)]
+        SmartCharging,
+
+        [StringValue(FeatureProfile.RemoteTrigger)]
+        RemoteTrigger
     }
+
+    public const string Core = "Core";
+    public const string FirmwareManagement = "FirmwareManagement";
+    public const string LocalAuthListManagement = "LocalAuthListManagement";
+    public const string Reservation = "Reservation";
+    public const string SmartCharging = "SmartCharging";
+    public const string RemoteTrigger = "RemoteTrigger";
 }

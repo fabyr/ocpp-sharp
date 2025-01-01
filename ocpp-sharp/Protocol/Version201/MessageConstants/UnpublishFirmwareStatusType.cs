@@ -1,22 +1,24 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class UnpublishFirmwareStatusType
 {
-    public static class UnpublishFirmwareStatusType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(UnpublishFirmwareStatusType.DownloadOngoing)]
-            DownloadOngoing,
-            [StringValue(UnpublishFirmwareStatusType.NoFirmware)]
-            NoFirmware,
-            [StringValue(UnpublishFirmwareStatusType.Unpublished)]
-            Unpublished
-        }
-        public const string DownloadOngoing = "DownloadOngoing";
-        public const string NoFirmware = "NoFirmware";
-        public const string Unpublished = "Unpublished";
+        [StringValue(UnpublishFirmwareStatusType.DownloadOngoing)]
+        DownloadOngoing,
+
+        [StringValue(UnpublishFirmwareStatusType.NoFirmware)]
+        NoFirmware,
+
+        [StringValue(UnpublishFirmwareStatusType.Unpublished)]
+        Unpublished
     }
+
+    public const string DownloadOngoing = "DownloadOngoing";
+    public const string NoFirmware = "NoFirmware";
+    public const string Unpublished = "Unpublished";
 }

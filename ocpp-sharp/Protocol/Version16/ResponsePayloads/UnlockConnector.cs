@@ -1,13 +1,14 @@
-using System;
+using OcppSharp.Protocol.Version16.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.ResponsePayloads
+namespace OcppSharp.Protocol.Version16.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "UnlockConnector", OcppMessageAttribute.Direction.PointToCentral)]
+public class UnlockConnectorResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "UnlockConnector", OcppMessageAttribute.Direction.PointToCentral)]
-    public class UnlockConnectorResponse : ResponsePayload
-    {
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.UnlockStatus"/>
-        /// </summary>
-        public MessageConstants.UnlockStatus.Enum status;
-    }
+    /// <summary>
+    /// Valid values in <see cref="UnlockStatus"/>
+    /// </summary>
+    [JsonProperty("status")]
+    public UnlockStatus.Enum Status { get; set; }
 }

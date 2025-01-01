@@ -1,25 +1,28 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class MessageStateType
 {
-    public static class MessageStateType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(MessageStateType.Charging)]
-            Charging,
-            [StringValue(MessageStateType.Faulted)]
-            Faulted,
-            [StringValue(MessageStateType.Idle)]
-            Idle,
-            [StringValue(MessageStateType.Unavailable)]
-            Unavailable
-        }
-        public const string Charging = "Charging";
-        public const string Faulted = "Faulted";
-        public const string Idle = "Idle";
-        public const string Unavailable = "Unavailable";
+        [StringValue(MessageStateType.Charging)]
+        Charging,
+
+        [StringValue(MessageStateType.Faulted)]
+        Faulted,
+
+        [StringValue(MessageStateType.Idle)]
+        Idle,
+
+        [StringValue(MessageStateType.Unavailable)]
+        Unavailable
     }
+
+    public const string Charging = "Charging";
+    public const string Faulted = "Faulted";
+    public const string Idle = "Idle";
+    public const string Unavailable = "Unavailable";
 }

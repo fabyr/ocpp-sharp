@@ -1,10 +1,6 @@
-using System;
+namespace OcppSharp.Protocol.Version16.ResponsePayloads;
 
-namespace OcppSharp.Protocol.Version16.ResponsePayloads
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "StatusNotification", OcppMessageAttribute.Direction.CentralToPoint)]
+public class StatusNotificationResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "StatusNotification", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class StatusNotificationResponse : ResponsePayload
-    {
-        
-    }
 }

@@ -1,25 +1,28 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class GenericDeviceModelStatusType
 {
-    public static class GenericDeviceModelStatusType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(GenericDeviceModelStatusType.Accepted)]
-            Accepted,
-            [StringValue(GenericDeviceModelStatusType.Rejected)]
-            Rejected,
-            [StringValue(GenericDeviceModelStatusType.NotSupported)]
-            NotSupported,
-            [StringValue(GenericDeviceModelStatusType.EmptyResultSet)]
-            EmptyResultSet
-        }
-        public const string Accepted = "Accepted";
-        public const string Rejected = "Rejected";
-        public const string NotSupported = "NotSupported";
-        public const string EmptyResultSet = "EmptyResultSet";
+        [StringValue(GenericDeviceModelStatusType.Accepted)]
+        Accepted,
+
+        [StringValue(GenericDeviceModelStatusType.Rejected)]
+        Rejected,
+
+        [StringValue(GenericDeviceModelStatusType.NotSupported)]
+        NotSupported,
+
+        [StringValue(GenericDeviceModelStatusType.EmptyResultSet)]
+        EmptyResultSet
     }
+
+    public const string Accepted = "Accepted";
+    public const string Rejected = "Rejected";
+    public const string NotSupported = "NotSupported";
+    public const string EmptyResultSet = "EmptyResultSet";
 }

@@ -1,13 +1,11 @@
-using System;
-using OcppSharp.Protocol.Version201.Types;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetInstalledCertificateIds", OcppMessageAttribute.Direction.CentralToPoint)]
+public class GetInstalledCertificateIdsRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetInstalledCertificateIds", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class GetInstalledCertificateIdsRequest : RequestPayload
-    {
-        public GetCertificateIdUseType.Enum[]? certificateType;
-
-    }
+    [JsonProperty("certificateType")]
+    public GetCertificateIdUseType.Enum[]? CertificateType { get; set; }
 }

@@ -1,16 +1,23 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct ChargingStation
 {
-    public struct ChargingStation
-    {
-        public static readonly ChargingStation Empty = new ChargingStation();
+    public static readonly ChargingStation Empty = new();
 
-        public string? serialNumber;
-        public string model;
-        public string vendorName;
-        public string? firmwareVersion;
-        public Modem? modem;
-    }
+    [JsonProperty("serialNumber")]
+    public string? SerialNumber { get; set; }
+
+    [JsonProperty("model")]
+    public string Model { get; set; }
+
+    [JsonProperty("vendorName")]
+    public string VendorName { get; set; }
+
+    [JsonProperty("firmwareVersion")]
+    public string? FirmwareVersion { get; set; }
+
+    [JsonProperty("modem")]
+    public Modem? Modem { get; set; }
 }

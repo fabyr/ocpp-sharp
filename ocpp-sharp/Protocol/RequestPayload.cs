@@ -1,10 +1,9 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol
+namespace OcppSharp.Protocol;
+
+public abstract class RequestPayload
 {
-    public abstract class RequestPayload
-    {
-        [Newtonsoft.Json.JsonIgnore]
-        public Request? FullRequest { get; set; }
-    }
+    [JsonIgnore]
+    public Request? FullRequest { get; set; }
 }

@@ -1,19 +1,27 @@
-using System;
+using OcppSharp.Protocol.Version16.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.Types
+namespace OcppSharp.Protocol.Version16.Types;
+
+public struct ChargingSchedule
 {
-    public struct ChargingSchedule
-    {
-        public static readonly ChargingSchedule Empty = new ChargingSchedule();
+    public static readonly ChargingSchedule Empty = new();
 
-        public long? duration;
-        public DateTime? startSchedule;
+    [JsonProperty("duration")]
+    public long? Duration { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.ChargingRateUnitType"/>
-        /// </summary>
-        public MessageConstants.ChargingRateUnitType.Enum chargingRateUnit;
-        public ChargingSchedulePeriod[] chargingSchedulePeriod;
-        public double? minChargingRate;
-    }
+    [JsonProperty("startSchedule")]
+    public DateTime? StartSchedule { get; set; }
+
+    /// <summary>
+    /// Valid values in <see cref="ChargingRateUnitType"/>
+    /// </summary>
+    [JsonProperty("chargingRateUnit")]
+    public ChargingRateUnitType.Enum ChargingRateUnit { get; set; }
+
+    [JsonProperty("chargingSchedulePeriod")]
+    public ChargingSchedulePeriod[] ChargingSchedulePeriod { get; set; }
+
+    [JsonProperty("minChargingRate")]
+    public double? MinChargingRate { get; set; }
 }

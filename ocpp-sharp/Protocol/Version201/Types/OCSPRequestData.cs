@@ -1,16 +1,24 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct OCSPRequestData
 {
-    public struct OCSPRequestData
-    {
-        public static readonly OCSPRequestData Empty = new OCSPRequestData();
+    public static readonly OCSPRequestData Empty = new();
 
-        public HashAlgorithmType.Enum hashAlgorithm;
-        public CiString issuerNameHash;
-        public string issuerKeyHash;
-        public CiString serialNumber;
-        public CiString responderURL;
-    }
+    [JsonProperty("hashAlgorithm")]
+    public HashAlgorithmType.Enum HashAlgorithm { get; set; }
+
+    [JsonProperty("issuerNameHash")]
+    public CiString IssuerNameHash { get; set; }
+
+    [JsonProperty("issuerKeyHash")]
+    public string IssuerKeyHash { get; set; }
+
+    [JsonProperty("serialNumber")]
+    public CiString SerialNumber { get; set; }
+
+    [JsonProperty("responderURL")]
+    public CiString ResponderURL { get; set; }
 }

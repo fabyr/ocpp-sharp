@@ -1,14 +1,17 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct Component
 {
-    public struct Component
-    {
-        public static readonly Component Empty = new Component();
+    public static readonly Component Empty = new();
 
-        public CiString name;
-        public CiString? instance;
-        public EVSE? evse;
-    }
+    [JsonProperty("name")]
+    public CiString Name { get; set; }
+
+    [JsonProperty("instance")]
+    public CiString? Instance { get; set; }
+
+    [JsonProperty("evse")]
+    public EVSE? Evse { get; set; }
 }

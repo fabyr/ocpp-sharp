@@ -1,15 +1,21 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct SetMonitoringData
 {
-    public struct SetMonitoringData
-    {
-        public static readonly SetMonitoringData Empty = new SetMonitoringData();
+    public static readonly SetMonitoringData Empty = new();
 
-        public int? id;
-        public bool? transaction;
-        public double value;
-        public MonitorType.Enum type;
-    }
+    [JsonProperty("id")]
+    public int? Id { get; set; }
+
+    [JsonProperty("transaction")]
+    public bool? Transaction { get; set; }
+
+    [JsonProperty("value")]
+    public double Value { get; set; }
+
+    [JsonProperty("type")]
+    public MonitorType.Enum Type { get; set; }
 }

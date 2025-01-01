@@ -1,21 +1,27 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct DCChargingParameters
 {
-    public struct DCChargingParameters
-    {
-        public static readonly DCChargingParameters Empty = new DCChargingParameters();
-        
-        public int evMaxCurrent;
-        public int evMaxVoltage;
-        public int energyAmount;
-        public int evMaxPower;
+    public static readonly DCChargingParameters Empty = new();
 
-        /// <summary>
-        /// Value range: [0; 100]
-        /// (0 to 100, both inclusive)
-        /// </summary>
-        public int stateOfCharge;
-    }
+    [JsonProperty("evMaxCurrent")]
+    public int EvMaxCurrent { get; set; }
+
+    [JsonProperty("evMaxVoltage")]
+    public int EvMaxVoltage { get; set; }
+
+    [JsonProperty("energyAmount")]
+    public int EnergyAmount { get; set; }
+
+    [JsonProperty("evMaxPower")]
+    public int EvMaxPower { get; set; }
+
+    /// <summary>
+    /// Value range: [0; 100]
+    /// (0 to 100, both inclusive)
+    /// </summary>
+    [JsonProperty("stateOfCharge")]
+    public int StateOfCharge { get; set; }
 }

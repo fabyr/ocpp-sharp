@@ -1,20 +1,27 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct CompositeSchedule
 {
-    public struct CompositeSchedule
-    {
-        public static readonly CompositeSchedule Empty = new CompositeSchedule();
+    public static readonly CompositeSchedule Empty = new();
 
-        public long evseId;
-        public int duration;
-        public DateTime scheduleStart;
-        public ChargingRateUnitType.Enum chargingRateUnit;
+    [JsonProperty("evseId")]
+    public long EvseId { get; set; }
 
-        /// <summary>
-        /// Must be at least one.
-        /// </summary>
-        public ChargingSchedulePeriod[] chargingSchedulePeriod;
-    }
+    [JsonProperty("duration")]
+    public int Duration { get; set; }
+
+    [JsonProperty("scheduleStart")]
+    public DateTime ScheduleStart { get; set; }
+
+    [JsonProperty("chargingRateUnit")]
+    public ChargingRateUnitType.Enum ChargingRateUnit { get; set; }
+
+    /// <summary>
+    /// Must be at least one.
+    /// </summary>
+    [JsonProperty("chargingSchedulePeriod")]
+    public ChargingSchedulePeriod[] ChargingSchedulePeriod { get; set; }
 }

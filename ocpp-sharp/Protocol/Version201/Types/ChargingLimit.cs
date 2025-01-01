@@ -1,13 +1,15 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct ChargingLimit
 {
-    public struct ChargingLimit
-    {
-        public static readonly ChargingLimit Empty = new ChargingLimit();
+    public static readonly ChargingLimit Empty = new();
 
-        public ChargingLimitSourceType.Enum chargingLimitSource;
-        public bool? isGridCritical;
-    }
+    [JsonProperty("chargingLimitSource")]
+    public ChargingLimitSourceType.Enum ChargingLimitSource { get; set; }
+
+    [JsonProperty("isGridCritical")]
+    public bool? IsGridCritical { get; set; }
 }

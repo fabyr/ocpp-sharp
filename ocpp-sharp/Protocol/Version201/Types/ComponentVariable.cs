@@ -1,13 +1,15 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct ComponentVariable
 {
-    public struct ComponentVariable
-    {
-        public static readonly ComponentVariable Empty = new ComponentVariable();
+    public static readonly ComponentVariable Empty = new();
 
-        public Component component;
-        public Variable? variable;
-    }
+
+    [JsonProperty("component")]
+    public Component Component { get; set; }
+
+    [JsonProperty("variable")]
+    public Variable? Variable { get; set; }
 }

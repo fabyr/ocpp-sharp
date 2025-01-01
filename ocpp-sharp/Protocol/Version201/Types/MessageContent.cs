@@ -1,14 +1,18 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct MessageContent
 {
-    public struct MessageContent
-    {
-        public static readonly MessageContent Empty = new MessageContent();
+    public static readonly MessageContent Empty = new();
 
-        public MessageFormatType.Enum format;
-        public string? language;
-        public string content;
-    }
+    [JsonProperty("format")]
+    public MessageFormatType.Enum Format { get; set; }
+
+    [JsonProperty("language")]
+    public string? Language { get; set; }
+
+    [JsonProperty("content")]
+    public string Content { get; set; }
 }

@@ -1,14 +1,17 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct LogParameters
 {
-    public struct LogParameters
-    {
-        public static readonly LogParameters Empty = new LogParameters();
+    public static readonly LogParameters Empty = new();
 
-        public string remoteLocation;
-        public DateTime? oldestTimestamp;
-        public DateTime? latestTimestamp;
-    }
+    [JsonProperty("remoteLocation")]
+    public string RemoteLocation { get; set; }
+
+    [JsonProperty("oldestTimestamp")]
+    public DateTime? OldestTimestamp { get; set; }
+
+    [JsonProperty("latestTimestamp")]
+    public DateTime? LatestTimestamp { get; set; }
 }

@@ -1,16 +1,24 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct ChargingProfile
 {
-    public struct ChargingProfile
-    {
-        public static readonly ChargingProfile Empty = new ChargingProfile();
+    public static readonly ChargingProfile Empty = new();
 
-        public long id;
-        public int stackLevel;
-        public ChargingProfilePurposeType.Enum chargingProfilePurpose;
-        public ChargingProfileKindType.Enum chargingProfileKind;
-        public RecurrencyKindType.Enum recurrencyKind;
-    }
+    [JsonProperty("id")]
+    public long Id { get; set; }
+
+    [JsonProperty("stackLevel")]
+    public int StackLevel { get; set; }
+
+    [JsonProperty("chargingProfilePurpose")]
+    public ChargingProfilePurposeType.Enum ChargingProfilePurpose { get; set; }
+
+    [JsonProperty("chargingProfileKind")]
+    public ChargingProfileKindType.Enum ChargingProfileKind { get; set; }
+
+    [JsonProperty("recurrencyKind")]
+    public RecurrencyKindType.Enum RecurrencyKind { get; set; }
 }

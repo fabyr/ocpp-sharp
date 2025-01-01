@@ -1,17 +1,27 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct VariableCharacteristics
 {
-    public struct VariableCharacteristics
-    {
-        public static readonly VariableCharacteristics Empty = new VariableCharacteristics();
+    public static readonly VariableCharacteristics Empty = new();
 
-        public CiString? unit;
-        public DataType.Enum dataType;
-        public double? minLimit;
-        public double? maxLimit;
-        public string? valuesList;
-        public bool supportsMonitoring;
-    }
+    [JsonProperty("unit")]
+    public CiString? Unit { get; set; }
+
+    [JsonProperty("dataType")]
+    public DataType.Enum DataType { get; set; }
+
+    [JsonProperty("minLimit")]
+    public double? MinLimit { get; set; }
+
+    [JsonProperty("maxLimit")]
+    public double? MaxLimit { get; set; }
+
+    [JsonProperty("valuesList")]
+    public string? ValuesList { get; set; }
+
+    [JsonProperty("supportsMonitoring")]
+    public bool SupportsMonitoring { get; set; }
 }

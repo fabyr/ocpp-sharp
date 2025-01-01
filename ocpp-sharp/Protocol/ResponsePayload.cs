@@ -1,12 +1,11 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol
+namespace OcppSharp.Protocol;
+
+public abstract class ResponsePayload
 {
-    public abstract class ResponsePayload
-    {
-        // Responses for requests initiated by this system are handled wherever the caller is calling from.
-        // See SendRequestAsync in OcppSharpServer.cs
-        [Newtonsoft.Json.JsonIgnore]
-        public Response? FullResponse { get; set; }
-    }
+    // Responses for requests initiated by this system are handled wherever the caller is calling from.
+    // See SendRequestAsync in OcppSharpServer.cs
+    [JsonIgnore]
+    public Response? FullResponse { get; set; }
 }

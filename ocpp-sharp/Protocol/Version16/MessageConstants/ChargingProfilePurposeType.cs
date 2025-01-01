@@ -1,22 +1,24 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.MessageConstants
+namespace OcppSharp.Protocol.Version16.MessageConstants;
+
+public static class ChargingProfilePurposeType
 {
-    public static class ChargingProfilePurposeType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(ChargingProfilePurposeType.ChargePointMaxProfile)]
-            ChargePointMaxProfile,
-            [StringValue(ChargingProfilePurposeType.TxDefaultProfile)]
-            TxDefaultProfile,
-            [StringValue(ChargingProfilePurposeType.TxProfile)]
-            TxProfile
-        }
-        public const string ChargePointMaxProfile = "ChargePointMaxProfile";
-        public const string TxDefaultProfile  = "TxDefaultProfile";
-        public const string TxProfile  = "TxProfile";
+        [StringValue(ChargingProfilePurposeType.ChargePointMaxProfile)]
+        ChargePointMaxProfile,
+
+        [StringValue(ChargingProfilePurposeType.TxDefaultProfile)]
+        TxDefaultProfile,
+
+        [StringValue(ChargingProfilePurposeType.TxProfile)]
+        TxProfile
     }
+
+    public const string ChargePointMaxProfile = "ChargePointMaxProfile";
+    public const string TxDefaultProfile = "TxDefaultProfile";
+    public const string TxProfile = "TxProfile";
 }

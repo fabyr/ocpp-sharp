@@ -1,18 +1,30 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct MessageInfo
 {
-    public struct MessageInfo
-    {
-        public static readonly MessageInfo Empty = new MessageInfo();
+    public static readonly MessageInfo Empty = new();
 
-        public long id;
-        public MessagePriorityType.Enum priority;
-        public MessageStateType.Enum? state;
-        public DateTime? startDateTime;
-        public DateTime? endDateTime;
-        public CiString? transactionId;
-        public MessageContent message;
-    }
+    [JsonProperty("id")]
+    public long Id { get; set; }
+
+    [JsonProperty("priority")]
+    public MessagePriorityType.Enum Priority { get; set; }
+
+    [JsonProperty("state")]
+    public MessageStateType.Enum? State { get; set; }
+
+    [JsonProperty("startDateTime")]
+    public DateTime? StartDateTime { get; set; }
+
+    [JsonProperty("endDateTime")]
+    public DateTime? EndDateTime { get; set; }
+
+    [JsonProperty("transactionId")]
+    public CiString? TransactionId { get; set; }
+
+    [JsonProperty("message")]
+    public MessageContent Message { get; set; }
 }

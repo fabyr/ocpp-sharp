@@ -1,17 +1,17 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct MeterValue
 {
-    public struct MeterValue
-    {
-        public static readonly MeterValue Empty = new MeterValue();
+    public static readonly MeterValue Empty = new();
 
-        public DateTime timestamp;
+    [JsonProperty("timestamp")]
+    public DateTime Timestamp { get; set; }
 
-        /// <summary>
-        /// Must contain atleast one entry.
-        /// </summary>
-        public SampledValue[] sampledValue;
-    }
+    /// <summary>
+    /// Must contain atleast one entry.
+    /// </summary>
+    [JsonProperty("sampledValue")]
+    public SampledValue[] SampledValue { get; set; }
 }

@@ -1,13 +1,14 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct AuthorizationData
 {
-    public struct AuthorizationData
-    {
-        public static readonly AuthorizationData Empty = new AuthorizationData();
+    public static readonly AuthorizationData Empty = new();
 
-        public IdTokenInfo? idTokenInfo;
-        public IdToken idToken;
-    }
+    [JsonProperty("idTokenInfo")]
+    public IdTokenInfo? IdTokenInfo { get; set; }
+
+    [JsonProperty("idToken")]
+    public IdToken IdToken { get; set; }
 }

@@ -1,17 +1,23 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "RequestStartTransaction", OcppMessageAttribute.Direction.CentralToPoint)]
+public class RequestStartTransactionRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "RequestStartTransaction", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class RequestStartTransactionRequest : RequestPayload
-    {
-        public long? evseId;
-        public long remoteStartId;
-        public IdToken idToken;
-        public ChargingProfile? chargingProfile;
-        public IdToken? groupIdToken;
-        
-    }
+    [JsonProperty("evseId")]
+    public long? EvseId { get; set; }
+
+    [JsonProperty("remoteStartId")]
+    public long RemoteStartId { get; set; }
+
+    [JsonProperty("idToken")]
+    public IdToken IdToken { get; set; }
+
+    [JsonProperty("chargingProfile")]
+    public ChargingProfile? ChargingProfile { get; set; }
+
+    [JsonProperty("groupIdToken")]
+    public IdToken? GroupIdToken { get; set; }
 }

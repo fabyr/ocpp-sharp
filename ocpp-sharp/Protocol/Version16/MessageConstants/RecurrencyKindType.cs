@@ -1,19 +1,20 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.MessageConstants
+namespace OcppSharp.Protocol.Version16.MessageConstants;
+
+public static class RecurrencyKindType
 {
-    public static class RecurrencyKindType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(RecurrencyKindType.Daily)]
-            Daily,
-            [StringValue(RecurrencyKindType.Weekly)]
-            Weekly
-        }
-        public const string Daily = "Daily";
-        public const string Weekly  = "Weekly";
+        [StringValue(RecurrencyKindType.Daily)]
+        Daily,
+
+        [StringValue(RecurrencyKindType.Weekly)]
+        Weekly
     }
+
+    public const string Daily = "Daily";
+    public const string Weekly = "Weekly";
 }

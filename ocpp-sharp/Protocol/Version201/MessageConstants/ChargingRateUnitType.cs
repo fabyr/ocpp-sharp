@@ -1,19 +1,20 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class ChargingRateUnitType
 {
-    public static class ChargingRateUnitType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(ChargingRateUnitType.W)]
-            W,
-            [StringValue(ChargingRateUnitType.A)]
-            A
-        }
-        public const string W = "W";
-        public const string A = "A";
+        [StringValue(ChargingRateUnitType.Watt)]
+        Watt,
+
+        [StringValue(ChargingRateUnitType.Ampere)]
+        Ampere
     }
+
+    public const string Watt = "W";
+    public const string Ampere = "A";
 }

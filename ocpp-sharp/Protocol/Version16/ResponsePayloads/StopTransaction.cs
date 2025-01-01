@@ -1,11 +1,11 @@
-using System;
 using OcppSharp.Protocol.Version16.Types;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.ResponsePayloads
+namespace OcppSharp.Protocol.Version16.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "StopTransaction", OcppMessageAttribute.Direction.CentralToPoint)]
+public class StopTransactionResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "StopTransaction", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class StopTransactionResponse : ResponsePayload
-    {
-        public IdTagInfo? idTagInfo;
-    }
+    [JsonProperty("idTagInfo")]
+    public IdTagInfo? IdTagInfo { get; set; }
 }

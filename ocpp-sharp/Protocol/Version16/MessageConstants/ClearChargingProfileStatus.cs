@@ -1,19 +1,20 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.MessageConstants
+namespace OcppSharp.Protocol.Version16.MessageConstants;
+
+public static class ClearChargingProfileStatus
 {
-    public static class ClearChargingProfileStatus
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(ClearChargingProfileStatus.Accepted)]
-            Accepted,
-            [StringValue(ClearChargingProfileStatus.Unknown)]
-            Unknown
-        }
-        public const string Accepted = "Accepted";
-        public const string Unknown = "Unknown";
+        [StringValue(ClearChargingProfileStatus.Accepted)]
+        Accepted,
+
+        [StringValue(ClearChargingProfileStatus.Unknown)]
+        Unknown
     }
+
+    public const string Accepted = "Accepted";
+    public const string Unknown = "Unknown";
 }

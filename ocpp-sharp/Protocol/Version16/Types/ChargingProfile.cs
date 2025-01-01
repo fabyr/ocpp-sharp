@@ -1,31 +1,45 @@
-using System;
+using OcppSharp.Protocol.Version16.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.Types
+namespace OcppSharp.Protocol.Version16.Types;
+
+public struct ChargingProfile
 {
-    public struct ChargingProfile
-    {
-        public static readonly ChargingProfile Empty = new ChargingProfile();
+    public static readonly ChargingProfile Empty = new();
 
-        public long chargingProfileId;
-        public long? transactionId;
-        public ulong stackLevel;
+    [JsonProperty("chargingProfileId")]
+    public long ChargingProfileId { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.ChargingProfilePurposeType"/>
-        /// </summary>
-        public MessageConstants.ChargingProfilePurposeType.Enum chargingProfilePurposeType;
+    [JsonProperty("transactionId")]
+    public long? TransactionId { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.ChargingProfileKindType"/>
-        /// </summary>
-        public MessageConstants.ChargingProfileKindType.Enum chargingProfileKind;
+    [JsonProperty("stackLevel")]
+    public ulong StackLevel { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.RecurrencyKindType"/>
-        /// </summary>
-        public MessageConstants.RecurrencyKindType.Enum? recurrencyKind;
-        public DateTime? validFrom;
-        public DateTime? validTo;
-        public ChargingSchedule chargingSchedule;
-    }
+    /// <summary>
+    /// Valid Values in <see cref="ChargingProfilePurposeType"/>
+    /// </summary>
+    [JsonProperty("chargingProfilePurpose")]
+    public ChargingProfilePurposeType.Enum ChargingProfilePurpose { get; set; }
+
+    /// <summary>
+    /// Valid Values in <see cref="ChargingProfileKindType"/>
+    /// </summary>
+    [JsonProperty("chargingProfileKind")]
+    public ChargingProfileKindType.Enum ChargingProfileKind { get; set; }
+
+    /// <summary>
+    /// Valid Values in <see cref="RecurrencyKindType"/>
+    /// </summary>
+    [JsonProperty("recurrencyKind")]
+    public RecurrencyKindType.Enum? RecurrencyKind { get; set; }
+
+    [JsonProperty("validFrom")]
+    public DateTime? ValidFrom { get; set; }
+
+    [JsonProperty("validTo")]
+    public DateTime? ValidTo { get; set; }
+
+    [JsonProperty("chargingSchedule")]
+    public ChargingSchedule ChargingSchedule { get; set; }
 }

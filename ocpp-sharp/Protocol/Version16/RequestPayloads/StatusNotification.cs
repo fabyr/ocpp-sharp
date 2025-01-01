@@ -1,19 +1,26 @@
-using System;
+using OcppSharp.Protocol.Version16.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.RequestPayloads
+namespace OcppSharp.Protocol.Version16.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "StatusNotification", OcppMessageAttribute.Direction.PointToCentral)]
+public class StatusNotificationRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "StatusNotification", OcppMessageAttribute.Direction.PointToCentral)]
-    public class StatusNotificationRequest : RequestPayload
-    {
-        public ulong connectorId;
-        public CiString errorCode = string.Empty;
-        public CiString? info;
+    [JsonProperty("connectorId")]
+    public ulong ConnectorId { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.ChargePointStatus"/>
-        /// </summary>
-        public MessageConstants.ChargePointStatus.Enum status;
-        public DateTime? timestamp;
+    [JsonProperty("errorCode")]
+    public CiString ErrorCode { get; set; } = string.Empty;
 
-    }
+    [JsonProperty("info")]
+    public CiString? Info { get; set; }
+
+    /// <summary>
+    /// Valid values in <see cref="ChargePointStatus"/>
+    /// </summary>
+    [JsonProperty("status")]
+    public ChargePointStatus.Enum Status { get; set; }
+
+    [JsonProperty("timestamp")]
+    public DateTime? Timestamp { get; set; }
 }

@@ -1,18 +1,20 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct MonitoringData
 {
-    public struct MonitoringData
-    {
-        public static readonly MonitoringData Empty = new MonitoringData();
+    public static readonly MonitoringData Empty = new();
 
-        public Component component;
-        public Variable variable;
+    [JsonProperty("component")]
+    public Component Component { get; set; }
 
-        /// <summary>
-        /// Must contain atleast one element.
-        /// </summary>
-        public VariableMonitoring[] variableMonitoring;
-    }
+    [JsonProperty("variable")]
+    public Variable Variable { get; set; }
+
+    /// <summary>
+    /// Must contain atleast one element.
+    /// </summary>
+    [JsonProperty("variableMonitoring")]
+    public VariableMonitoring[] VariableMonitoring { get; set; }
 }

@@ -1,19 +1,20 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.MessageConstants
+namespace OcppSharp.Protocol.Version16.MessageConstants;
+
+public static class RemoteStartStopStatus
 {
-    public static class RemoteStartStopStatus
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(RemoteStartStopStatus.Accepted)]
-            Accepted,
-            [StringValue(RemoteStartStopStatus.Rejected)]
-            Rejected
-        }
-        public const string Accepted = "Accepted";
-        public const string Rejected  = "Rejected";
+        [StringValue(RemoteStartStopStatus.Accepted)]
+        Accepted,
+
+        [StringValue(RemoteStartStopStatus.Rejected)]
+        Rejected
     }
+
+    public const string Accepted = "Accepted";
+    public const string Rejected = "Rejected";
 }

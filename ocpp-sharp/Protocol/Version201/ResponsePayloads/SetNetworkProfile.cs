@@ -1,13 +1,15 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
 using OcppSharp.Protocol.Version201.Types;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.ResponsePayloads
+namespace OcppSharp.Protocol.Version201.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "SetNetworkProfile", OcppMessageAttribute.Direction.PointToCentral)]
+public class SetNetworkProfileResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "SetNetworkProfile", OcppMessageAttribute.Direction.PointToCentral)]
-    public class SetNetworkProfileResponse : ResponsePayload
-    {
-        public SetNetworkProfileStatusType.Enum status;
-        public StatusInfo? statusInfo;
-    }
+    [JsonProperty("status")]
+    public SetNetworkProfileStatusType.Enum Status { get; set; }
+
+    [JsonProperty("statusInfo")]
+    public StatusInfo? StatusInfo { get; set; }
 }

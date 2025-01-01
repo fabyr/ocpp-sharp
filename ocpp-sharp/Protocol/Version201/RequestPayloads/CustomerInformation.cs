@@ -1,18 +1,26 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "CustomerInformation", OcppMessageAttribute.Direction.CentralToPoint)]
+public class CustomerInformationRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "CustomerInformation", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class CustomerInformationRequest : RequestPayload
-    {
-        public long requestId;
-        public bool report;
-        public bool clear;
-        public string? customerIdentifier;
-        public IdToken? idToken;
-        public CertificateHashData? customerCertificate;
+    [JsonProperty("requestId")]
+    public long RequestId { get; set; }
 
-    }
+    [JsonProperty("report")]
+    public bool Report { get; set; }
+
+    [JsonProperty("clear")]
+    public bool Clear { get; set; }
+
+    [JsonProperty("customerIdentifier")]
+    public string? CustomerIdentifier { get; set; }
+
+    [JsonProperty("idToken")]
+    public IdToken? IdToken { get; set; }
+
+    [JsonProperty("customerCertificate")]
+    public CertificateHashData? CustomerCertificate { get; set; }
 }

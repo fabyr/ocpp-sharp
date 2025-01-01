@@ -1,22 +1,24 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class DeleteCertificateStatusType
 {
-    public static class DeleteCertificateStatusType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(DeleteCertificateStatusType.Accepted)]
-            Accepted,
-            [StringValue(DeleteCertificateStatusType.Failed)]
-            Failed,
-            [StringValue(DeleteCertificateStatusType.NotFound)]
-            NotFound
-        }
-        public const string Accepted = "Accepted";
-        public const string Failed = "Failed";
-        public const string NotFound = "NotFound";
+        [StringValue(DeleteCertificateStatusType.Accepted)]
+        Accepted,
+
+        [StringValue(DeleteCertificateStatusType.Failed)]
+        Failed,
+
+        [StringValue(DeleteCertificateStatusType.NotFound)]
+        NotFound
     }
+
+    public const string Accepted = "Accepted";
+    public const string Failed = "Failed";
+    public const string NotFound = "NotFound";
 }

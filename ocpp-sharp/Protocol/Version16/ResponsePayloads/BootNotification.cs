@@ -1,16 +1,20 @@
-using System;
+using OcppSharp.Protocol.Version16.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.ResponsePayloads
+namespace OcppSharp.Protocol.Version16.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "BootNotification", OcppMessageAttribute.Direction.CentralToPoint)]
+public class BootNotificationResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "BootNotification", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class BootNotificationResponse : ResponsePayload
-    {
-        public DateTime currentTime;
-        public long interval;
-        
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.RegistrationStatus"/>
-        /// </summary>
-        public MessageConstants.RegistrationStatus.Enum status;
-    }
+    [JsonProperty("currentTime")]
+    public DateTime CurrentTime { get; set; }
+
+    [JsonProperty("interval")]
+    public long Interval { get; set; }
+
+    /// <summary>
+    /// Valid values in <see cref="RegistrationStatus"/>
+    /// </summary>
+    [JsonProperty("status")]
+    public RegistrationStatus.Enum Status { get; set; }
 }

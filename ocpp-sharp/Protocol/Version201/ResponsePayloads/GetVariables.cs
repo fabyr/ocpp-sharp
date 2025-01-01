@@ -1,12 +1,11 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 using OcppSharp.Protocol.Version201.Types;
 
-namespace OcppSharp.Protocol.Version201.ResponsePayloads
+namespace OcppSharp.Protocol.Version201.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "GetVariables", OcppMessageAttribute.Direction.PointToCentral)]
+public class GetVariablesResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "GetVariables", OcppMessageAttribute.Direction.PointToCentral)]
-    public class GetVariablesResponse : ResponsePayload
-    {
-        public GetVariableResult[] getVariableResult = new GetVariableResult[0];
-    }
+    [JsonProperty("getVariableResult")]
+    public GetVariableResult[] GetVariableResult { get; set; } = [];
 }

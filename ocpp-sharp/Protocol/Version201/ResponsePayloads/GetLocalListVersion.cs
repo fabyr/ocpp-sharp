@@ -1,12 +1,10 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
-using OcppSharp.Protocol.Version201.Types;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.ResponsePayloads
+namespace OcppSharp.Protocol.Version201.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "GetLocalListVersion", OcppMessageAttribute.Direction.PointToCentral)]
+public class GetLocalListVersionResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "GetLocalListVersion", OcppMessageAttribute.Direction.PointToCentral)]
-    public class GetLocalListVersionResponse : ResponsePayload
-    {
-        public int versionNumber;
-    }
+    [JsonProperty("versionNumber")]
+    public int VersionNumber { get; set; }
 }

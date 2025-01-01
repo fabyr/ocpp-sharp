@@ -1,15 +1,16 @@
-using System;
-using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "SecurityEventNotification", OcppMessageAttribute.Direction.PointToCentral)]
+public class SecurityEventNotificationRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "SecurityEventNotification", OcppMessageAttribute.Direction.PointToCentral)]
-    public class SecurityEventNotificationRequest : RequestPayload
-    {
-        public string type = string.Empty;
-        public DateTime timestamp;
-        public string? techInfo;
-        
-    }
+    [JsonProperty("type")]
+    public string Type { get; set; } = string.Empty;
+
+    [JsonProperty("timestamp")]
+    public DateTime Timestamp { get; set; }
+
+    [JsonProperty("techInfo")]
+    public string? TechInfo { get; set; }
 }

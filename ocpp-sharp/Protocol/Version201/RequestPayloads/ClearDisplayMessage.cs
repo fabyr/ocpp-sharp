@@ -1,13 +1,10 @@
-using System;
-using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "ClearDisplayMessage", OcppMessageAttribute.Direction.CentralToPoint)]
+public class ClearDisplayMessageRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "ClearDisplayMessage", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class ClearDisplayMessageRequest : RequestPayload
-    {
-        public long id;
-
-    }
+    [JsonProperty("id")]
+    public long Id { get; set; }
 }

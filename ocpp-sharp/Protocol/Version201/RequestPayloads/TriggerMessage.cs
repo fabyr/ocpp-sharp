@@ -1,14 +1,15 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "TriggerMessage", OcppMessageAttribute.Direction.CentralToPoint)]
+public class TriggerMessageRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "TriggerMessage", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class TriggerMessageRequest : RequestPayload
-    {
-        public MessageTriggerType.Enum requestedMessage;
-        public EVSE? evse;
-        
-    }
+    [JsonProperty("requestedMessage")]
+    public MessageTriggerType.Enum RequestedMessage { get; set; }
+
+    [JsonProperty("evse")]
+    public EVSE? Evse { get; set; }
 }

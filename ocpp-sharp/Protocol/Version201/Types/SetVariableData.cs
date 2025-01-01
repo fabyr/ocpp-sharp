@@ -1,15 +1,21 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct SetVariableData
 {
-    public struct SetVariableData
-    {
-        public static readonly SetVariableData Empty = new SetVariableData();
+    public static readonly SetVariableData Empty = new();
 
-        public AttributeType.Enum? attributeType;
-        public string attributeValue;
-        public Component component;
-        public Variable variable;
-    }
+    [JsonProperty("attributeType")]
+    public AttributeType.Enum? AttributeType { get; set; }
+
+    [JsonProperty("attributeValue")]
+    public string AttributeValue { get; set; }
+
+    [JsonProperty("component")]
+    public Component Component { get; set; }
+
+    [JsonProperty("variable")]
+    public Variable Variable { get; set; }
 }

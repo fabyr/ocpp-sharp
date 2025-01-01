@@ -1,19 +1,20 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class ResetType
 {
-    public static class ResetType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(ResetType.Immediate)]
-            Immediate,
-            [StringValue(ResetType.OnIdle)]
-            OnIdle
-        }
-        public const string Immediate = "Immediate";
-        public const string OnIdle = "OnIdle";
+        [StringValue(ResetType.Immediate)]
+        Immediate,
+
+        [StringValue(ResetType.OnIdle)]
+        OnIdle
     }
+
+    public const string Immediate = "Immediate";
+    public const string OnIdle = "OnIdle";
 }

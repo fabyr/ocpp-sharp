@@ -1,20 +1,22 @@
-using System;
 using OcppSharp.Protocol.Version16.Types;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.ResponsePayloads
+namespace OcppSharp.Protocol.Version16.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "GetConfiguration", OcppMessageAttribute.Direction.PointToCentral)]
+public class GetConfigurationResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "GetConfiguration", OcppMessageAttribute.Direction.PointToCentral)]
-    public class GetConfigurationResponse : ResponsePayload
-    {
-        public KeyValue[]? configurationKey;
-        public CiString[]? unknownKey;
+    [JsonProperty("configurationKey")]
+    public KeyValue[]? ConfigurationKey { get; set; }
 
-        public KeyValue? this[string key]
+    [JsonProperty("unknownKey")]
+    public CiString[]? UnknownKey { get; set; }
+
+    public KeyValue? this[string key]
+    {
+        get
         {
-            get 
-            {
-                return configurationKey?.FirstOrDefault(x => CiString.Equals(x.key, key));
-            }
+            return ConfigurationKey?.FirstOrDefault(x => Equals(x.Key, key));
         }
     }
 }

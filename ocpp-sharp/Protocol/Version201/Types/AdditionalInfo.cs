@@ -1,13 +1,14 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct AdditionalInfo
 {
-    public struct AdditionalInfo
-    {
-        public static readonly AdditionalInfo Empty = new AdditionalInfo();
+    public static readonly AdditionalInfo Empty = new();
 
-        public CiString additionalIdToken;
-        public string type; // Custom type not defined in protocol
-    }
+    [JsonProperty("additionalIdToken")]
+    public CiString AdditionalIdToken { get; set; }
+
+    [JsonProperty("type")]
+    public string Type { get; set; } // Custom type not defined in protocol
 }

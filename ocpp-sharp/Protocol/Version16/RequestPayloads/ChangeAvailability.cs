@@ -1,16 +1,17 @@
-using System;
+using OcppSharp.Protocol.Version16.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.RequestPayloads
+namespace OcppSharp.Protocol.Version16.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ChangeAvailability", OcppMessageAttribute.Direction.CentralToPoint)]
+public class ChangeAvailabilityRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ChangeAvailability", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class ChangeAvailabilityRequest : RequestPayload
-    {
-        public ulong connectorId;
-        
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.AvailabilityType"/>
-        /// </summary>
-        public MessageConstants.AvailabilityType.Enum type;
+    [JsonProperty("connectorId")]
+    public ulong ConnectorId { get; set; }
 
-    }
+    /// <summary>
+    /// Valid values in <see cref="AvailabilityType"/>
+    /// </summary>
+    [JsonProperty("type")]
+    public AvailabilityType.Enum Type { get; set; }
 }

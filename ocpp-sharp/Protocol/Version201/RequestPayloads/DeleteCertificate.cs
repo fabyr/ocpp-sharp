@@ -1,13 +1,11 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "DeleteCertificate", OcppMessageAttribute.Direction.CentralToPoint)]
+public class DeleteCertificateRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "DeleteCertificate", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class DeleteCertificateRequest : RequestPayload
-    {
-        public CertificateHashData certificateHashData = CertificateHashData.Empty;
-
-    }
+    [JsonProperty("certificateHashData")]
+    public CertificateHashData CertificateHashData { get; set; } = CertificateHashData.Empty;
 }

@@ -1,15 +1,22 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.RequestPayloads
+namespace OcppSharp.Protocol.Version16.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ReserveNow", OcppMessageAttribute.Direction.CentralToPoint)]
+public class ReserveNowRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ReserveNow", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class ReserveNowRequest : RequestPayload
-    {
-        public ulong connectorId;
-        public DateTime expiryDate;
-        public CiString idTag = string.Empty;
-        public CiString? parentIdTag;
-        public long reservationId;
+    [JsonProperty("connectorId")]
+    public ulong ConnectorId { get; set; }
 
-    }
+    [JsonProperty("expiryDate")]
+    public DateTime ExpiryDate { get; set; }
+
+    [JsonProperty("idTag")]
+    public CiString IdTag { get; set; } = string.Empty;
+
+    [JsonProperty("parentIdTag")]
+    public CiString? ParentIdTag { get; set; }
+
+    [JsonProperty("reservationId")]
+    public long ReservationId { get; set; }
 }

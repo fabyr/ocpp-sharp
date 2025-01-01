@@ -1,14 +1,14 @@
-using System;
-using OcppSharp.Protocol.Version16.Types;
+using OcppSharp.Protocol.Version16.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.ResponsePayloads
+namespace OcppSharp.Protocol.Version16.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "SendLocalList", OcppMessageAttribute.Direction.PointToCentral)]
+public class SendLocalListResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "SendLocalList", OcppMessageAttribute.Direction.PointToCentral)]
-    public class SendLocalListResponse : ResponsePayload
-    {
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.UpdateStatus"/>
-        /// </summary>
-        public MessageConstants.UpdateStatus.Enum CiString;
-    }
+    /// <summary>
+    /// Valid values in <see cref="UpdateStatus"/>
+    /// </summary>
+    [JsonProperty("status")]
+    public UpdateStatus.Enum Status { get; set; }
 }

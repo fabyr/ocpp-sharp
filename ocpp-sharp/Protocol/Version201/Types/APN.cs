@@ -1,18 +1,30 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct APN
 {
-    public struct APN
-    {
-        public static readonly APN Empty = new APN();
+    public static readonly APN Empty = new();
 
-        public string apn;
-        public string? apnUserName;
-        public string? apnPassword;
-        public int? simPin;
-        public CiString? preferredNetwork;
-        public bool? useOnlyPreferredNetwork;
-        public APNAuthenticationType.Enum apnAuthentication;
-    }
+    [JsonProperty("apn")]
+    public string Apn { get; set; }
+
+    [JsonProperty("apnUserName")]
+    public string? ApnUserName { get; set; }
+
+    [JsonProperty("apnPassword")]
+    public string? ApnPassword { get; set; }
+
+    [JsonProperty("simPin")]
+    public int? SimPin { get; set; }
+
+    [JsonProperty("preferredNetwork")]
+    public CiString? PreferredNetwork { get; set; }
+
+    [JsonProperty("useOnlyPreferredNetwork")]
+    public bool? UseOnlyPreferredNetwork { get; set; }
+
+    [JsonProperty("apnAuthentication")]
+    public APNAuthenticationType.Enum ApnAuthentication { get; set; }
 }

@@ -1,19 +1,20 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class UpdateType
 {
-    public static class UpdateType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(UpdateType.Differential)]
-            Differential,
-            [StringValue(UpdateType.Full)]
-            Full
-        }
-        public const string Differential = "Differential";
-        public const string Full = "Full";
+        [StringValue(UpdateType.Differential)]
+        Differential,
+
+        [StringValue(UpdateType.Full)]
+        Full
     }
+
+    public const string Differential = "Differential";
+    public const string Full = "Full";
 }

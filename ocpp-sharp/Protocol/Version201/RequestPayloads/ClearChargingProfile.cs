@@ -1,14 +1,14 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "ClearChargingProfile", OcppMessageAttribute.Direction.CentralToPoint)]
+public class ClearChargingProfileRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "ClearChargingProfile", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class ClearChargingProfileRequest : RequestPayload
-    {
-        public long? chargingProfileId;
-        public Types.ClearChargingProfile? chargingProfileCriteria;
+    [JsonProperty("chargingProfileId")]
+    public long? ChargingProfileId { get; set; }
 
-    }
+    [JsonProperty("chargingProfileCriteria")]
+    public ClearChargingProfile? ChargingProfileCriteria { get; set; }
 }

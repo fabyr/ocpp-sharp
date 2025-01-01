@@ -1,15 +1,17 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyEVChargingSchedule", OcppMessageAttribute.Direction.PointToCentral)]
+public class NotifyEVChargingScheduleRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyEVChargingSchedule", OcppMessageAttribute.Direction.PointToCentral)]
-    public class NotifyEVChargingScheduleRequest : RequestPayload
-    {
-        public DateTime timeBase;
-        public long evseId;
-        public ChargingSchedule chargingSchedule;
+    [JsonProperty("timeBase")]
+    public DateTime TimeBase { get; set; }
 
-    }
+    [JsonProperty("evseId")]
+    public long EvseId { get; set; }
+
+    [JsonProperty("chargingSchedule")]
+    public ChargingSchedule ChargingSchedule { get; set; }
 }

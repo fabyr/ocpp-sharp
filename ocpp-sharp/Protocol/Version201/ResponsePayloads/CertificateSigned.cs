@@ -1,13 +1,15 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
 using OcppSharp.Protocol.Version201.Types;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.ResponsePayloads
+namespace OcppSharp.Protocol.Version201.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "CertificateSigned", OcppMessageAttribute.Direction.PointToCentral)]
+public class CertificateSignedResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "CertificateSigned", OcppMessageAttribute.Direction.PointToCentral)]
-    public class CertificateSignedResponse : ResponsePayload
-    {
-        public CertificateSignedStatusType.Enum status;
-        public StatusInfo? statusInfo;
-    }
+    [JsonProperty("status")]
+    public CertificateSignedStatusType.Enum Status { get; set; }
+
+    [JsonProperty("statusInfo")]
+    public StatusInfo? StatusInfo { get; set; }
 }

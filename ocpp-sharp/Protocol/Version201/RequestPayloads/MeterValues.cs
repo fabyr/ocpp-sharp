@@ -1,18 +1,17 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "MeterValues", OcppMessageAttribute.Direction.PointToCentral)]
+public class MeterValuesRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "MeterValues", OcppMessageAttribute.Direction.PointToCentral)]
-    public class MeterValuesRequest : RequestPayload
-    {
-        public long evseId;
+    [JsonProperty("evseId")]
+    public long EvseId { get; set; }
 
-        /// <summary>
-        /// Array must contain atleast one entry.
-        /// </summary>
-        public MeterValue[] meterValue = new MeterValue[0];
-
-    }
+    /// <summary>
+    /// Array must contain atleast one entry.
+    /// </summary>
+    [JsonProperty("meterValue")]
+    public MeterValue[] MeterValue { get; set; } = [];
 }

@@ -1,19 +1,20 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class ClearCacheStatusType
 {
-    public static class ClearCacheStatusType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(ClearCacheStatusType.Accepted)]
-            Accepted,
-            [StringValue(ClearCacheStatusType.Rejected)]
-            Rejected
-        }
-        public const string Accepted = "Accepted";
-        public const string Rejected = "Rejected";
+        [StringValue(ClearCacheStatusType.Accepted)]
+        Accepted,
+
+        [StringValue(ClearCacheStatusType.Rejected)]
+        Rejected
     }
+
+    public const string Accepted = "Accepted";
+    public const string Rejected = "Rejected";
 }

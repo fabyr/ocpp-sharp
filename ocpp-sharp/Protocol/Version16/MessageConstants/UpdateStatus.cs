@@ -1,25 +1,28 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.MessageConstants
+namespace OcppSharp.Protocol.Version16.MessageConstants;
+
+public static class UpdateStatus
 {
-    public static class UpdateStatus
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(UpdateStatus.Accepted)]
-            Accepted,
-            [StringValue(UpdateStatus.Failed)]
-            Failed,
-            [StringValue(UpdateStatus.NotSupported)]
-            NotSupported,
-            [StringValue(UpdateStatus.VersionMismatch)]
-            VersionMismatch
-        }
-        public const string Accepted = "Accepted";
-        public const string Failed = "Failed";
-        public const string NotSupported = "NotSupported";
-        public const string VersionMismatch = "VersionMismatch";
+        [StringValue(UpdateStatus.Accepted)]
+        Accepted,
+
+        [StringValue(UpdateStatus.Failed)]
+        Failed,
+
+        [StringValue(UpdateStatus.NotSupported)]
+        NotSupported,
+
+        [StringValue(UpdateStatus.VersionMismatch)]
+        VersionMismatch
     }
+
+    public const string Accepted = "Accepted";
+    public const string Failed = "Failed";
+    public const string NotSupported = "NotSupported";
+    public const string VersionMismatch = "VersionMismatch";
 }

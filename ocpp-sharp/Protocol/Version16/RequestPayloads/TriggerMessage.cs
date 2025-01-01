@@ -1,16 +1,17 @@
-using System;
-using OcppSharp.Protocol.Version16.Types;
+using OcppSharp.Protocol.Version16.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.RequestPayloads
+namespace OcppSharp.Protocol.Version16.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "TriggerMessage", OcppMessageAttribute.Direction.CentralToPoint)]
+public class TriggerMessageRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "TriggerMessage", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class TriggerMessageRequest : RequestPayload
-    {
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.MessageTrigger"/>
-        /// </summary>
-        public MessageConstants.MessageTrigger.Enum requestedMessage;
-        public ulong? connectorId; // must be > 0
+    /// <summary>
+    /// Valid values in <see cref="MessageTrigger"/>
+    /// </summary>
+    [JsonProperty("requestedMessage")]
+    public MessageTrigger.Enum RequestedMessage { get; set; }
 
-    }
+    [JsonProperty("connectorId")]
+    public ulong? ConnectorId { get; set; }
 }

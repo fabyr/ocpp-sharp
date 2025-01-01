@@ -1,170 +1,169 @@
-using System;
+using OcppSharp.Protocol.Version16.MessageConstants;
 
-namespace OcppSharp.Protocol.Version16.Standard
+namespace OcppSharp.Protocol.Version16.Standard;
+
+public enum ConfigKeyValue
 {
-    public enum ConfigKeyValue
-    {
-        #region "Core Profile"
+    #region "Core Profile"
 
-        [ValidValues(typeof(bool))]
-        AllowOfflineTxForUnknownId,
+    [ValidValues(typeof(bool))]
+    AllowOfflineTxForUnknownId,
 
-        [ValidValues(typeof(bool))]
-        AuthorizationCacheEnabled,
+    [ValidValues(typeof(bool))]
+    AuthorizationCacheEnabled,
 
-        [ValidValues(typeof(bool))]
-        AuthorizeRemoteTxRequests,
+    [ValidValues(typeof(bool))]
+    AuthorizeRemoteTxRequests,
 
-        [ValidValues(typeof(int))]
-        BlinkRepeat,
+    [ValidValues(typeof(int))]
+    BlinkRepeat,
 
-        [ValueUnit("s")]
-        [ValidValues(typeof(int))]
-        ClockAlignedDataInterval,
+    [ValueUnit("s")]
+    [ValidValues(typeof(int))]
+    ClockAlignedDataInterval,
 
-        [ValueUnit("s")]
-        [ValidValues(typeof(int))]
-        ConnectionTimeOut,
+    [ValueUnit("s")]
+    [ValidValues(typeof(int))]
+    ConnectionTimeOut,
 
-        [ValidValues(typeof(int))]
-        GetConfigurationMaxKeys,
+    [ValidValues(typeof(int))]
+    GetConfigurationMaxKeys,
 
-        [ValueUnit("s")]
-        [ValidValues(typeof(int))]
-        HeartbeatInterval,
+    [ValueUnit("s")]
+    [ValidValues(typeof(int))]
+    HeartbeatInterval,
 
-        [ValueRange(0, 100)]
-        [ValueUnit("%")]
-        [ValidValues(typeof(int))]
-        LightIntensity,
+    [ValueRange(0, 100)]
+    [ValueUnit("%")]
+    [ValidValues(typeof(int))]
+    LightIntensity,
 
-        [ValidValues(typeof(bool))]
-        LocalAuthorizeOffline,
+    [ValidValues(typeof(bool))]
+    LocalAuthorizeOffline,
 
-        [ValidValues(typeof(bool))]
-        LocalPreAuthorize,
+    [ValidValues(typeof(bool))]
+    LocalPreAuthorize,
 
-        [ValueUnit("Wh")]
-        [ValidValues(typeof(int))]
-        MaxEnergyOnInvalidId,
+    [ValueUnit("Wh")]
+    [ValidValues(typeof(int))]
+    MaxEnergyOnInvalidId,
 
-        [ValueList]
-        [ValidValues(typeof(MessageConstants.Measurand.Enum))]
-        MeterValuesAlignedData,
+    [ValueList]
+    [ValidValues(typeof(Measurand.Enum))]
+    MeterValuesAlignedData,
 
-        [ValidValues(typeof(int))]
-        MeterValuesAlignedDataMaxLength,
+    [ValidValues(typeof(int))]
+    MeterValuesAlignedDataMaxLength,
 
-        [ValueList]
-        [ValidValues(typeof(MessageConstants.Measurand.Enum))]
-        MeterValuesSampledData,
+    [ValueList]
+    [ValidValues(typeof(Measurand.Enum))]
+    MeterValuesSampledData,
 
-        [ValidValues(typeof(int))]
-        MeterValuesSampledDataMaxLength,
+    [ValidValues(typeof(int))]
+    MeterValuesSampledDataMaxLength,
 
-        [ValueUnit("s")]
-        [ValidValues(typeof(int))]
-        MeterValueSampleInterval,
+    [ValueUnit("s")]
+    [ValidValues(typeof(int))]
+    MeterValueSampleInterval,
 
-        [ValueUnit("s")]
-        [ValidValues(typeof(int))]
-        MinimumStatusDuration,
+    [ValueUnit("s")]
+    [ValidValues(typeof(int))]
+    MinimumStatusDuration,
 
-        [ValidValues(typeof(int))]
-        NumberOfConnectors,
+    [ValidValues(typeof(int))]
+    NumberOfConnectors,
 
-        [ValidValues(typeof(int))]
-        ResetRetries,
+    [ValidValues(typeof(int))]
+    ResetRetries,
 
-        [ValueIndexed]
-        [ValueList]
-        [ValidValues(typeof(MessageConstants.ConnectorPhaseRotation.Enum))]
-        ConnectorPhaseRotation,
-        
-        [ValidValues(typeof(int))]
-        ConnectorPhaseRotationMaxLength,
+    [ValueIndexed]
+    [ValueList]
+    [ValidValues(typeof(ConnectorPhaseRotation.Enum))]
+    ConnectorPhaseRotation,
 
-        [ValidValues(typeof(bool))]
-        StopTransactionOnEVSideDisconnect,
+    [ValidValues(typeof(int))]
+    ConnectorPhaseRotationMaxLength,
 
-        [ValidValues(typeof(bool))]
-        StopTransactionOnInvalidId,
+    [ValidValues(typeof(bool))]
+    StopTransactionOnEVSideDisconnect,
 
-        [ValueList]
-        [ValidValues(typeof(MessageConstants.Measurand.Enum))]
-        StopTxnAlignedData,
+    [ValidValues(typeof(bool))]
+    StopTransactionOnInvalidId,
 
-        [ValidValues(typeof(int))]
-        StopTxnAlignedDataMaxLength,
+    [ValueList]
+    [ValidValues(typeof(Measurand.Enum))]
+    StopTxnAlignedData,
 
-        [ValueList]
-        [ValidValues(typeof(MessageConstants.Measurand.Enum))]
-        StopTxnSampledData,
-        
-        [ValidValues(typeof(int))]
-        StopTxnSampledDataMaxLength,
+    [ValidValues(typeof(int))]
+    StopTxnAlignedDataMaxLength,
 
-        [ValueList]
-        [ValidValues(typeof(MessageConstants.FeatureProfile.Enum))]
-        SupportedFeatureProfiles,
+    [ValueList]
+    [ValidValues(typeof(Measurand.Enum))]
+    StopTxnSampledData,
 
-        [ValidValues(typeof(int))]
-        SupportedFeatureProfilesMaxLength,
+    [ValidValues(typeof(int))]
+    StopTxnSampledDataMaxLength,
 
-        [ValidValues(typeof(int))]
-        TransactionMessageAttempts,
+    [ValueList]
+    [ValidValues(typeof(FeatureProfile.Enum))]
+    SupportedFeatureProfiles,
 
-        [ValueUnit("s")]
-        [ValidValues(typeof(int))]
-        TransactionMessageRetryInterval,
+    [ValidValues(typeof(int))]
+    SupportedFeatureProfilesMaxLength,
 
-        [ValidValues(typeof(bool))]
-        UnlockConnectorOnEVSideDisconnect,
+    [ValidValues(typeof(int))]
+    TransactionMessageAttempts,
 
-        [ValueUnit("s")]
-        [ValidValues(typeof(int))]
-        WebSocketPingInterval,
+    [ValueUnit("s")]
+    [ValidValues(typeof(int))]
+    TransactionMessageRetryInterval,
 
-        #endregion
+    [ValidValues(typeof(bool))]
+    UnlockConnectorOnEVSideDisconnect,
 
-        #region "Local Auth List Management Profile"
+    [ValueUnit("s")]
+    [ValidValues(typeof(int))]
+    WebSocketPingInterval,
 
-        [ValidValues(typeof(bool))]
-        LocalAuthListEnabled,
+    #endregion
 
-        [ValidValues(typeof(int))]
-        LocalAuthListMaxLength,
+    #region "Local Auth List Management Profile"
 
-        [ValidValues(typeof(int))]
-        SendLocalListMaxLength,
+    [ValidValues(typeof(bool))]
+    LocalAuthListEnabled,
 
-        #endregion
-    
-        #region "Reservation Profile"
+    [ValidValues(typeof(int))]
+    LocalAuthListMaxLength,
 
-        [ValidValues(typeof(bool))]
-        ReserveConnectorZeroSupported,
+    [ValidValues(typeof(int))]
+    SendLocalListMaxLength,
 
-        #endregion
-    
-        #region "Smart Charging Profile"
+    #endregion
 
-        [ValidValues(typeof(int))]
-        ChargeProfileMaxStackLevel,
+    #region "Reservation Profile"
 
-        [ValueList]
-        [ValidValues(typeof(MessageConstants.ChargingRateUnitType.QuantityEnum))]
-        ChargingScheduleAllowedChargingRateUnit,
+    [ValidValues(typeof(bool))]
+    ReserveConnectorZeroSupported,
 
-        [ValidValues(typeof(int))]
-        ChargingScheduleMaxPeriods,
+    #endregion
 
-        [ValidValues(typeof(bool))]
-        ConnectorSwitch3to1PhaseSupported,
+    #region "Smart Charging Profile"
 
-        [ValidValues(typeof(int))]
-        MaxChargingProfilesInstalled,
+    [ValidValues(typeof(int))]
+    ChargeProfileMaxStackLevel,
 
-        #endregion
-    }
+    [ValueList]
+    [ValidValues(typeof(ChargingRateQuantityType.Enum))]
+    ChargingScheduleAllowedChargingRateUnit,
+
+    [ValidValues(typeof(int))]
+    ChargingScheduleMaxPeriods,
+
+    [ValidValues(typeof(bool))]
+    ConnectorSwitch3to1PhaseSupported,
+
+    [ValidValues(typeof(int))]
+    MaxChargingProfilesInstalled,
+
+    #endregion
 }

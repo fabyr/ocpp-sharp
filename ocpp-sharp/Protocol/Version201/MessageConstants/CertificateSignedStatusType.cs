@@ -1,19 +1,20 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.MessageConstants
+namespace OcppSharp.Protocol.Version201.MessageConstants;
+
+public static class CertificateSignedStatusType
 {
-    public static class CertificateSignedStatusType
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(CertificateSignedStatusType.Accepted)]
-            Accepted,
-            [StringValue(CertificateSignedStatusType.Rejected)]
-            Rejected
-        }
-        public const string Accepted = "Accepted";
-        public const string Rejected = "Rejected";
+        [StringValue(CertificateSignedStatusType.Accepted)]
+        Accepted,
+
+        [StringValue(CertificateSignedStatusType.Rejected)]
+        Rejected
     }
+
+    public const string Accepted = "Accepted";
+    public const string Rejected = "Rejected";
 }

@@ -1,19 +1,20 @@
-using System;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.MessageConstants
+namespace OcppSharp.Protocol.Version16.MessageConstants;
+
+public static class ValueFormat
 {
-    public static class ValueFormat
+    [JsonConverter(typeof(OcppEnumJsonConverter))]
+    [OcppEnum]
+    public enum Enum
     {
-        [Newtonsoft.Json.JsonConverter(typeof(OcppEnumJsonConverter))]
-		[OcppEnum]
-        public enum Enum
-        {
-            [StringValue(ValueFormat.Raw)]
-            Raw,
-            [StringValue(ValueFormat.SignedData)]
-            SignedData
-        }
-        public const string Raw = "Raw";
-        public const string SignedData = "SignedData";
+        [StringValue(ValueFormat.Raw)]
+        Raw,
+
+        [StringValue(ValueFormat.SignedData)]
+        SignedData
     }
+
+    public const string Raw = "Raw";
+    public const string SignedData = "SignedData";
 }

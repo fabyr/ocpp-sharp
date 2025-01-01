@@ -1,60 +1,57 @@
-﻿using System;
-using OcppSharp;
-using OcppSharp.Client;
+﻿using OcppSharp.Client;
 using OcppSharp.Protocol;
 using OcppSharp.Protocol.Version16.RequestPayloads;
 using OcppSharp.Protocol.Version16.ResponsePayloads;
 using OcppSharp.Protocol.Version16.Types;
 
-namespace OcppSharp.Examples.Client
+namespace OcppSharp.Examples.Client;
+
+public class Program
 {
-    public class Program
+    private static readonly ManualResetEvent _closeEvent = new(false);
+
+    public static async Task Main(string[] args)
     {
-        private static ManualResetEvent _closeEvent = new ManualResetEvent(false);
-
-        public static async Task Main(string[] args)
+        Console.CancelKeyPress += (s, e) =>
         {
-            Console.CancelKeyPress += (s, e) =>
+            e.Cancel = true;
+            Console.WriteLine("Ctrl+C detected. Shutting down...");
+            _closeEvent.Set();
+        };
+
+        using (OcppSharpClient client = new("ws://localhost:8000/ocpp16/example_id_1234", ProtocolVersion.OCPP16))
+        {
+            // Example handler
+            client.RegisterHandler<GetConfigurationRequest>((client, resp) =>
             {
-                e.Cancel = true;
-                Console.WriteLine("Ctrl+C detected. Shutting down...");
-                _closeEvent.Set();
-            };
+                Console.WriteLine("Got a GetConfiguration request from the server.");
 
-            using(OcppSharpClient client = new OcppSharpClient("ws://localhost:8000/ocpp16/example_id_1234", ProtocolVersion.OCPP16))
+                return new GetConfigurationResponse()
+                {
+                    ConfigurationKey = [new KeyValue() { Key = "Example", Value = "Config" }]
+                };
+            });
+
+            client.Connect();
+
+            // Send a boot notification
+            Response resp = await client.SendRequestAsync(new BootNotificationRequest()
             {
-                // Example handler
-                client.RegisterHandler<GetConfigurationRequest>((client, resp) => 
-                {
-                    Console.WriteLine("Got a GetConfiguration request from the server.");
+                ChargePointVendor = "example",
+                ChargePointModel = "example-model",
+                FirmwareVersion = "1.0"
+            });
 
-                    return new GetConfigurationResponse()
-                    {
-                        configurationKey = new[] { new KeyValue() { key = "Example", value = "Config" } }
-                    };
-                });
+            BootNotificationResponse? payload = resp.Payload as BootNotificationResponse;
 
-                client.Connect();
+            // Do something with the payload...
 
-                // Send a boot notification
-                Response resp = await client.SendRequestAsync(new BootNotificationRequest()
-                {
-                    chargePointVendor = "example",
-                    chargePointModel = "example-model",
-                    firmwareVersion = "1.0"
-                });
+            // Example output of full json
+            Console.WriteLine($"Got BootNotification response: {resp.BaseJson}");
 
-                BootNotificationResponse? payload = resp.Payload as BootNotificationResponse;
-
-                // Do something with the payload...
-
-                // Example output of full json
-                Console.WriteLine($"Got BootNotification response: {resp.BaseJson}");
-
-                _closeEvent.WaitOne();
-                client.Disconnect();
-                Console.WriteLine("Stopped.");
-            }
+            _closeEvent.WaitOne();
+            client.Disconnect();
+            Console.WriteLine("Stopped.");
         }
     }
 }

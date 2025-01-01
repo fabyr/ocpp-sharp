@@ -1,12 +1,11 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
 using OcppSharp.Protocol.Version201.Types;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.ResponsePayloads
+namespace OcppSharp.Protocol.Version201.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "ClearVariableMonitoring", OcppMessageAttribute.Direction.PointToCentral)]
+public class ClearVariableMonitoringResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "ClearVariableMonitoring", OcppMessageAttribute.Direction.PointToCentral)]
-    public class ClearVariableMonitoringResponse : ResponsePayload
-    {
-        public ClearMonitoringResult[] clearMonitoringResult = new ClearMonitoringResult[0];
-    }
+    [JsonProperty("clearMonitoringResult")]
+    public ClearMonitoringResult[] ClearMonitoringResult { get; set; } = [];
 }

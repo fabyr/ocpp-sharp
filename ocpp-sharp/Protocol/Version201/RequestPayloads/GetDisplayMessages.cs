@@ -1,16 +1,20 @@
-using System;
-using OcppSharp.Protocol.Version201.Types;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetDisplayMessages", OcppMessageAttribute.Direction.CentralToPoint)]
+public class GetDisplayMessagesRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetDisplayMessages", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class GetDisplayMessagesRequest : RequestPayload
-    {
-        public long[]? id;
-        public long requestId;
-        public MessagePriorityType.Enum priority;
-        public MessageStateType.Enum state;
+    [JsonProperty("id")]
+    public long[]? Id { get; set; }
 
-    }
+    [JsonProperty("requestId")]
+    public long RequestId { get; set; }
+
+    [JsonProperty("priority")]
+    public MessagePriorityType.Enum Priority { get; set; }
+
+    [JsonProperty("state")]
+    public MessageStateType.Enum State { get; set; }
 }

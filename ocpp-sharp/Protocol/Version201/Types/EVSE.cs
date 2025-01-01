@@ -1,13 +1,14 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct EVSE
 {
-    public struct EVSE
-    {
-        public static readonly EVSE Empty = new EVSE();
+    public static readonly EVSE Empty = new();
 
-        public ulong id;
-        public long connectorId;
-    }
+    [JsonProperty("id")]
+    public ulong Id { get; set; }
+
+    [JsonProperty("connectorId")]
+    public long ConnectorId { get; set; }
 }

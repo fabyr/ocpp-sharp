@@ -1,13 +1,15 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
 using OcppSharp.Protocol.Version201.Types;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.ResponsePayloads
+namespace OcppSharp.Protocol.Version201.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "GetDisplayMessages", OcppMessageAttribute.Direction.PointToCentral)]
+public class GetDisplayMessagesResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "GetDisplayMessages", OcppMessageAttribute.Direction.PointToCentral)]
-    public class GetDisplayMessagesResponse : ResponsePayload
-    {
-        public GetDisplayMessagesStatusType.Enum status;
-        public StatusInfo? statusInfo;
-    }
+    [JsonProperty("status")]
+    public GetDisplayMessagesStatusType.Enum Status { get; set; }
+
+    [JsonProperty("statusInfo")]
+    public StatusInfo? StatusInfo { get; set; }
 }

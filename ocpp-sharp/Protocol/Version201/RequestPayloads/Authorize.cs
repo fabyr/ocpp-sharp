@@ -1,14 +1,17 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "Authorize", OcppMessageAttribute.Direction.PointToCentral)]
+public class AuthorizeRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "Authorize", OcppMessageAttribute.Direction.PointToCentral)]
-    public class AuthorizeRequest : RequestPayload
-    {
-        public string? certificate;
-        public IdToken idToken = IdToken.Empty;
-        public OCSPRequestData iso15118CertificateHashData = OCSPRequestData.Empty;
+    [JsonProperty("certificate")]
+    public string? Certificate { get; set; }
 
-    }
+    [JsonProperty("idToken")]
+    public IdToken IdToken { get; set; } = IdToken.Empty;
+
+    [JsonProperty("iso15118CertificateHashData")]
+    public OCSPRequestData Iso15118CertificateHashData { get; set; } = OCSPRequestData.Empty;
 }

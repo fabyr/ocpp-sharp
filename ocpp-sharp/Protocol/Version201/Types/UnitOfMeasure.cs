@@ -1,17 +1,17 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct UnitOfMeasure
 {
-    public struct UnitOfMeasure
-    {
-        public static readonly UnitOfMeasure Empty = new UnitOfMeasure();
+    public static readonly UnitOfMeasure Empty = new();
 
-        public string? unit; // From list of Standardized Units in Part 2 Appendices
+    [JsonProperty("unit")]
+    public string? Unit { get; set; } // From list of Standardized Units in Part 2 Appendices
 
-        /// <summary>
-        /// The value is multiplied by 10^multiplier (power)
-        /// </summary>
-        public int? multiplier; // Default is 0
-    }
+    /// <summary>
+    /// The value is multiplied by 10^multiplier (power)
+    /// </summary>
+    [JsonProperty("multiplier")]
+    public int? Multiplier { get; set; } // Default is 0
 }

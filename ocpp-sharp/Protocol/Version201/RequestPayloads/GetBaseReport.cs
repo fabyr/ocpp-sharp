@@ -1,14 +1,14 @@
-using System;
-using OcppSharp.Protocol.Version201.Types;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetBaseReport", OcppMessageAttribute.Direction.CentralToPoint)]
+public class GetBaseReportRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetBaseReport", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class GetBaseReportRequest : RequestPayload
-    {
-        public long requestId;
-        public ReportBaseType.Enum reportBase;
+    [JsonProperty("requestId")]
+    public long RequestId { get; set; }
 
-    }
+    [JsonProperty("reportBase")]
+    public ReportBaseType.Enum ReportBase { get; set; }
 }

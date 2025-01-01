@@ -1,19 +1,33 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct IdTokenInfo
 {
-    public struct IdTokenInfo
-    {
-        public static readonly IdTokenInfo Empty = new IdTokenInfo();
+    public static readonly IdTokenInfo Empty = new();
 
-        public AuthorizationStatusType.Enum status;
-        public DateTime? cacheExpiryDateTime;
-        public int? chargingPriority;
-        public string? language1;
-        public int? evseId;
-        public string? language2;
-        public IdToken? groupIdToken;
-        public MessageContent? personalMessage;
-    }
+    [JsonProperty("status")]
+    public AuthorizationStatusType.Enum Status { get; set; }
+
+    [JsonProperty("cacheExpiryDateTime")]
+    public DateTime? CacheExpiryDateTime { get; set; }
+
+    [JsonProperty("chargingPriority")]
+    public int? ChargingPriority { get; set; }
+
+    [JsonProperty("language1")]
+    public string? Language1 { get; set; }
+
+    [JsonProperty("evseId")]
+    public int? EvseId { get; set; }
+
+    [JsonProperty("language2")]
+    public string? Language2 { get; set; }
+
+    [JsonProperty("groupIdToken")]
+    public IdToken? GroupIdToken { get; set; }
+
+    [JsonProperty("personalMessage")]
+    public MessageContent? PersonalMessage { get; set; }
 }

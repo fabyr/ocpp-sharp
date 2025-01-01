@@ -6,13 +6,15 @@ Supported Versions:
 - Ocpp 2.0.1
 
 ## Table of contents
-- [Dependencies](#dependencies)
-- [Features](#features)
-- [What it isn't](#what-it-isnt)
-- [Possible use cases](#possible-use-cases)
-- [Running the Examples](#running-the-examples)
-- [Basic Server Code](#basic-server-code)
-- [Motivation](#motivation)
+- [ocpp-sharp](#ocpp-sharp)
+  - [Table of contents](#table-of-contents)
+  - [Dependencies](#dependencies)
+  - [Features](#features)
+  - [What it isn't](#what-it-isnt)
+  - [Possible use cases](#possible-use-cases)
+  - [Running the Examples](#running-the-examples)
+  - [Basic Server Code](#basic-server-code)
+  - [Motivation](#motivation)
 
 ## Dependencies
 - Newtonsoft.Json
@@ -46,42 +48,44 @@ dotnet run
 
 ## Basic Server Code
 ```cs
-using System;
 using OcppSharp;
 using OcppSharp.Server;
 using OcppSharp.Protocol.Version16.RequestPayloads;
 using OcppSharp.Protocol.Version16.ResponsePayloads;
 
-namespace OcppApp
+namespace OcppApp;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        // set up a server to listen on port 80
+        // Stations will be connecting to ws://<Hostname>/ocpp16/<Station ID>
+        OcppSharpServer server = new("/ocpp16", ProtocolVersion.OCPP16, 80)
         {
-            // set up a server to listen on port 80
-            // Stations will be connecting to ws://<Hostname>/ocpp16/<Station ID>
-            OcppSharpServer server = new OcppSharpServer("/ocpp16", ProtocolVersion.OCPP16, 80);
-            server.Log = null; // Disable console logging
-            server.RegisterHandler<BootNotificationRequest>((server, sender, req) => {
+            Log = null // Disable console logging
+        };
 
-                Console.WriteLine($"Received BootNotification! (Message ID = {req.FullRequest!.MessageId})");
-                Console.WriteLine($"Vendor: {req.chargePointVendor}");
-                Console.WriteLine($"Serial Number: {req.chargePointSerialNumber}");
-                // ...
+        server.RegisterHandler<BootNotificationRequest>((server, sender, req) =>
+        {
 
-                // Always need to send a response
-                return new BootNotificationResponse()
-                {
-                    currentTime = DateTime.Now,
-                    interval = 90 // Heartbeat Interval
-                };
-            });
+            Console.WriteLine($"Received BootNotification! (Message ID = {req.FullRequest!.MessageId})");
+            Console.WriteLine($"Vendor: {req.ChargePointVendor}");
+            Console.WriteLine($"Serial Number: {req.ChargePointSerialNumber}");
+            // ...
 
-            server.Start();
-            Console.WriteLine("Server started!");
-            Console.ReadLine();
-            server.Stop();
-        }
+            // Always need to send a response
+            return new BootNotificationResponse()
+            {
+                CurrentTime = DateTime.Now,
+                Interval = 90 // Heartbeat Interval
+            };
+        });
+
+        server.Start();
+        Console.WriteLine("Server started!");
+        Console.ReadLine();
+        server.Stop();
     }
 }
 ```

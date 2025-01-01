@@ -1,14 +1,18 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct IdToken
 {
-    public struct IdToken
-    {
-        public static readonly IdToken Empty = new IdToken();
+    public static readonly IdToken Empty = new();
 
-        public CiString idToken;
-        public IdTokenType.Enum type;
-        public AdditionalInfo[]? additionalInfo;
-    }
+    [JsonProperty("idToken")]
+    public CiString IdTokenValue { get; set; }
+
+    [JsonProperty("type")]
+    public IdTokenType.Enum Type { get; set; }
+
+    [JsonProperty("additionalInfo")]
+    public AdditionalInfo[]? AdditionalInfo { get; set; }
 }

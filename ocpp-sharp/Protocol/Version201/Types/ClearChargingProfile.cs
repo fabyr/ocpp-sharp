@@ -1,14 +1,18 @@
-using System;
 using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.Types
+namespace OcppSharp.Protocol.Version201.Types;
+
+public struct ClearChargingProfile
 {
-    public struct ClearChargingProfile
-    {
-        public static readonly ClearChargingProfile Empty = new ClearChargingProfile();
+    public static readonly ClearChargingProfile Empty = new();
 
-        public long? evseId;
-        public ChargingProfilePurposeType.Enum? chargingProfilePurpose;
-        public int? stackLevel;
-    }
+    [JsonProperty("evseId")]
+    public long? EvseId { get; set; }
+
+    [JsonProperty("chargingProfilePurpose")]
+    public ChargingProfilePurposeType.Enum? ChargingProfilePurpose { get; set; }
+
+    [JsonProperty("stackLevel")]
+    public int? StackLevel { get; set; }
 }

@@ -1,12 +1,10 @@
-using System;
-using OcppSharp.Protocol.Version16.Types;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.RequestPayloads
+namespace OcppSharp.Protocol.Version16.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "UnlockConnector", OcppMessageAttribute.Direction.CentralToPoint)]
+public class UnlockConnectorRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "UnlockConnector", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class UnlockConnectorRequest : RequestPayload
-    {
-        public ulong connectorId; // mute be > 0
-
-    }
+    [JsonProperty("connectorId")]
+    public ulong ConnectorId { get; set; }
 }

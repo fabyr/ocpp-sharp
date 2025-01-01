@@ -1,15 +1,20 @@
-using System;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 using OcppSharp.Protocol.Version201.Types;
 
-namespace OcppSharp.Protocol.Version201.ResponsePayloads
+namespace OcppSharp.Protocol.Version201.ResponsePayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "TransactionEvent", OcppMessageAttribute.Direction.CentralToPoint)]
+public class TransactionEventResponse : ResponsePayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "TransactionEvent", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class TransactionEventResponse : ResponsePayload
-    {
-        public decimal? totalCost;
-        public int? chargingPriority;
-        public IdTokenInfo? idTokenInfo;
-        public MessageContent? updatedPersonalMessage;
-    }
+    [JsonProperty("totalCost")]
+    public decimal? TotalCost { get; set; }
+
+    [JsonProperty("chargingPriority")]
+    public int? ChargingPriority { get; set; }
+
+    [JsonProperty("idTokenInfo")]
+    public IdTokenInfo? IdTokenInfo { get; set; }
+
+    [JsonProperty("updatedPersonalMessage")]
+    public MessageContent? UpdatedPersonalMessage { get; set; }
 }

@@ -1,41 +1,49 @@
-using System;
+using OcppSharp.Protocol.Version16.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.Types
+namespace OcppSharp.Protocol.Version16.Types;
+
+public struct SampledValue
 {
-    public struct SampledValue
-    {
-        public static readonly SampledValue Empty = new SampledValue();
+    public static readonly SampledValue Empty = new();
 
-        public string value;
+    [JsonProperty("value")]
+    public string Value { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.ReadingContext"/>
-        /// </summary>
-        public MessageConstants.ReadingContext.Enum? context;
+    /// <summary>
+    /// Valid values in <see cref="ReadingContext"/>
+    /// </summary>
+    [JsonProperty("context")]
+    public ReadingContext.Enum? Context { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.ValueFormat"/>
-        /// </summary>
-        public MessageConstants.ValueFormat.Enum? format;
+    /// <summary>
+    /// Valid values in <see cref="ValueFormat"/>
+    /// </summary>
+    [JsonProperty("format")]
+    public ValueFormat.Enum? Format { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.Measurand"/>
-        /// </summary>
-        public MessageConstants.Measurand.Enum? measurand;// = MessageConstants.Measurand.Enum.EnergyActiveImportRegister;
+    /// <summary>
+    /// Valid values in <see cref="MessageConstants.Measurand"/>
+    /// </summary>
+    [JsonProperty("measurand")]
+    public Measurand.Enum? Measurand { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.Phase"/>
-        /// </summary>
-        public MessageConstants.Phase.Enum? phase;
+    /// <summary>
+    /// Valid values in <see cref="MessageConstants.Phase"/>
+    /// </summary>
+    [JsonProperty("phase")]
+    public Phase.Enum? Phase { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.Location"/>
-        /// </summary>
-        public MessageConstants.Location.Enum? location;
+    /// <summary>
+    /// Valid values in <see cref="MessageConstants.Location"/>
+    /// </summary>
+    [JsonProperty("location")]
+    public Location.Enum? Location { get; set; }
 
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.UnitOfMeasure"/>
-        /// </summary>
-        public MessageConstants.UnitOfMeasure.Enum? unit; // Default = MessageConstants.UnitOfMeasure.Enum.Wh;
-    }
+    /// <summary>
+    /// Valid values in <see cref="UnitOfMeasure"/> <br/>
+    /// Default according to specification: <see cref="UnitOfMeasure.Enum.Wh"/>
+    /// </summary>
+    [JsonProperty("unit")]
+    public UnitOfMeasure.Enum? Unit { get; set; }
 }

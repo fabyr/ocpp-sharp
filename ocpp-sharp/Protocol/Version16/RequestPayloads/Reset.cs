@@ -1,14 +1,14 @@
-using System;
+using OcppSharp.Protocol.Version16.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version16.RequestPayloads
+namespace OcppSharp.Protocol.Version16.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "Reset", OcppMessageAttribute.Direction.CentralToPoint)]
+public class ResetRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "Reset", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class ResetRequest : RequestPayload
-    {
-        /// <summary>
-        /// Valid Values in <see cref="OcppSharp.Protocol.MessageConstants.ResetType"/>
-        /// </summary>
-        public MessageConstants.ResetType.Enum type;
-
-    }
+    /// <summary>
+    /// Valid values in <see cref="ResetType"/>
+    /// </summary>
+    [JsonProperty("type")]
+    public ResetType.Enum Type { get; set; }
 }

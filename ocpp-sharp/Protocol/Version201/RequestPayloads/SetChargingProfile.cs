@@ -1,14 +1,14 @@
-using System;
 using OcppSharp.Protocol.Version201.Types;
-using OcppSharp.Protocol.Version201.MessageConstants;
+using Newtonsoft.Json;
 
-namespace OcppSharp.Protocol.Version201.RequestPayloads
+namespace OcppSharp.Protocol.Version201.RequestPayloads;
+
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "SetChargingProfile", OcppMessageAttribute.Direction.CentralToPoint)]
+public class SetChargingProfileRequest : RequestPayload
 {
-    [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "SetChargingProfile", OcppMessageAttribute.Direction.CentralToPoint)]
-    public class SetChargingProfileRequest : RequestPayload
-    {
-        public long evseId;
-        public ChargingProfile chargingProfile;
-        
-    }
+    [JsonProperty("evseId")]
+    public long EvseId { get; set; }
+
+    [JsonProperty("chargingProfile")]
+    public ChargingProfile ChargingProfile { get; set; }
 }
