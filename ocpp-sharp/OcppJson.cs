@@ -2,6 +2,7 @@ using OcppSharp.Protocol;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace OcppSharp;
 
@@ -24,14 +25,12 @@ public static class OcppJson
 
         Assembly currentAssembly = Assembly.GetExecutingAssembly();
 
-        // Scan the assembly for Types having a "[OcppMessage(...)]", and add the appropriate ones to the dictionaries
+        // Scan the assembly for Types defining "[OcppMessage(...)]" and add them to the dictionaries
         foreach (Type type in currentAssembly.GetTypes())
         {
-            OcppMessageAttribute[] attrs;
-            if ((attrs = (OcppMessageAttribute[])type.GetCustomAttributes(typeof(OcppMessageAttribute), true)).Length == 1)
+            OcppMessageAttribute? attr = type.GetCustomAttributes<OcppMessageAttribute>(true).FirstOrDefault();
+            if (attr != null)
             {
-                OcppMessageAttribute attr = attrs[0];
-
                 switch (attr.MsgType)
                 {
                     case OcppMessageAttribute.MessageType.Request:
@@ -45,73 +44,21 @@ public static class OcppJson
         }
     }
 
-    public static string? GetStringValue(Enum? e)
-    {
-        if (e == null)
-            return null;
-        StringValueAttribute? attr = null;
-        if ((attr = e.GetAttributeOfType<StringValueAttribute>()) != null)
-        {
-            return attr.Text;
-        }
-        return e.ToString();
-    }
-
-    public static T? GetEnumValue<T>(string stringValue) where T : Enum
-    {
-        return (T?)GetEnumValue(stringValue, typeof(T));
-    }
-
-    public static Enum? GetEnumValue(string stringValue, Type enumType)
-    {
-        var values = Enum.GetValues(enumType).Cast<Enum>();
-
-        foreach (Enum value in values)
-        {
-            CiString? compare = value.GetAttributeOfType<StringValueAttribute>()?.Text ?? value.ToString();
-            if (compare == stringValue)
-            {
-                return value;
-            }
-        }
-        return null;
-    }
-
-    public static string SerializeObject(object? obj, bool humanReadable = false)
-    {
-        JsonSerializerSettings jsonSerializerSettings = new()
-        {
-            TypeNameHandling = TypeNameHandling.None,
-            NullValueHandling = NullValueHandling.Ignore
-        };
-        if (humanReadable)
-            jsonSerializerSettings.Formatting = Formatting.Indented;
-
-        string json = JsonConvert.SerializeObject(obj, jsonSerializerSettings);
-        return json;
-    }
-
-    public static T? DeserializeObject<T>(string json)
-    {
-        JsonSerializerSettings jsonSerializerSettings = new()
-        {
-            TypeNameHandling = TypeNameHandling.None,
-            NullValueHandling = NullValueHandling.Ignore
-        };
-
-        return JsonConvert.DeserializeObject<T>(json, jsonSerializerSettings);
-    }
-
     public static bool IsRequest(string json)
     {
         JArray array = JArray.Parse(json);
         int messageKind = array[0].ToObject<int>();
-        return messageKind == 2;// && messageRequestTypeMap.ContainsKey(array[2].ToObject<string>());
+        return messageKind == Request.MessageKind;
     }
 
     private static Dictionary<CiString, Type> GetMap(ProtocolVersion version, bool responseMap)
     {
-        return responseMap ? messageResponseTypeMap[version] : messageRequestTypeMap[version];
+        return (responseMap ? messageResponseTypeMap : messageRequestTypeMap)[version];
+    }
+
+    private static Type GetMessageType(ProtocolVersion version, bool responseMap, CiString key)
+    {
+        return GetMap(version, responseMap)[key];
     }
 
     // Decodes a Request JSON to the corresponding object, always of base type Request
@@ -120,13 +67,19 @@ public static class OcppJson
         JArray array = JArray.Parse(json);
         string messageType = array[2].ToObject<string>() ?? throw new Exception();
         string messageId = array[1].ToObject<string>() ?? throw new Exception();
-        Request req = new(array[0].ToObject<int>(), messageId, messageType);
 
-        JsonSerializer jse = new();
+        Debug.Assert(array[0].ToObject<int>() == Request.MessageKind, "Invalid Message Header for Request");
 
-        req.Payload = (RequestPayload?)array[3].ToObject(GetMap(version, false)[messageType], jse);
-        if (req.Payload != null) req.Payload.FullRequest = req;
+        Request req = new(messageId, messageType);
+
+        JsonSerializer serializer = new();
+
+        req.Payload = (RequestPayload?)array[3].ToObject(GetMessageType(version, false, messageType), serializer);
+        if (req.Payload == null)
+            throw new FormatException("Failed to parse request payload.");
+        req.Payload.FullRequest = req;
         req.ProtocolVersion = version;
+
         return req;
     }
 
@@ -138,7 +91,10 @@ public static class OcppJson
     {
         JArray array = JArray.Parse(json);
         string messageId = array[1].ToObject<string>() ?? throw new Exception();
-        Response resp = new(array[0].ToObject<int>(), messageId)
+
+        Debug.Assert(array[0].ToObject<int>() == Response.MessageKind, "Invalid Message Header for Response");
+
+        Response resp = new(messageId)
         {
             ProtocolVersion = version
         };
@@ -149,23 +105,23 @@ public static class OcppJson
     /// Parses the rest of an unfinished response parsed by DecodeResponseCrude.
     /// It directly modifies the reference of the supplied crudeResponse.
     /// </summary>
-    /// <param name="requestMessageType">Since a response does not contain the type of request it originates from, <br/>this needs to be supplied for proper parsing.</param>
+    /// <param name="requestMessageType">Since a response does not contain the type of request it originates from, <br/>this parameter needs to be supplied for proper parsing.</param>
     public static void DecodeResponseFull(Response crudeResponse, string requestMessageType)
     {
-        JArray array = JArray.Parse(crudeResponse.BaseJson);
+        JArray array = JArray.Parse(crudeResponse.OriginalJsonBody);
 
-        JsonSerializer jse = new();
+        JsonSerializer serializer = new();
 
-        crudeResponse.Payload = (ResponsePayload?)array[2].ToObject(GetMap(crudeResponse.ProtocolVersion, true)[requestMessageType], jse);
-        if (crudeResponse.Payload != null) crudeResponse.Payload.FullResponse = crudeResponse;
+        crudeResponse.Payload = (ResponsePayload?)array[2].ToObject(GetMessageType(crudeResponse.ProtocolVersion, true, requestMessageType), serializer);
+        if (crudeResponse.Payload != null)
+            crudeResponse.Payload.FullResponse = crudeResponse;
     }
 
     // Serialize Response object to JSON
     public static string SerializeResponse(Response resp)
     {
-        object?[] array =
-        [
-            resp.MessageKind,
+        object?[] array = [
+            Response.MessageKind,
             resp.MessageId,
             resp.Payload
         ];
@@ -183,9 +139,8 @@ public static class OcppJson
     // Serialize Request object to JSON
     public static string SerializeRequest(Request req)
     {
-        object?[] array =
-        [
-            req.MessageKind,
+        object?[] array = [
+            Request.MessageKind,
             req.MessageId,
             req.MessageType,
             req.Payload
@@ -197,7 +152,6 @@ public static class OcppJson
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        string json = JsonConvert.SerializeObject(array, jsonSerializerSettings);
-        return json;
+        return JsonConvert.SerializeObject(array, jsonSerializerSettings);
     }
 }

@@ -1,10 +1,12 @@
 namespace OcppSharp;
 
-public class Log
+public class Logger
 {
+    public static Logger Default => new(Console.Out, Console.Error);
+
     private readonly TextWriter @out, err;
 
-    public Log(TextWriter @out, TextWriter err)
+    public Logger(TextWriter @out, TextWriter err)
     {
         this.@out = @out;
         this.err = err;
@@ -12,47 +14,35 @@ public class Log
 
     public bool EnableLogging { get; set; } = true;
 
-    private string GetDate(bool dateFormat)
+    private static string GetCurrentDateFormatted(bool dateFormat)
     {
         if (dateFormat)
             return $"{DateTime.Now:HH:mm:ss}\t";
         return string.Empty;
     }
 
-    public virtual void Write(string text)
+    protected virtual void WriteTo(TextWriter writer, params string[] text)
     {
         if (EnableLogging)
-            @out.Write(text);
+            foreach (string item in text)
+                writer.Write(item);
     }
 
-    public virtual void WriteLine(string text, bool dateFormat = true)
-        => Write(GetDate(dateFormat) + text + @out.NewLine);
-
-    public virtual void WriteVerbose(string text)
+    protected virtual string[] GetFormattedLine(string text, bool dateFormat = true)
     {
-        if (EnableLogging)
-            @out.Write(text);
+        return [GetCurrentDateFormatted(dateFormat), text, Environment.NewLine];
     }
 
-    public virtual void WriteVerboseLine(string text, bool dateFormat = true)
-        => WriteVerbose(GetDate(dateFormat) + text + @out.NewLine);
+    public virtual void Write(params string[] text) => WriteTo(@out, text);
+    public virtual void WriteLine(string text, bool dateFormat = true) => Write(GetFormattedLine(text, dateFormat));
 
-    public virtual void WriteErr(string text)
-    {
-        if (EnableLogging)
-            err.Write(text);
-    }
+    public virtual void WriteErr(params string[] text) => WriteTo(err, text);
+    public virtual void WriteLineErr(string text, bool dateFormat = true) => WriteErr(GetFormattedLine(text, dateFormat));
 
-    public virtual void WriteLineErr(string text, bool dateFormat = true)
-        => WriteErr(GetDate(dateFormat) + text + err.NewLine);
+    // Might add special formatting in future
+    public virtual void WriteVerbose(params string[] text) => Write(text);
+    public virtual void WriteVerboseLine(string text, bool dateFormat = true) => WriteVerbose(GetFormattedLine(text, dateFormat));
 
-    public virtual void WriteWarn(string text)
-    {
-        // Might add special formatting in future
-        if (EnableLogging)
-            @out.Write(text);
-    }
-
-    public virtual void WriteLineWarn(string text, bool dateFormat = true)
-        => WriteWarn(GetDate(dateFormat) + text + @out.NewLine);
+    public virtual void WriteWarn(params string[] text) => Write(text);
+    public virtual void WriteLineWarn(string text, bool dateFormat = true) => WriteWarn(GetFormattedLine(text, dateFormat));
 }

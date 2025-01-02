@@ -3,28 +3,15 @@ using OcppSharp.Protocol;
 
 namespace OcppSharp;
 
-public class OcppEnumJsonConverter : JsonConverter
+public class OcppEnumJsonConverter : JsonConverter<Enum?>
 {
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, Enum? value, JsonSerializer serializer)
     {
-        if (value == null)
-        {
-            writer.WriteValue((string?)null);
-            return;
-        }
-        Enum e = (Enum)value;
-        StringValueAttribute? attr;
-        if ((attr = e?.GetAttributeOfType<StringValueAttribute>()) != null)
-        {
-            writer.WriteValue(attr.Text);
-        }
-        else
-        {
-            writer.WriteValue(value?.ToString());
-        }
+        string? stringValue = value?.GetAttributeOfType<StringValueAttribute>()?.Text ?? value?.ToString();
+        writer.WriteValue(stringValue);
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    public override Enum? ReadJson(JsonReader reader, Type objectType, Enum? existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         string? existing = (string?)reader.Value;
         if (existing == null || existing == "null")
@@ -48,10 +35,5 @@ public class OcppEnumJsonConverter : JsonConverter
         }
 
         throw new FormatException($"Invalid enum value for {objectType.Name}: {reader.Value}");
-    }
-
-    public override bool CanConvert(Type objectType)
-    {
-        return objectType.GetCustomAttributes(typeof(OcppEnumAttribute), true).Length == 1;
     }
 }

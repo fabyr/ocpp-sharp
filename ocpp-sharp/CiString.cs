@@ -1,12 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
 
 namespace OcppSharp;
 
 /// <summary>
 /// Provides an easy to work with type of which Equality and GetHashCode ignore case.
-/// However, the original representation is still stored for other use.
+/// However, the original representation is still stored for other use. (<see cref="RawValue"/>)
 /// </summary>
-[Newtonsoft.Json.JsonConverter(typeof(CiJsonConverter))]
+[JsonConverter(typeof(CiJsonConverter))]
 public readonly struct CiString
 {
     public char this[int i]
@@ -28,20 +29,19 @@ public readonly struct CiString
     {
         if (obj == null)
             return false;
-        if (obj is string)
-            return ((string)obj).Equals(Value, StringComparison.OrdinalIgnoreCase);
-        if (obj is CiString cis)
+        if (obj is string stringValue)
+            return stringValue.Equals(Value, StringComparison.OrdinalIgnoreCase);
+        if (obj is CiString ciStringValue)
         {
-            return cis.Value != null && cis.Value.Equals(Value, StringComparison.OrdinalIgnoreCase);
+            return ciStringValue.Value.Equals(Value);
         }
+
         return false;
     }
 
     public override int GetHashCode()
     {
-        if (Value == null)
-            return 0;
-        return Value.GetHashCode();
+        return Value?.GetHashCode() ?? 0;
     }
 
     public override string ToString()

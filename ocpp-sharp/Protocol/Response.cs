@@ -2,17 +2,18 @@ namespace OcppSharp.Protocol;
 
 public class Response
 {
-    public string BaseJson { get; set; } = string.Empty;
+    // Defined within the OCPP protocol specification
+    public const int MessageKind = 3;
+
+    public string OriginalJsonBody { get; set; } = string.Empty;
     public ProtocolVersion ProtocolVersion { get; set; }
 
-    public int MessageKind { get; private set; }
-    public string MessageId { get; private set; }
+    public string MessageId { get; }
 
     public ResponsePayload? Payload { get; set; }
 
-    public Response(int kind, string id)
+    public Response(string id)
     {
-        MessageKind = kind;
         MessageId = id;
     }
 }

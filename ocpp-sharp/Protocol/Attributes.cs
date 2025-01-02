@@ -1,5 +1,8 @@
+using System.Reflection;
+
 namespace OcppSharp.Protocol;
 
+[AttributeUsage(AttributeTargets.Field)]
 public class StringValueAttribute : Attribute
 {
     public string Text { get; }
@@ -10,14 +13,15 @@ public class StringValueAttribute : Attribute
     }
 }
 
+[AttributeUsage(AttributeTargets.Enum)]
 public class OcppEnumAttribute : Attribute
 {
     public OcppEnumAttribute()
     {
-
     }
 }
 
+[AttributeUsage(AttributeTargets.Class)]
 public class OcppMessageAttribute : Attribute
 {
     public enum Direction
@@ -45,8 +49,16 @@ public class OcppMessageAttribute : Attribute
         Dir = direction;
         Name = name;
     }
+
+    public static string? GetMessageIdentifier<T>() => GetMessageIdentifier(typeof(T));
+
+    public static string? GetMessageIdentifier(Type t)
+    {
+        return t.GetCustomAttribute<OcppMessageAttribute>()?.Name;
+    }
 }
 
+[AttributeUsage(AttributeTargets.Field)]
 public class ValueRangeAttribute : Attribute
 {
     public long Min { get; }
@@ -59,23 +71,24 @@ public class ValueRangeAttribute : Attribute
     }
 }
 
+[AttributeUsage(AttributeTargets.Field)]
 public class ValueListAttribute : Attribute // CSL: Comma Seperated List
 {                                           // Value,Value,Value
     public ValueListAttribute()
     {
-
     }
 }
 
 // Should only be compatible with ValueListAttribute
+[AttributeUsage(AttributeTargets.Field)]
 public class ValueIndexedAttribute : Attribute // 0.Value,1.Value,2.Value
 {
     public ValueIndexedAttribute()
     {
-
     }
 }
 
+[AttributeUsage(AttributeTargets.Field)]
 public class ValueUnitAttribute : Attribute
 {
     public string Unit { get; }
@@ -86,6 +99,7 @@ public class ValueUnitAttribute : Attribute
     }
 }
 
+[AttributeUsage(AttributeTargets.Field)]
 public class ValidValuesAttribute : Attribute
 {
     public Type ValidType { get; }

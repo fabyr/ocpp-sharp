@@ -1,7 +1,7 @@
 # ocpp-sharp
 An implementation of the [Open Charge Point Protocol](https://openchargealliance.org/protocols/open-charge-point-protocol/) (`OCPP`) in C#.
 
-Supported Versions:
+Currently supported versions:
 - Ocpp 1.6
 - Ocpp 2.0.1
 
@@ -12,8 +12,8 @@ Supported Versions:
   - [Features](#features)
   - [What it isn't](#what-it-isnt)
   - [Possible use cases](#possible-use-cases)
-  - [Running the Examples](#running-the-examples)
-  - [Basic Server Code](#basic-server-code)
+  - [Running the examples](#running-the-examples)
+  - [Basic server code](#basic-server-code)
   - [Motivation](#motivation)
 
 ## Dependencies
@@ -32,21 +32,24 @@ It's not a ready-to-go backend server. You still have to implement what happens 
 - Emulating a charge point
 - Implementation of a basic backend server for charge points
 
-## Running the Examples
+## Running the examples
 A minimalistic client and server example can be found under [/ocpp-sharp.examples](/ocpp-sharp.examples)
 
-Running the functionality test (Single test message communication on `localhost`):
-```
+Start the server:
+```shell
 cd ./ocpp-sharp.examples/server
 dotnet run
 ```
 
-```
+And then a client:
+```shell
 cd ./ocpp-sharp.examples/client
 dotnet run
 ```
 
-## Basic Server Code
+The examples are preconfigured to connect to each other on `localhost:8000`.
+
+## Basic server code
 ```cs
 using OcppSharp;
 using OcppSharp.Server;
@@ -68,7 +71,6 @@ public class Program
 
         server.RegisterHandler<BootNotificationRequest>((server, sender, req) =>
         {
-
             Console.WriteLine($"Received BootNotification! (Message ID = {req.FullRequest!.MessageId})");
             Console.WriteLine($"Vendor: {req.ChargePointVendor}");
             Console.WriteLine($"Serial Number: {req.ChargePointSerialNumber}");

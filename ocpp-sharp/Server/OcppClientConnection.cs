@@ -1,47 +1,33 @@
+using System.Net;
 using System.Net.WebSockets;
+using OcppSharp.Client;
 using OcppSharp.Protocol;
 
 namespace OcppSharp.Server;
 
-public class OcppClientConnection
+public class OcppClientConnection : OcppSharpClient
 {
     public OcppSharpServer ParentServer { get; }
-    public WebSocket? Socket { get; set; }
-    public System.Net.IPEndPoint? EndPoint { get; set; }
-    public ProtocolVersion OcppVersion { get; }
+    public IPEndPoint EndPoint { get; set; }
 
-    /// <summary>
-    /// The ID the Station identifies with.
-    /// </summary>
-    public string ID { get; private set; }
-    public DateTime? LastCommunication { get; set; }
+    // propagate MaxIncomingData from ParentServer if MaxIncomingData is null
+    protected override int MaxIncomingDataValue => MaxIncomingData ?? ParentServer.MaxIncomingData;
 
-    public OcppClientConnection(OcppSharpServer server, WebSocket? sock, ProtocolVersion ver, string id)
+    public OcppClientConnection(OcppSharpServer parentServer, WebSocket socket, IPEndPoint endPoint, string id, ProtocolVersion version)
+        : base(socket, id, version)
     {
-        ParentServer = server;
-        Socket = sock;
-        OcppVersion = ver;
-        ID = id;
+        ParentServer = parentServer;
+        EndPoint = endPoint;
     }
 
-    public OcppClientConnection(OcppSharpServer server, ProtocolVersion ver, string id) : this(server, null, ver, id)
-    { }
+    private static InvalidOperationException HandlerException => new("Per-client handlers are not supported on a client instance that stems from a server.");
 
-    public override bool Equals(object? obj)
+    public override ClientRequestHandler RegisterHandler(Type type, Client.RequestPayloadHandlerDelegate handler) => throw HandlerException;
+    public override ClientRequestHandler RegisterHandler<T>(Client.RequestPayloadHandlerDelegateGeneric<T> handler) => throw HandlerException;
+    public override void UnregisterHandler(ClientRequestHandler handler) => throw HandlerException;
+
+    protected override ResponsePayload RunHandler(RequestPayload payload)
     {
-        if (obj == null || obj is not OcppClientConnection)
-            return false;
-
-        return ((OcppClientConnection)obj).ID.Equals(ID);
-    }
-
-    public override int GetHashCode()
-    {
-        return ID.GetHashCode();
-    }
-
-    public async Task<Response> SendRequestAsync<T>(T payload) where T : RequestPayload
-    {
-        return await ParentServer.SendRequestAsync<T>(this, payload);
+        return ParentServer.RunHandler(this, payload);
     }
 }

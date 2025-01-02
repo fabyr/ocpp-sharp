@@ -17,19 +17,19 @@ public struct ChargingProfile
     public ulong StackLevel { get; set; }
 
     /// <summary>
-    /// Valid Values in <see cref="ChargingProfilePurposeType"/>
+    /// Valid values in <see cref="ChargingProfilePurposeType"/>
     /// </summary>
     [JsonProperty("chargingProfilePurpose")]
     public ChargingProfilePurposeType.Enum ChargingProfilePurpose { get; set; }
 
     /// <summary>
-    /// Valid Values in <see cref="ChargingProfileKindType"/>
+    /// Valid values in <see cref="ChargingProfileKindType"/>
     /// </summary>
     [JsonProperty("chargingProfileKind")]
     public ChargingProfileKindType.Enum ChargingProfileKind { get; set; }
 
     /// <summary>
-    /// Valid Values in <see cref="RecurrencyKindType"/>
+    /// Valid values in <see cref="RecurrencyKindType"/>
     /// </summary>
     [JsonProperty("recurrencyKind")]
     public RecurrencyKindType.Enum? RecurrencyKind { get; set; }

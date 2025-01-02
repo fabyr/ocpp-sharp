@@ -19,27 +19,43 @@ public class Program
             _closeEvent.Set();
         };
 
-        using (OcppSharpClient client = new("ws://localhost:8000/ocpp16/example_id_1234", ProtocolVersion.OCPP16))
+        const string stationId = "example_id_1234";
+        const string serverUrl = $"ws://localhost:8000/ocpp16/{stationId}";
+
+        using (OcppSharpClient client = new(stationId, ProtocolVersion.OCPP16))
         {
             // Example handler
             client.RegisterHandler<GetConfigurationRequest>((client, resp) =>
             {
                 Console.WriteLine("Got a GetConfiguration request from the server.");
 
+                if (resp.Key != null)
+                    throw new NotImplementedException();
+
                 return new GetConfigurationResponse()
                 {
-                    ConfigurationKey = [new KeyValue() { Key = "Example", Value = "Config" }]
+                    ConfigurationKey = [
+                        new KeyValue() { Key = "ExampleKey", Value = "ConfigValue" },
+                        new KeyValue() { Key = "ExampleKey2", Value = "ExampleValue2", ReadOnly = true }
+                    ]
                 };
             });
 
-            client.Connect();
+            client.Closed += (sender, e) =>
+            {
+                Console.WriteLine("Client connection has been closed.");
+                _closeEvent.Set();
+            };
+
+            await client.Connect(serverUrl);
 
             // Send a boot notification
             Response resp = await client.SendRequestAsync(new BootNotificationRequest()
             {
                 ChargePointVendor = "example",
                 ChargePointModel = "example-model",
-                FirmwareVersion = "1.0"
+                FirmwareVersion = "1.0",
+                ChargePointSerialNumber = "Test Serial"
             });
 
             BootNotificationResponse? payload = resp.Payload as BootNotificationResponse;
@@ -47,7 +63,7 @@ public class Program
             // Do something with the payload...
 
             // Example output of full json
-            Console.WriteLine($"Got BootNotification response: {resp.BaseJson}");
+            Console.WriteLine($"Got BootNotification response: {resp.OriginalJsonBody}");
 
             _closeEvent.WaitOne();
             client.Disconnect();
