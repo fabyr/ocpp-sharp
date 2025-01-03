@@ -8,8 +8,21 @@ namespace OcppSharp;
 
 public static class OcppJson
 {
-    private static readonly Dictionary<ProtocolVersion, Dictionary<CiString, Type>> messageRequestTypeMap; // Requests from Station
-    private static readonly Dictionary<ProtocolVersion, Dictionary<CiString, Type>> messageResponseTypeMap; // Responses from Station
+    // Default settings for all OCPP related json decode operations
+    private static readonly JsonSerializerSettings jsonSerializerSettings = new()
+    {
+        TypeNameHandling = TypeNameHandling.None,
+        NullValueHandling = NullValueHandling.Ignore
+    };
+
+    private static readonly JsonSerializer jsonSerializer = new()
+    {
+        TypeNameHandling = TypeNameHandling.None,
+        NullValueHandling = NullValueHandling.Ignore
+    };
+
+    private static readonly Dictionary<ProtocolVersion, Dictionary<CiString, Type>> messageRequestTypeMap; // OCPP request classes
+    private static readonly Dictionary<ProtocolVersion, Dictionary<CiString, Type>> messageResponseTypeMap; // OCPP response classes
 
     static OcppJson()
     {
@@ -44,13 +57,6 @@ public static class OcppJson
         }
     }
 
-    public static bool IsRequest(string json)
-    {
-        JArray array = JArray.Parse(json);
-        int messageKind = array[0].ToObject<int>();
-        return messageKind == Request.MessageKind;
-    }
-
     private static Dictionary<CiString, Type> GetMap(ProtocolVersion version, bool responseMap)
     {
         return (responseMap ? messageResponseTypeMap : messageRequestTypeMap)[version];
@@ -61,96 +67,118 @@ public static class OcppJson
         return GetMap(version, responseMap)[key];
     }
 
-    // Decodes a Request JSON to the corresponding object, always of base type Request
+    /// <summary>
+    /// Determines if a raw ocpp json message is a request or a response.
+    /// </summary>
+    /// <param name="json">The raw ocpp json message.</param>
+    /// <returns>true, if the message is a request; false, otherwise.</returns>
+    public static bool IsRequest(string json)
+    {
+        JArray array = JArray.Parse(json);
+        int messageKind = array[0].ToObject<int>();
+
+        return messageKind == Request.MessageKind;
+    }
+
+    /// <summary>
+    /// Parses an ocpp request message and returns a request object.
+    /// </summary>
+    /// <param name="json">The raw ocpp json message.</param>
+    /// <param name="version">The ocpp protocol version of this message.</param>
+    /// <returns>A request object with parsed header information and a parsed request payload.</returns>
+    /// <exception cref="FormatException">If the json string cannot be parsed as it is malformed.</exception>
     public static Request DecodeRequest(string json, ProtocolVersion version)
     {
         JArray array = JArray.Parse(json);
-        string messageType = array[2].ToObject<string>() ?? throw new Exception();
-        string messageId = array[1].ToObject<string>() ?? throw new Exception();
 
-        Debug.Assert(array[0].ToObject<int>() == Request.MessageKind, "Invalid Message Header for Request");
+        string messageType = array[2].ToObject<string>() ?? throw new FormatException("Malformed message header: missing message type");
+        string messageId = array[1].ToObject<string>() ?? throw new FormatException("Malformed message header: missing message id");
 
-        Request req = new(messageId, messageType);
+        Debug.Assert(array[0].ToObject<int>() == Request.MessageKind, "Invalid message header magic number for request");
+
+        Request request = new(messageId, messageType);
 
         JsonSerializer serializer = new();
 
-        req.Payload = (RequestPayload?)array[3].ToObject(GetMessageType(version, false, messageType), serializer);
-        if (req.Payload == null)
-            throw new FormatException("Failed to parse request payload.");
-        req.Payload.FullRequest = req;
-        req.ProtocolVersion = version;
+        RequestPayload payload = (RequestPayload?)array[3].ToObject(GetMessageType(version, false, messageType), serializer)
+                                    ?? throw new FormatException("Failed to parse request payload.");
 
-        return req;
+        request.Payload = payload;
+        request.Payload.FullRequest = request;
+        request.ProtocolVersion = version;
+
+        return request;
     }
 
     /// <summary>
-    /// Parses the "header" of the Response to a Response Object.
-    /// This means that the Payload won't be parsed and needs to be handled seperately.
+    /// Parses the "header" of a response and returns a response object.
+    /// This means that the Payload won't be parsed and needs to be handled separately.
     /// </summary>
+    /// <param name="json">The raw ocpp json message.</param>
+    /// <param name="version">The ocpp protocol version of this message.</param>
+    /// <returns>A response object with parsed header information but no payload.</returns>
+    /// <exception cref="FormatException">If the json string cannot be parsed as it is malformed.</exception>
     public static Response DecodeResponseCrude(string json, ProtocolVersion version)
     {
         JArray array = JArray.Parse(json);
-        string messageId = array[1].ToObject<string>() ?? throw new Exception();
+        string messageId = array[1].ToObject<string>() ?? throw new FormatException("Malformed message header: missing message id");
 
-        Debug.Assert(array[0].ToObject<int>() == Response.MessageKind, "Invalid Message Header for Response");
+        Debug.Assert(array[0].ToObject<int>() == Response.MessageKind, "Invalid message header magic number for response");
 
-        Response resp = new(messageId)
+        Response response = new(messageId)
         {
             ProtocolVersion = version
         };
-        return resp;
+
+        return response;
     }
 
     /// <summary>
-    /// Parses the rest of an unfinished response parsed by DecodeResponseCrude.
-    /// It directly modifies the reference of the supplied crudeResponse.
+    /// Parses the rest of an unfinished response parsed by <see cref="DecodeResponseCrude"/>.
+    /// <para>It directly modifies the response object and extends it with the missing payload.</para>
     /// </summary>
+    /// <param name="crudeResponse">A response object produced by a call to <see cref="DecodeResponseCrude"/>, which will be modified.</param>
     /// <param name="requestMessageType">Since a response does not contain the type of request it originates from, <br/>this parameter needs to be supplied for proper parsing.</param>
     public static void DecodeResponseFull(Response crudeResponse, string requestMessageType)
     {
         JArray array = JArray.Parse(crudeResponse.OriginalJsonBody);
 
-        JsonSerializer serializer = new();
+        ResponsePayload payload = (ResponsePayload?)array[2].ToObject(GetMessageType(crudeResponse.ProtocolVersion, true, requestMessageType), jsonSerializer)
+                                    ?? throw new FormatException("Failed to parse response payload.");
+        payload.FullResponse = crudeResponse;
 
-        crudeResponse.Payload = (ResponsePayload?)array[2].ToObject(GetMessageType(crudeResponse.ProtocolVersion, true, requestMessageType), serializer);
-        if (crudeResponse.Payload != null)
-            crudeResponse.Payload.FullResponse = crudeResponse;
+        crudeResponse.Payload = payload;
     }
 
-    // Serialize Response object to JSON
-    public static string SerializeResponse(Response resp)
+    /// <summary>
+    /// Serialize a response object to JSON, ready to be sent as a websocket message.
+    /// </summary>
+    /// <param name="response">The response object to be serialized.</param>
+    /// <returns>The serialized json string.</returns>
+    public static string SerializeResponse(Response response)
     {
         object?[] array = [
             Response.MessageKind,
-            resp.MessageId,
-            resp.Payload
+            response.MessageId,
+            response.Payload
         ];
 
-        JsonSerializerSettings jsonSerializerSettings = new()
-        {
-            TypeNameHandling = TypeNameHandling.None,
-            NullValueHandling = NullValueHandling.Ignore
-        };
-
-        string json = JsonConvert.SerializeObject(array, jsonSerializerSettings);
-        return json;
+        return JsonConvert.SerializeObject(array, jsonSerializerSettings);
     }
 
-    // Serialize Request object to JSON
-    public static string SerializeRequest(Request req)
+    /// <summary>
+    /// Serialize a request object to JSON, ready to be sent as a websocket message.
+    /// </summary>
+    /// <param name="request">The request object to be serialized.</param>
+    /// <returns>The serialized json string.</returns>
+    public static string SerializeRequest(Request request)
     {
         object?[] array = [
             Request.MessageKind,
-            req.MessageId,
-            req.MessageType,
-            req.Payload
+            request.MessageId,
+            request.MessageType,
+            request.Payload
         ];
-
-        JsonSerializerSettings jsonSerializerSettings = new()
-        {
-            TypeNameHandling = TypeNameHandling.None,
-            NullValueHandling = NullValueHandling.Ignore
-        };
 
         return JsonConvert.SerializeObject(array, jsonSerializerSettings);
     }

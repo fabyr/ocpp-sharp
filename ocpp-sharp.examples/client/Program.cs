@@ -25,11 +25,11 @@ public class Program
         using (OcppSharpClient client = new(stationId, ProtocolVersion.OCPP16))
         {
             // Example handler
-            client.RegisterHandler<GetConfigurationRequest>((client, resp) =>
+            client.RegisterHandler<GetConfigurationRequest>((client, response) =>
             {
                 Console.WriteLine("Got a GetConfiguration request from the server.");
 
-                if (resp.Key != null)
+                if (response.Key != null)
                     throw new NotImplementedException();
 
                 return new GetConfigurationResponse()
@@ -50,7 +50,7 @@ public class Program
             await client.Connect(serverUrl);
 
             // Send a boot notification
-            Response resp = await client.SendRequestAsync(new BootNotificationRequest()
+            Response response = await client.SendRequestAsync(new BootNotificationRequest()
             {
                 ChargePointVendor = "example",
                 ChargePointModel = "example-model",
@@ -58,12 +58,12 @@ public class Program
                 ChargePointSerialNumber = "Test Serial"
             });
 
-            BootNotificationResponse? payload = resp.Payload as BootNotificationResponse;
+            BootNotificationResponse? payload = response.Payload as BootNotificationResponse;
 
             // Do something with the payload...
 
             // Example output of full json
-            Console.WriteLine($"Got BootNotification response: {resp.OriginalJsonBody}");
+            Console.WriteLine($"Got BootNotification response: {response.OriginalJsonBody}");
 
             _closeEvent.WaitOne();
             client.Disconnect();

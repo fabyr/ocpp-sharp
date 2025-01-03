@@ -32,11 +32,11 @@ public class Program
             server.Log = null;
         }
 
-        server.RegisterHandler<BootNotificationRequest>((server, sender, req) =>
+        server.RegisterHandler<BootNotificationRequest>((server, sender, request) =>
         {
-            Console.WriteLine($"Received BootNotification! (Message ID = {req.FullRequest!.MessageId})");
-            Console.WriteLine($"Vendor: {req.ChargePointVendor}");
-            Console.WriteLine($"Serial Number: {req.ChargePointSerialNumber}");
+            Console.WriteLine($"Received BootNotification! (Message ID = {request.FullRequest!.MessageId})");
+            Console.WriteLine($"Vendor: {request.ChargePointVendor}");
+            Console.WriteLine($"Serial Number: {request.ChargePointSerialNumber}");
             // ...
 
             // Always need to send a response

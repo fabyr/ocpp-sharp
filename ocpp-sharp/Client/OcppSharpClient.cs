@@ -45,7 +45,7 @@ public class OcppSharpClient : IDisposable
 
     public bool Disposed { get; protected set; } = false;
 
-    protected delegate void ResponseHandlerDelegateInternal(OcppSharpClient client, Response resp);
+    protected delegate void ResponseHandlerDelegateInternal(OcppSharpClient client, Response response);
 
     public event ResponseHandlerDelegate? ResponseReceived;
     public event ResponseHandlerDelegate? ResponseSent;
@@ -58,6 +58,13 @@ public class OcppSharpClient : IDisposable
 
     protected readonly List<ClientRequestHandler> handlers = [];
 
+    /// <summary>
+    /// Create an OCPP-Client using an existing <see cref="WebSocket"/> connection.
+    /// This is realistically only needed by a server which is accepting new clients via its websocket logic.
+    /// </summary>
+    /// <param name="socket">The client websocket connection.</param>
+    /// <param name="id">The id the client identifies with.</param>
+    /// <param name="version">The ocpp protocol version to use.</param>
     public OcppSharpClient(WebSocket socket, string id, ProtocolVersion version)
     {
         Socket = socket;
@@ -65,6 +72,14 @@ public class OcppSharpClient : IDisposable
         Id = id;
     }
 
+    /// <summary>
+    /// Create an OCPP-Client.
+    /// </summary>
+    /// <param name="id">
+    /// The id the client identifies with.
+    /// This should ideally be the same that is used in the url when calling <see cref="Connect"/> afterwards.
+    /// </param>
+    /// <param name="version">The ocpp protocol version to use.</param>
     public OcppSharpClient(string id, ProtocolVersion version)
     {
         OcppVersion = version;
@@ -78,7 +93,7 @@ public class OcppSharpClient : IDisposable
     /// </summary>
     /// <remarks>
     /// This method should only be used if the client has been initialized
-    /// using an existing WebSocket by calling this constructor: <see cref="OcppSharpClient(WebSocket, string, ProtocolVersion)"/>.
+    /// using an existing WebSocket using this constructor: <see cref="OcppSharpClient(WebSocket, string, ProtocolVersion)"/>.
     /// <para>Use <see cref="Connect"/> in the other case instead.</para>
     /// </remarks>
     /// <exception cref="ObjectDisposedException">If this client is already disposed.</exception>
@@ -149,7 +164,7 @@ public class OcppSharpClient : IDisposable
     /// </summary>
     /// <remarks>
     /// This method should only be used if the client has been initialized
-    /// using an existing WebSocket by calling this constructor: <see cref="OcppSharpClient(WebSocket, ProtocolVersion, string)"/>.
+    /// using an existing WebSocket using this constructor: <see cref="OcppSharpClient(WebSocket, string, ProtocolVersion)"/>.
     /// <para>Use <see cref="Disconnect"/> in the other case instead.</para>
     /// </remarks>
     public virtual void StopLoop()
@@ -163,14 +178,16 @@ public class OcppSharpClient : IDisposable
     /// </summary>
     /// <param name="url">
     /// The URL of the server to connect to.
-    /// <example>For example:
+    /// <example>
+    /// For example:
     /// <c>ws://localhost:8000/ocpp16/example_id_1234</c>
     /// </example>
     /// </param>
     /// <param name="credentials">
     /// Connection credentials. Leave set to null if none are required.
     /// <para>
-    /// <example>For example:
+    /// <example>
+    /// For example:
     /// <c>new System.Net.NetworkCredential(username, password)</c>
     /// </example>
     /// </para>
@@ -210,10 +227,7 @@ public class OcppSharpClient : IDisposable
                     await Task.Delay(10);
             }
         }
-        catch
-        {
-            System.Console.WriteLine("Close Output error");
-        }
+        catch { }
 
         Dispose();
     }
@@ -221,16 +235,16 @@ public class OcppSharpClient : IDisposable
     /// <summary>
     /// Registers a handler to this client instance for a specific type of OCPP-Request.
     /// </summary>
-    /// <param name="type">The type of request the handler is supposed to process. Must be a derived class of <see cref="RequestPayload"/>.</param>
+    /// <param name="payloadType">The type of request the handler is supposed to process. Must be a derived class of <see cref="RequestPayload"/>.</param>
     /// <param name="handler">The handler to be executed upon receival of a request matching the type.</param>
     /// <returns>A reference to the created <see cref="ClientRequestHandler"/>. This can be used to call <see cref="UnregisterHandler"/>.</returns>
     /// <exception cref="ArgumentException">If a handler for this specific type has already been registered.</exception>
-    public virtual ClientRequestHandler RegisterHandler(Type type, RequestPayloadHandlerDelegate handler)
+    public virtual ClientRequestHandler RegisterHandler(Type payloadType, RequestPayloadHandlerDelegate handler)
     {
-        if (handlers.Any(x => x.OnType == type))
-            throw new ArgumentException("A handler has already been registered for this type.", nameof(type));
+        if (handlers.Any(x => x.OnType == payloadType))
+            throw new ArgumentException("A handler has already been registered for this type.", nameof(payloadType));
 
-        ClientRequestHandler result = new(type, handler);
+        ClientRequestHandler result = new(payloadType, handler);
         handlers.Add(result);
 
         return result;
@@ -244,9 +258,9 @@ public class OcppSharpClient : IDisposable
     /// <returns>A reference to the created <see cref="ClientRequestHandler"/>. This can be used to call <see cref="UnregisterHandler"/>.</returns>
     public virtual ClientRequestHandler RegisterHandler<T>(RequestPayloadHandlerDelegateGeneric<T> handler) where T : RequestPayload
     {
-        return RegisterHandler(typeof(T), (server, req) =>
+        return RegisterHandler(typeof(T), (server, request) =>
         {
-            return handler(server, (T)req);
+            return handler(server, (T)request);
         });
     }
 
@@ -265,7 +279,6 @@ public class OcppSharpClient : IDisposable
 
     /// <summary>
     /// Sends a request to server and returns the answer.
-    /// <para>Throws an instance of <see cref="TimeoutException"/> after a certain timeout.</para>
     /// </summary>
     /// <typeparam name="T">The type of the request payload. Must derive from <see cref="RequestPayload"/>. See parameter <paramref name="payload"/>.</typeparam>
     /// <param name="payload">The payload to be sent.</param>
@@ -287,25 +300,25 @@ public class OcppSharpClient : IDisposable
         string payloadType = ocppMessageAttr.Name;
 
         // Create Request object from payload
-        Request req = new(id, payloadType)
+        Request request = new(id, payloadType)
         {
             Payload = payload
         };
-        payload.FullRequest = req;
+        payload.FullRequest = request;
 
-        string json = OcppJson.SerializeRequest(req);
-        req.OriginalJsonBody = json;
+        string json = OcppJson.SerializeRequest(request);
+        request.OriginalJsonBody = json;
 
         bool received = false;
-        Response? resp = null;
+        Response? response = null;
 
         ResponseHandlerDelegateInternal handler = (client, r) => // A temporary (local scope) event handler to wait for incoming packets
         {
             // If the Stations match and the Ids match, the response was received
             if (client != null && r.MessageId.Equals(id))
             {
-                resp = r;
-                OcppJson.DecodeResponseFull(resp, payloadType); // We can now decode the full response payload because we know the payload type
+                response = r;
+                OcppJson.DecodeResponseFull(response, payloadType); // We can now decode the full response payload because we know the payload type
                 received = true; // Set to true to exit while loop below
 
                 ResponseReceived?.Invoke(client, r, payloadType);
@@ -319,7 +332,7 @@ public class OcppSharpClient : IDisposable
 
         await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None); // Send the request
 
-        RequestSent?.Invoke(this, req);
+        RequestSent?.Invoke(this, request);
 
         // Wait until it is received or abort if it takes too long
         long startTime = Environment.TickCount64;
@@ -328,12 +341,19 @@ public class OcppSharpClient : IDisposable
 
         ResponseReceivedInternal -= handler; // Important: unregister; otherwise they would stack the more Requests are sent
 
-        if (resp == null)
+        if (response == null)
             throw new TimeoutException($"Station did not answer back within {timeoutMs}ms");
 
-        return resp;
+        return response;
     }
 
+    /// <summary>
+    /// This method will be called by the main message processing logic.
+    /// It will call a registered handler with the request payload.
+    /// </summary>
+    /// <param name="payload">The request payload to be processed.</param>
+    /// <returns>The response payload resulting from the processing by the handler.</returns>
+    /// <exception cref="KeyNotFoundException">If no handler for this OCPP message type has been registered.</exception>
     protected virtual ResponsePayload RunHandler(RequestPayload payload)
     {
         Type payloadType = payload.GetType();
@@ -344,7 +364,11 @@ public class OcppSharpClient : IDisposable
         return handler.Handle(this, payload);
     }
 
-    // Main method executing when a message is received by the WebSocket connection
+    /// <summary>
+    /// Main method executing when a message is received by the WebSocket connection.
+    /// </summary>
+    /// <param name="json">The raw ocpp message.</param>
+    /// <returns>The task object representing the asynchronous operation.</returns>
     protected virtual async Task ProcessMessageAsync(string json)
     {
         if (Socket == null)
@@ -357,12 +381,12 @@ public class OcppSharpClient : IDisposable
                 Log?.WriteVerboseLine($"Request: {json}");
 
                 // Deserialize JSON to a request object
-                Request req = OcppJson.DecodeRequest(json, OcppVersion);
-                req.OriginalJsonBody = json; // The original Json is saved for later use within handlers
+                Request request = OcppJson.DecodeRequest(json, OcppVersion);
+                request.OriginalJsonBody = json; // The original Json is saved for later use within handlers
 
-                RequestReceived?.Invoke(this, req);
+                RequestReceived?.Invoke(this, request);
 
-                Type payloadType = req.Payload!.GetType();
+                Type payloadType = request.Payload!.GetType();
                 ClientRequestHandler? handler = handlers.FirstOrDefault(x => x.OnType == payloadType);
 
                 string? messageTypeName = OcppMessageAttribute.GetMessageIdentifier(payloadType);
@@ -373,36 +397,36 @@ public class OcppSharpClient : IDisposable
                 }
 
                 // Handle the request
-                ResponsePayload payload = RunHandler(req.Payload);
+                ResponsePayload payload = RunHandler(request.Payload);
 
                 // Make and send Response
-                Response resp = new(req.MessageId)
+                Response response = new(request.MessageId)
                 {
                     Payload = payload
                 };
-                payload.FullResponse = resp;
+                payload.FullResponse = response;
 
                 // Serialize to JSON
-                json = OcppJson.SerializeResponse(resp);
-                resp.OriginalJsonBody = json;
+                json = OcppJson.SerializeResponse(response);
+                response.OriginalJsonBody = json;
 
                 Log?.WriteVerboseLine($"Response: {json}");
 
                 // Send json to station
                 byte[] bytes = Encoding.GetBytes(json);
                 await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
-                ResponseSent?.Invoke(this, resp, messageTypeName);
+                ResponseSent?.Invoke(this, response, messageTypeName);
             }
             else // Responses to our requests are handled differently
             {
                 Log?.WriteVerboseLine($"Response: {json}");
 
                 // Just parse the Response "header" (everything except payload)
-                Response resp = OcppJson.DecodeResponseCrude(json, OcppVersion);
-                resp.OriginalJsonBody = json;
+                Response response = OcppJson.DecodeResponseCrude(json, OcppVersion);
+                response.OriginalJsonBody = json;
 
                 // Invoke the event (Used in SendRequestAsync)
-                ResponseReceivedInternal?.Invoke(this, resp);
+                ResponseReceivedInternal?.Invoke(this, response);
             }
         }
         catch (Exception ex)

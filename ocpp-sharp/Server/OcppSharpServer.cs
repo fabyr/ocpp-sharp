@@ -54,12 +54,13 @@ public class OcppSharpServer
     /// </summary>
     /// <remarks>
     /// Note: Clients won't be removed after they have connected once.
-    /// <para>The collection will only be cleared once the server stops. (Call to <see cref="Stop"/>)</para>
     /// <para>
+    /// The collection will only be cleared once the server itself restarts.
     /// You will have to check <see cref="OcppSharpClient.LastCommunication"/>
     /// for finding actively connected clients.
     /// </para>
-    /// <para>Or alternatively check the WebSocket-State:
+    /// <para>
+    /// Or alternatively check the WebSocket-State:
     /// <code>
     /// station.Socket?.State == WebSocketState.Open
     /// </code>
@@ -79,9 +80,16 @@ public class OcppSharpServer
     private readonly List<ServerRequestHandler> handlers = [];
 
     /// <summary>
-    /// Sets up an OCPP-Server using an existing Http Listener.
+    /// Sets up an OCPP-Server (WebSocket-Server) using an existing <see cref="HttpListener"/> instance.
     /// Only call <see cref="StartLoop"/> and <see cref="StopLoop"/> to start and stop the message processing.
     /// </summary>
+    /// <param name="urlPrefix">The path for the websocket endpoint.</param>
+    /// <param name="listener">
+    /// The existing instance of <see cref="HttpListener"/>.<br/>
+    /// Note: This listener must be externally started and stopped
+    /// and have its Prefixes correctly configured.
+    /// </param>
+    /// <param name="version">The ocpp protocol version this server communicates with.</param>
     public OcppSharpServer(string urlPrefix, HttpListener listener, ProtocolVersion version)
     {
         OcppVersion = version;
@@ -95,11 +103,19 @@ public class OcppSharpServer
     }
 
     /// <summary>
-    /// Sets up an OCPP-Server to listen on Port 80.
+    /// Sets up an OCPP-Server (WebSocket-Server) to listen on port 80.
     /// </summary>
+    /// <param name="urlPrefix">The path for the websocket endpoint.</param>
+    /// <param name="version">The ocpp protocol version this server communicates with.</param>
     public OcppSharpServer(string urlPrefix, ProtocolVersion version) : this(urlPrefix, version, 80)
     { }
 
+    /// <summary>
+    /// Sets up an OCPP-Server (WebSocket-Server) to listen on the specified port.
+    /// </summary>
+    /// <param name="urlPrefix">The path for the websocket endpoint.</param>
+    /// <param name="version">The ocpp protocol version this server communicates with.</param>
+    /// <param name="port">The port to listen on for incoming connections.</param>
     public OcppSharpServer(string urlPrefix, ProtocolVersion version, ushort port)
     {
         OcppVersion = version;
@@ -241,9 +257,9 @@ public class OcppSharpServer
     /// <returns>A reference to the created <see cref="ServerRequestHandler"/>. This can be used to call <see cref="UnregisterHandler"/>.</returns>
     public ServerRequestHandler RegisterHandler<T>(RequestPayloadHandlerDelegateGeneric<T> handler) where T : RequestPayload
     {
-        return RegisterHandler(typeof(T), (server, sender, req) =>
+        return RegisterHandler(typeof(T), (server, sender, request) =>
         {
-            return handler(server, sender, (T)req);
+            return handler(server, sender, (T)request);
         });
     }
 
@@ -260,24 +276,24 @@ public class OcppSharpServer
     /// </returns>
     public bool UnregisterHandler(ServerRequestHandler handler) => handlers.Remove(handler);
 
-    private void OnRequestReceived(OcppSharpClient sender, Request req)
+    private void OnRequestReceived(OcppSharpClient sender, Request request)
     {
-        RequestReceived?.Invoke(this, (OcppClientConnection)sender, req);
+        RequestReceived?.Invoke(this, (OcppClientConnection)sender, request);
     }
 
-    private void OnRequestSent(OcppSharpClient sender, Request req)
+    private void OnRequestSent(OcppSharpClient sender, Request request)
     {
-        RequestSent?.Invoke(this, (OcppClientConnection)sender, req);
+        RequestSent?.Invoke(this, (OcppClientConnection)sender, request);
     }
 
-    private void OnResponseReceived(OcppSharpClient sender, Response resp, string causeType)
+    private void OnResponseReceived(OcppSharpClient sender, Response response, string causeType)
     {
-        ResponseReceived?.Invoke(this, (OcppClientConnection)sender, resp, causeType);
+        ResponseReceived?.Invoke(this, (OcppClientConnection)sender, response, causeType);
     }
 
-    private void OnResponseSent(OcppSharpClient sender, Response resp, string causeType)
+    private void OnResponseSent(OcppSharpClient sender, Response response, string causeType)
     {
-        ResponseSent?.Invoke(this, (OcppClientConnection)sender, resp, causeType);
+        ResponseSent?.Invoke(this, (OcppClientConnection)sender, response, causeType);
     }
 
     private void OnClientClosed(object? sender, EventArgs e)

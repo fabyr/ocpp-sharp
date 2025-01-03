@@ -1,5 +1,5 @@
 # ocpp-sharp
-An implementation of the [Open Charge Point Protocol](https://openchargealliance.org/protocols/open-charge-point-protocol/) (`OCPP`) in C#.
+An implementation of the [Open Charge Point Protocol](https://openchargealliance.org/protocols/open-charge-point-protocol) (`OCPP`) in C#.
 
 Currently supported versions:
 - Ocpp 1.6
@@ -21,7 +21,7 @@ Currently supported versions:
 - .NET 8
 
 ## Features
-- C# Classes for all messages of the OCPP-Protocol.
+- C# classes for all messages of the OCPP-Protocol.
 - Easy to set up server and event system for processing messages.
 
 ## What it isn't
@@ -62,18 +62,18 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        // set up a server to listen on port 80
+        // Set up a server to listen on port 80
         // Stations will be connecting to ws://<Hostname>/ocpp16/<Station ID>
         OcppSharpServer server = new("/ocpp16", ProtocolVersion.OCPP16, 80)
         {
             Log = null // Disable console logging
         };
 
-        server.RegisterHandler<BootNotificationRequest>((server, sender, req) =>
+        server.RegisterHandler<BootNotificationRequest>((server, sender, request) =>
         {
-            Console.WriteLine($"Received BootNotification! (Message ID = {req.FullRequest!.MessageId})");
-            Console.WriteLine($"Vendor: {req.ChargePointVendor}");
-            Console.WriteLine($"Serial Number: {req.ChargePointSerialNumber}");
+            Console.WriteLine($"Received BootNotification! (Message ID = {request.FullRequest!.MessageId})");
+            Console.WriteLine($"Vendor: {request.ChargePointVendor}");
+            Console.WriteLine($"Serial Number: {request.ChargePointSerialNumber}");
             // ...
 
             // Always need to send a response

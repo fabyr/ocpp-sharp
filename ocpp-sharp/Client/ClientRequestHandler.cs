@@ -13,8 +13,8 @@ public class ClientRequestHandler
         Handler = handler;
     }
 
-    public ResponsePayload Handle(OcppSharpClient client, RequestPayload req)
+    public ResponsePayload Handle(OcppSharpClient client, RequestPayload request)
     {
-        return Handler(client, req);
+        return Handler(client, request);
     }
 }
