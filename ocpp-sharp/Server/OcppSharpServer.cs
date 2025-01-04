@@ -369,7 +369,10 @@ public partial class OcppSharpServer
             WebSocket socket = webSocketContext.WebSocket;
 
             // Directly set those properties on connect (no need to wait for first message)
-            OcppClientConnection client = new(this, socket, listenerContext.Request.RemoteEndPoint, stationId, OcppVersion);
+            OcppClientConnection client = new(this, socket, listenerContext.Request.RemoteEndPoint, stationId, OcppVersion)
+            {
+                Log = Log
+            };
 
             stationMap.AddOrUpdate(stationId, (key) => client, (key, existing) =>
             {
