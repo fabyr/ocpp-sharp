@@ -4,11 +4,15 @@ using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using OcppSharp.Protocol;
 using OcppSharp.Client;
+using System.Text.RegularExpressions;
 
 namespace OcppSharp.Server;
 
-public class OcppSharpServer
+public partial class OcppSharpServer
 {
+    [GeneratedRegex(@"^(\/?(?:.*?\/)+?)([^\/]*?)\/?$", RegexOptions.Singleline)]
+    private static partial Regex PathRegex();
+
     /// <summary>
     /// The logger instance for this server.
     /// This can be set to null to disable logging.
@@ -333,49 +337,65 @@ public class OcppSharpServer
     // Continously handles subsequent messages
     private async void ProcessRequestAsync(HttpListenerContext listenerContext)
     {
-        string? requestUri = listenerContext.Request.RawUrl;
-        string subPath = Util.SubPathFromRequestLine(requestUri);
-        WebSocketContext webSocketContext;
-        try
+        void AbortBadRequest()
         {
-            if (subPath != SubPath)
-            {
-                throw new Exception("Invalid sub path.");
-            }
-
-            // important: specify sub protocol
-            webSocketContext = await listenerContext.AcceptWebSocketAsync(subProtocol: OcppVersion.GetWebSocketSubProtocol());
-        }
-        catch (Exception ex)
-        {
-            // The upgrade process failed somehow. For simplicity lets assume it was a failure on the part of the server and indicate this using 500.
-            listenerContext.Response.StatusCode = 500;
+            listenerContext.Response.StatusCode = 400;
             listenerContext.Response.Close();
-            Log?.WriteLineErr($"WebSocket Error: {ex.Message} {ex.StackTrace}");
+            Log?.WriteLineWarn("Client connected with malformed url!");
+        }
+
+        string requestUri = listenerContext.Request.RawUrl ?? string.Empty;
+        Match pathMatch = PathRegex().Match(requestUri);
+
+        if (!pathMatch.Success)
+        {
+            AbortBadRequest();
             return;
         }
 
-        WebSocket socket = webSocketContext.WebSocket;
-
-        // Directly set those properties on connect (no need to wait for first message)
-        string stationId = Util.IdFromRequestLine(requestUri);
-        OcppClientConnection client = new(this, socket, listenerContext.Request.RemoteEndPoint, stationId, OcppVersion);
-
-        stationMap.AddOrUpdate(stationId, (key) => client, (key, existing) =>
+        string subPath = pathMatch.Groups[1].Value;
+        string stationId = pathMatch.Groups[2].Value;
+        if (string.IsNullOrWhiteSpace(stationId) || subPath != SubPath)
         {
-            if (!existing.Disposed)
+            AbortBadRequest();
+            return;
+        }
+
+        try
+        {
+            // important: specify sub protocol
+            WebSocketContext webSocketContext = await listenerContext.AcceptWebSocketAsync(subProtocol: OcppVersion.GetWebSocketSubProtocol());
+
+            WebSocket socket = webSocketContext.WebSocket;
+
+            // Directly set those properties on connect (no need to wait for first message)
+            OcppClientConnection client = new(this, socket, listenerContext.Request.RemoteEndPoint, stationId, OcppVersion);
+
+            stationMap.AddOrUpdate(stationId, (key) => client, (key, existing) =>
             {
-                Log?.WriteLineWarn("Station connected with a duplicate id or the old connection was not terminated gracefully!");
-                existing.Disconnect();
-            }
+                if (!existing.Disposed)
+                {
+                    Log?.WriteLineWarn("Station connected with a duplicate id or the old connection was not terminated gracefully!");
+                    existing.Disconnect();
+                }
 
-            return client;
-        });
+                return client;
+            });
 
-        RegisterEvents(client);
+            RegisterEvents(client);
 
-        ClientAccepted?.Invoke(this, client);
+            ClientAccepted?.Invoke(this, client);
 
-        client.StartLoop();
+            client.StartLoop();
+        }
+        catch (Exception ex)
+        {
+            // The upgrade process failed somehow or there was an error creating the OcppClient. 
+            // For simplicity lets assume it was a failure on the part of the server and indicate this using 500.
+            listenerContext.Response.StatusCode = 500;
+            listenerContext.Response.Close();
+            Log?.WriteLineErr($"WebSocket Accept Error: {ex.Message} {ex.StackTrace}");
+            return;
+        }
     }
 }
