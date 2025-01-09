@@ -41,7 +41,7 @@ public static class OcppJson
         // Scan the assembly for Types defining "[OcppMessage(...)]" and add them to the dictionaries
         foreach (Type type in currentAssembly.GetTypes())
         {
-            OcppMessageAttribute? attr = type.GetCustomAttributes<OcppMessageAttribute>(true).FirstOrDefault();
+            OcppMessageAttribute? attr = type.GetCustomAttribute<OcppMessageAttribute>();
             if (attr != null)
             {
                 switch (attr.MsgType)

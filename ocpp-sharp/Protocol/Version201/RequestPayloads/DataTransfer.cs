@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
-[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "DataTransfer", OcppMessageAttribute.Direction.PointToCentral)]
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "DataTransfer", OcppMessageAttribute.Direction.Bidirectional)]
 public class DataTransferRequest : RequestPayload
 {
     [JsonProperty("messageId")]

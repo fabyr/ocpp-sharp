@@ -3,8 +3,7 @@ using Newtonsoft.Json;
 
 namespace OcppSharp.Protocol.Version16.ResponsePayloads;
 
-// Can be received by both
-[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "DataTransfer", OcppMessageAttribute.Direction.PointToCentral)]
+[OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Response, "DataTransfer", OcppMessageAttribute.Direction.Bidirectional)]
 public class DataTransferResponse : ResponsePayload
 {
     /// <summary>

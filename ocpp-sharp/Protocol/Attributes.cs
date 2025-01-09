@@ -27,7 +27,8 @@ public class OcppMessageAttribute : Attribute
     public enum Direction
     {
         CentralToPoint,
-        PointToCentral
+        PointToCentral,
+        Bidirectional
     }
 
     public enum MessageType

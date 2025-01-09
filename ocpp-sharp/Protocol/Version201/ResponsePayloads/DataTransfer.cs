@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace OcppSharp.Protocol.Version201.ResponsePayloads;
 
-[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "DataTransfer", OcppMessageAttribute.Direction.PointToCentral)]
+[OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "DataTransfer", OcppMessageAttribute.Direction.Bidirectional)]
 public class DataTransferResponse : ResponsePayload
 {
     [JsonProperty("status")]

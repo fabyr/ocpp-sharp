@@ -2,7 +2,7 @@ using System.Text;
 using System.Net;
 using System.Net.WebSockets;
 using OcppSharp.Protocol;
-using System.Data;
+using System.Reflection;
 
 namespace OcppSharp.Client;
 
@@ -238,11 +238,18 @@ public class OcppSharpClient : IDisposable
     /// <param name="payloadType">The type of request the handler is supposed to process. Must be a derived class of <see cref="RequestPayload"/>.</param>
     /// <param name="handler">The handler to be executed upon receival of a request matching the type.</param>
     /// <returns>A reference to the created <see cref="ClientRequestHandler"/>. This can be used to call <see cref="UnregisterHandler"/>.</returns>
-    /// <exception cref="ArgumentException">If a handler for this specific type has already been registered.</exception>
+    /// <exception cref="ArgumentException">If a handler for this specific type has already been registered or an invalid type was given.</exception>
+    /// <exception cref="InvalidOperationException">If the payload is not meant to be received by a client (OCPP-Specification).</exception>
     public virtual ClientRequestHandler RegisterHandler(Type payloadType, RequestPayloadHandlerDelegate handler)
     {
         if (handlers.Any(x => x.OnType == payloadType))
             throw new ArgumentException("A handler has already been registered for this type.", nameof(payloadType));
+
+        OcppMessageAttribute attr = payloadType.GetCustomAttribute<OcppMessageAttribute>()
+            ?? throw new ArgumentException("The supplied RequestPayload-Type does not have an OcppMessage-Attribute.", nameof(payloadType));
+
+        if (attr.Dir == OcppMessageAttribute.Direction.PointToCentral)
+            throw new InvalidOperationException($"An OCPP-Message of type '{payloadType.Name}' cannot be received by a client (charge point) as per the OCPP-Specification.");
 
         ClientRequestHandler result = new(payloadType, handler);
         handlers.Add(result);
@@ -291,10 +298,8 @@ public class OcppSharpClient : IDisposable
             throw UninitializedException;
 
         // GetType() instead of T is used to get the exact type if T is inferred to be just "RequestPayload" (at the call site), if you don't explicitly specify a type between the <>
-        var ocppMessageAttr = payload.GetType()
-                                    .GetCustomAttributes(typeof(OcppMessageAttribute), true)
-                                    .Cast<OcppMessageAttribute>().FirstOrDefault()
-                                        ?? throw new ArgumentException("The supplied RequestPayload-Type does not have an OcppMessage-Attribute");
+        var ocppMessageAttr = payload.GetType().GetCustomAttribute<OcppMessageAttribute>()
+            ?? throw new ArgumentException("The supplied RequestPayload-Type does not have an OcppMessage-Attribute.", nameof(payload));
 
         string id = Guid.NewGuid().ToString(); // RequestID needn't be numeric. Easiest way to generate unique identifier
         string payloadType = ocppMessageAttr.Name;

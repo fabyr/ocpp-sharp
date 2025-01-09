@@ -5,6 +5,7 @@ using System.Net.WebSockets;
 using OcppSharp.Protocol;
 using OcppSharp.Client;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace OcppSharp.Server;
 
@@ -238,16 +239,23 @@ public partial class OcppSharpServer
     /// <summary>
     /// Registers a handler to this server instance for a specific type of OCPP-Request.
     /// </summary>
-    /// <param name="type">The type of request the handler is supposed to process. Must be a derived class of <see cref="RequestPayload"/>.</param>
+    /// <param name="payloadType">The type of request the handler is supposed to process. Must be a derived class of <see cref="RequestPayload"/>.</param>
     /// <param name="handler">The handler to be executed upon receival of a request matching the type.</param>
     /// <returns>A reference to the created <see cref="ServerRequestHandler"/>. This can be used to call <see cref="UnregisterHandler"/>.</returns>
-    /// <exception cref="ArgumentException">If a handler for this specific type has already been registered.</exception>
-    public ServerRequestHandler RegisterHandler(Type type, RequestPayloadHandlerDelegate handler)
+    /// <exception cref="ArgumentException">If a handler for this specific type has already been registered or an invalid type was given.</exception>
+    /// <exception cref="InvalidOperationException">If the payload is not meant to be received by a server (OCPP-Specification).</exception>
+    public ServerRequestHandler RegisterHandler(Type payloadType, RequestPayloadHandlerDelegate handler)
     {
-        if (handlers.Any(x => x.OnType == type))
-            throw new ArgumentException("A handler has already been registered for this type.", nameof(type));
+        if (handlers.Any(x => x.OnType == payloadType))
+            throw new ArgumentException("A handler has already been registered for this type.", nameof(payloadType));
 
-        ServerRequestHandler result = new(type, handler);
+        OcppMessageAttribute attr = payloadType.GetCustomAttribute<OcppMessageAttribute>()
+            ?? throw new ArgumentException("The supplied RequestPayload-Type does not have an OcppMessage-Attribute.", nameof(payloadType));
+
+        if (attr.Dir == OcppMessageAttribute.Direction.CentralToPoint)
+            throw new InvalidOperationException($"An OCPP-Message of type '{payloadType.Name}' cannot be received by a server (central system) as per the OCPP-Specification.");
+
+        ServerRequestHandler result = new(payloadType, handler);
         handlers.Add(result);
 
         return result;
