@@ -1,6 +1,4 @@
-using OcppSharp.Protocol;
-
-namespace OcppSharp;
+namespace OcppSharp.Protocol;
 
 public enum ProtocolVersion
 {
