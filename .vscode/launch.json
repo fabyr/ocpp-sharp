@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Example Server",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ocpp-sharp.examples/server/bin/Debug/net8.0/server.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/ocpp-sharp.examples/server",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Launch Example Client",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ocpp-sharp.examples/client/bin/Debug/net8.0/client.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/ocpp-sharp.examples/client",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
+}
