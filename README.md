@@ -47,14 +47,15 @@ cd ./ocpp-sharp.examples/client
 dotnet run
 ```
 
-The examples are preconfigured to connect to each other on `localhost:8000`.
+The examples are preconfigured to connect to each other on `localhost:8000` \
+and exchange some example messages.
 
 ## Basic server code
 ```cs
-using OcppSharp;
 using OcppSharp.Server;
 using OcppSharp.Protocol.Version16.RequestPayloads;
 using OcppSharp.Protocol.Version16.ResponsePayloads;
+using OcppSharp.Protocol;
 
 namespace OcppApp;
 
@@ -64,10 +65,7 @@ public class Program
     {
         // Set up a server to listen on port 80
         // Stations will be connecting to ws://<Hostname>/ocpp16/<Station ID>
-        OcppSharpServer server = new("/ocpp16", ProtocolVersion.OCPP16, 80)
-        {
-            Log = null // Disable console logging
-        };
+        OcppSharpServer server = new("/ocpp16", ProtocolVersion.OCPP16, 80);
 
         server.RegisterHandler<BootNotificationRequest>((server, sender, request) =>
         {
