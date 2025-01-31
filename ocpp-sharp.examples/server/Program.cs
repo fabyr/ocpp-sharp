@@ -2,14 +2,13 @@
 using OcppSharp.Protocol.Version16.RequestPayloads;
 using OcppSharp.Protocol.Version16.ResponsePayloads;
 using OcppSharp.Protocol;
+using Microsoft.Extensions.Logging;
 
 namespace OcppSharp.Examples.Server;
 
 public class Program
 {
     private static readonly ManualResetEvent _closeEvent = new(false);
-
-    private static readonly bool enableLogging = true;
 
     public static void Main(string[] args)
     {
@@ -22,15 +21,16 @@ public class Program
 
         const int port = 8000;
 
+        // Set the loggerFactory paramter to null when creating the server instance for no logging.
+        using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+            builder.SetMinimumLevel(LogLevel.Debug);
+        });
+
         // set up a server to listen on port 8000
         // Stations will be connecting to ws://<Hostname>/ocpp16/<Station ID>
-        OcppSharpServer server = new("/ocpp16", ProtocolVersion.OCPP16, port);
-
-        if (!enableLogging)
-        {
-            // Disable console logging by the server
-            server.Log = null;
-        }
+        OcppSharpServer server = new("/ocpp16", ProtocolVersion.OCPP16, port, loggerFactory);
 
         server.RegisterHandler<BootNotificationRequest>((server, sender, request) =>
         {

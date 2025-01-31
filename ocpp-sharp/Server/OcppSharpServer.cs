@@ -6,6 +6,8 @@ using OcppSharp.Protocol;
 using OcppSharp.Client;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace OcppSharp.Server;
 
@@ -14,12 +16,8 @@ public partial class OcppSharpServer
     [GeneratedRegex(@"^(\/?(?:.*?\/)+?)([^\/]*?)\/?$", RegexOptions.Singleline)]
     private static partial Regex PathRegex();
 
-    /// <summary>
-    /// The logger instance for this server.
-    /// This can be set to null to disable logging.
-    /// <para>Defaults to stdout and stderr.</para>
-    /// </summary>
-    public Logger? Log { get; set; } = Logger.Default;
+    private readonly ILogger<OcppSharpServer> _logger;
+    private readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// The number of bytes the server will accept in a single WebSocket message.
@@ -95,10 +93,14 @@ public partial class OcppSharpServer
     /// and have its Prefixes correctly configured.
     /// </param>
     /// <param name="version">The ocpp protocol version this server communicates with.</param>
-    public OcppSharpServer(string urlPrefix, HttpListener listener, ProtocolVersion version)
+    /// <param name="loggerFactory">Optional logger factory.</param>
+    public OcppSharpServer(string urlPrefix, HttpListener listener, ProtocolVersion version, ILoggerFactory? loggerFactory = null)
     {
         OcppVersion = version;
         _server = listener;
+
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+        _logger = _loggerFactory.CreateLogger<OcppSharpServer>();
 
         if (!urlPrefix.EndsWith('/'))
             urlPrefix += '/';
@@ -112,7 +114,8 @@ public partial class OcppSharpServer
     /// </summary>
     /// <param name="urlPrefix">The path for the websocket endpoint.</param>
     /// <param name="version">The ocpp protocol version this server communicates with.</param>
-    public OcppSharpServer(string urlPrefix, ProtocolVersion version) : this(urlPrefix, version, 80)
+    /// <param name="loggerFactory">Optional logger factory.</param>
+    public OcppSharpServer(string urlPrefix, ProtocolVersion version, ILoggerFactory? loggerFactory = null) : this(urlPrefix, version, 80, loggerFactory)
     { }
 
     /// <summary>
@@ -121,10 +124,14 @@ public partial class OcppSharpServer
     /// <param name="urlPrefix">The path for the websocket endpoint.</param>
     /// <param name="version">The ocpp protocol version this server communicates with.</param>
     /// <param name="port">The port to listen on for incoming connections.</param>
-    public OcppSharpServer(string urlPrefix, ProtocolVersion version, ushort port)
+    /// <param name="loggerFactory">Optional logger factory.</param>
+    public OcppSharpServer(string urlPrefix, ProtocolVersion version, ushort port, ILoggerFactory? loggerFactory = null)
     {
         OcppVersion = version;
         _server = new HttpListener();
+
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+        _logger = _loggerFactory.CreateLogger<OcppSharpServer>();
 
         if (!urlPrefix.EndsWith('/'))
             urlPrefix += '/';
@@ -182,6 +189,7 @@ public partial class OcppSharpServer
     /// </remarks>
     public async void StartLoop()
     {
+        _logger.LogDebug("Server loop start.");
         stationMap.Clear();
         _stopLoop = false;
         try
@@ -191,7 +199,7 @@ public partial class OcppSharpServer
                 HttpListenerContext listenerContext = await _server.GetContextAsync();
                 if (listenerContext.Request.IsWebSocketRequest)
                 {
-                    Log?.WriteLine($"Processing WebSocket Connect by {listenerContext.Request.RemoteEndPoint.Address}");
+                    _logger.LogInformation("Processing WebSocket Connect by {RemoteAddress}", listenerContext.Request.RemoteEndPoint.Address);
 
                     ProcessRequestAsync(listenerContext);
                 }
@@ -204,10 +212,10 @@ public partial class OcppSharpServer
         }
         catch (Exception ex)
         {
-            Log?.WriteLineErr($"WebSocket Server Error: {ex.Message} {ex.StackTrace}");
+            _logger.LogError("WebSocket Server Error: {Exception}", ex);
         }
 
-        Log?.WriteLine("Server loop stop.");
+        _logger.LogDebug("Server loop stop.");
     }
 
     /// <summary>
@@ -345,14 +353,14 @@ public partial class OcppSharpServer
     // Continously handles subsequent messages
     private async void ProcessRequestAsync(HttpListenerContext listenerContext)
     {
+        string requestUri = listenerContext.Request.RawUrl ?? string.Empty;
         void AbortBadRequest()
         {
             listenerContext.Response.StatusCode = 400;
             listenerContext.Response.Close();
-            Log?.WriteLineWarn("Client connected with malformed url!");
+            _logger.LogWarning("Client connected with a malformed url, terminating connection. ({Url})", requestUri);
         }
 
-        string requestUri = listenerContext.Request.RawUrl ?? string.Empty;
         Match pathMatch = PathRegex().Match(requestUri);
 
         if (!pathMatch.Success)
@@ -377,16 +385,13 @@ public partial class OcppSharpServer
             WebSocket socket = webSocketContext.WebSocket;
 
             // Directly set those properties on connect (no need to wait for first message)
-            OcppClientConnection client = new(this, socket, listenerContext.Request.RemoteEndPoint, stationId, OcppVersion)
-            {
-                Log = Log
-            };
+            OcppClientConnection client = new(this, socket, listenerContext.Request.RemoteEndPoint, stationId, OcppVersion, _loggerFactory);
 
             stationMap.AddOrUpdate(stationId, (key) => client, (key, existing) =>
             {
                 if (!existing.Disposed)
                 {
-                    Log?.WriteLineWarn("Station connected with a duplicate id or the old connection was not terminated gracefully!");
+                    _logger.LogWarning("Station ({StationId}) connected with a duplicate id or the old connection was not terminated gracefully!", key);
                     existing.Disconnect();
                 }
 
@@ -405,7 +410,7 @@ public partial class OcppSharpServer
             // For simplicity lets assume it was a failure on the part of the server and indicate this using 500.
             listenerContext.Response.StatusCode = 500;
             listenerContext.Response.Close();
-            Log?.WriteLineErr($"WebSocket Accept Error: {ex.Message} {ex.StackTrace}");
+            _logger.LogError("WebSocket accept error: {Exception}", ex);
             return;
         }
     }

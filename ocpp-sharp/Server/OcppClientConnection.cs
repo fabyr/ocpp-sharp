@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.WebSockets;
+using Microsoft.Extensions.Logging;
 using OcppSharp.Client;
 using OcppSharp.Protocol;
 
@@ -13,8 +14,8 @@ public class OcppClientConnection : OcppSharpClient
     // Propagate MaxIncomingData from the parent server if MaxIncomingData is null
     protected override int MaxIncomingDataValue => MaxIncomingData ?? ParentServer.MaxIncomingData;
 
-    public OcppClientConnection(OcppSharpServer parentServer, WebSocket socket, IPEndPoint endPoint, string id, ProtocolVersion version)
-        : base(socket, id, version)
+    public OcppClientConnection(OcppSharpServer parentServer, WebSocket socket, IPEndPoint endPoint, string id, ProtocolVersion version, ILoggerFactory? loggerFactory = null)
+        : base(socket, id, version, loggerFactory)
     {
         ParentServer = parentServer;
         EndPoint = endPoint;

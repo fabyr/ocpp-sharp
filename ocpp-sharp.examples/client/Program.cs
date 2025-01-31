@@ -1,4 +1,5 @@
-﻿using OcppSharp.Client;
+﻿using Microsoft.Extensions.Logging;
+using OcppSharp.Client;
 using OcppSharp.Protocol;
 using OcppSharp.Protocol.Version16.RequestPayloads;
 using OcppSharp.Protocol.Version16.ResponsePayloads;
@@ -22,7 +23,13 @@ public class Program
         const string stationId = "example_id_1234";
         const string serverUrl = $"ws://localhost:8000/ocpp16/{stationId}";
 
-        using (OcppSharpClient client = new(stationId, ProtocolVersion.OCPP16))
+        using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+            builder.SetMinimumLevel(LogLevel.Debug);
+        });
+
+        using (OcppSharpClient client = new(stationId, ProtocolVersion.OCPP16, loggerFactory))
         {
             // Example handler
             client.RegisterHandler<GetConfigurationRequest>((client, response) =>

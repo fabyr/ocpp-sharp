@@ -3,17 +3,16 @@ using System.Net;
 using System.Net.WebSockets;
 using OcppSharp.Protocol;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OcppSharp.Client;
 
 public class OcppSharpClient : IDisposable
 {
-    /// <summary>
-    /// The logger instance.
-    /// This can be set to null to disable logging.
-    /// <para>Defaults to stdout and stderr.</para>
-    /// </summary>
-    public Logger? Log { get; set; } = Logger.Default;
+    private readonly ILogger<OcppSharpClient> _logger;
+    private readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// The number of bytes that will be accepted in a single WebSocket message.
@@ -65,11 +64,15 @@ public class OcppSharpClient : IDisposable
     /// <param name="socket">The client websocket connection.</param>
     /// <param name="id">The id the client identifies with.</param>
     /// <param name="version">The ocpp protocol version to use.</param>
-    public OcppSharpClient(WebSocket socket, string id, ProtocolVersion version)
+    /// <param name="loggerFactory">Optional logger factory.</param>
+    public OcppSharpClient(WebSocket socket, string id, ProtocolVersion version, ILoggerFactory? loggerFactory = null)
     {
         Socket = socket;
         OcppVersion = version;
         Id = id;
+
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+        _logger = _loggerFactory.CreateLogger<OcppSharpClient>();
     }
 
     /// <summary>
@@ -80,10 +83,14 @@ public class OcppSharpClient : IDisposable
     /// This should ideally be the same that is used in the url when calling <see cref="Connect"/> afterwards.
     /// </param>
     /// <param name="version">The ocpp protocol version to use.</param>
-    public OcppSharpClient(string id, ProtocolVersion version)
+    /// <param name="loggerFactory">Optional logger factory.</param>
+    public OcppSharpClient(string id, ProtocolVersion version, ILoggerFactory? loggerFactory = null)
     {
         OcppVersion = version;
         Id = id;
+
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+        _logger = _loggerFactory.CreateLogger<OcppSharpClient>();
     }
 
     protected static InvalidOperationException UninitializedException => new("This client has not been initialized yet.");
@@ -93,7 +100,7 @@ public class OcppSharpClient : IDisposable
     /// </summary>
     /// <remarks>
     /// This method should only be used if the client has been initialized
-    /// using an existing WebSocket using this constructor: <see cref="OcppSharpClient(WebSocket, string, ProtocolVersion)"/>.
+    /// using an existing WebSocket using this constructor: <see cref="OcppSharpClient(WebSocket, string, ProtocolVersion, ILoggerFactory?)"/>.
     /// <para>Use <see cref="Connect"/> in the other case instead.</para>
     /// </remarks>
     /// <exception cref="ObjectDisposedException">If this client is already disposed.</exception>
@@ -105,6 +112,7 @@ public class OcppSharpClient : IDisposable
         if (Socket == null)
             throw UninitializedException;
 
+        _logger.LogDebug("Client loop start.");
         _stopLoop = false;
         byte[]? receiveBuffer = null;
         try
@@ -149,14 +157,14 @@ public class OcppSharpClient : IDisposable
         }
         catch (Exception ex)
         {
-            Log?.WriteLineErr($"WebSocket Error: {ex.Message} {ex.StackTrace}");
+            _logger.LogError("WebSocket Error: {Exception}", ex);
         }
         finally
         {
             // Clean up by disposing the WebSocket once it is closed/aborted.
             Dispose();
         }
-        Log?.WriteLine("Client loop stop.");
+        _logger.LogDebug("Client loop stop.");
     }
 
     /// <summary>
@@ -164,7 +172,7 @@ public class OcppSharpClient : IDisposable
     /// </summary>
     /// <remarks>
     /// This method should only be used if the client has been initialized
-    /// using an existing WebSocket using this constructor: <see cref="OcppSharpClient(WebSocket, string, ProtocolVersion)"/>.
+    /// using an existing WebSocket using this constructor: <see cref="OcppSharpClient(WebSocket, string, ProtocolVersion, ILoggerFactory?)"/>.
     /// <para>Use <see cref="Disconnect"/> in the other case instead.</para>
     /// </remarks>
     public virtual void StopLoop()
@@ -331,7 +339,7 @@ public class OcppSharpClient : IDisposable
         };
         ResponseReceivedInternal += handler;
 
-        Log?.WriteVerboseLine($"Request: {json}");
+        _logger.LogDebug("Request: {Json}", json);
 
         byte[] bytes = Encoding.GetBytes(json);
 
@@ -383,7 +391,7 @@ public class OcppSharpClient : IDisposable
         {
             if (OcppJson.IsRequest(json))
             {
-                Log?.WriteVerboseLine($"Request: {json}");
+                _logger.LogDebug("Request: {Json}", json);
 
                 // Deserialize JSON to a request object
                 Request request = OcppJson.DecodeRequest(json, OcppVersion);
@@ -415,7 +423,7 @@ public class OcppSharpClient : IDisposable
                 json = OcppJson.SerializeResponse(response);
                 response.OriginalJsonBody = json;
 
-                Log?.WriteVerboseLine($"Response: {json}");
+                _logger.LogDebug("Response: {Json}", json);
 
                 // Send json to station
                 byte[] bytes = Encoding.GetBytes(json);
@@ -424,7 +432,7 @@ public class OcppSharpClient : IDisposable
             }
             else // Responses to our requests are handled differently
             {
-                Log?.WriteVerboseLine($"Response: {json}");
+                _logger.LogDebug("Response: {Json}", json);
 
                 // Just parse the Response "header" (everything except payload)
                 Response response = OcppJson.DecodeResponseCrude(json, OcppVersion);
@@ -436,7 +444,7 @@ public class OcppSharpClient : IDisposable
         }
         catch (Exception ex)
         {
-            Log?.WriteLineErr($"Request Error: {ex.Message} {ex.StackTrace}");
+            _logger.LogError("Request Error: {Exception}", ex);
         }
     }
 
@@ -449,13 +457,13 @@ public class OcppSharpClient : IDisposable
         StopLoop();
         Socket?.Dispose();
 
-        Log?.WriteLine($"Closed WebSocket connection of client '{Id}'");
+        _logger.LogInformation("Closed WebSocket connection of client '{Id}'", Id);
         Closed?.Invoke(this, EventArgs.Empty);
 
         GC.SuppressFinalize(this);
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         if (obj == null)
             return false;
