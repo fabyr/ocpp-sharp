@@ -157,7 +157,7 @@ public class OcppSharpClient : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError("WebSocket Error: {Exception}", ex);
+            _logger.LogError(ex, "WebSocket Error");
         }
         finally
         {
@@ -367,9 +367,14 @@ public class OcppSharpClient : IDisposable
     /// <param name="payload">The request payload to be processed.</param>
     /// <returns>The response payload resulting from the processing by the handler.</returns>
     /// <exception cref="KeyNotFoundException">If no handler for this OCPP message type has been registered.</exception>
+    /// <exception cref="InvalidOperationException">If the payload is not meant to be received by a client (OCPP-Specification).</exception>
     protected virtual ResponsePayload RunHandler(RequestPayload payload)
     {
         Type payloadType = payload.GetType();
+
+        if (payloadType.GetCustomAttribute<OcppMessageAttribute>()?.Dir == OcppMessageAttribute.Direction.PointToCentral)
+            throw new InvalidOperationException($"Received an OCPP-Message of type '{payloadType.Name}', which cannot be received by a client (charge point) as per the OCPP-Specification.");
+
         string? messageTypeName = OcppMessageAttribute.GetMessageIdentifier(payloadType);
         ClientRequestHandler? handler = handlers.FirstOrDefault(x => x.OnType == payloadType)
                                             ?? throw new KeyNotFoundException($"No handler registered for {messageTypeName}.");
@@ -444,7 +449,7 @@ public class OcppSharpClient : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError("Request Error: {Exception}", ex);
+            _logger.LogError(ex, "Request Error");
         }
     }
 

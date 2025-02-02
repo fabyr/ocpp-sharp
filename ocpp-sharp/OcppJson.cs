@@ -64,7 +64,12 @@ public static class OcppJson
 
     private static Type GetMessageType(ProtocolVersion version, bool responseMap, CiString key)
     {
-        return GetMap(version, responseMap)[key];
+        if (GetMap(version, responseMap).TryGetValue(key, out Type? value))
+        {
+            return value;
+        }
+
+        throw new KeyNotFoundException($"No OCPP protocol class for message type '{key}'");
     }
 
     /// <summary>
@@ -72,9 +77,12 @@ public static class OcppJson
     /// </summary>
     /// <param name="json">The raw ocpp json message.</param>
     /// <returns>true, if the message is a request; false, otherwise.</returns>
+    /// <exception cref="FormatException">If the json string cannot be parsed as it is malformed.</exception>
     public static bool IsRequest(string json)
     {
         JArray array = JArray.Parse(json);
+        if (array.Count < 1)
+            throw new FormatException("Empty header structure.");
         int messageKind = array[0].ToObject<int>();
 
         return messageKind == Request.MessageKind;
@@ -94,7 +102,11 @@ public static class OcppJson
         string messageType = array[2].ToObject<string>() ?? throw new FormatException("Malformed message header: missing message type");
         string messageId = array[1].ToObject<string>() ?? throw new FormatException("Malformed message header: missing message id");
 
-        Debug.Assert(array[0].ToObject<int>() == Request.MessageKind, "Invalid message header magic number for request");
+        if (array.Count != 4)
+            throw new FormatException("Invalid length for message header");
+
+        if (array[0].ToObject<int>() != Request.MessageKind)
+            throw new FormatException("Invalid message header magic number for request");
 
         Request request = new(messageId, messageType);
 
@@ -121,9 +133,14 @@ public static class OcppJson
     public static Response DecodeResponseCrude(string json, ProtocolVersion version)
     {
         JArray array = JArray.Parse(json);
-        string messageId = array[1].ToObject<string>() ?? throw new FormatException("Malformed message header: missing message id");
 
-        Debug.Assert(array[0].ToObject<int>() == Response.MessageKind, "Invalid message header magic number for response");
+        if (array.Count != 3)
+            throw new FormatException("Invalid length for message header");
+
+        if (array[0].ToObject<int>() != Response.MessageKind)
+            throw new FormatException("Invalid message header magic number for response");
+
+        string messageId = array[1].ToObject<string>() ?? throw new FormatException("Malformed message header: missing message id");
 
         Response response = new(messageId)
         {

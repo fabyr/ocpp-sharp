@@ -212,7 +212,7 @@ public partial class OcppSharpServer
         }
         catch (Exception ex)
         {
-            _logger.LogError("WebSocket Server Error: {Exception}", ex);
+            _logger.LogError(ex, "WebSocket Server Error");
         }
 
         _logger.LogDebug("Server loop stop.");
@@ -234,6 +234,8 @@ public partial class OcppSharpServer
     /// <summary>
     /// Returns a station object by its id.
     /// </summary>
+    /// <exception cref="KeyNotFoundException">If no station with that id exists.</exception>
+
     public OcppClientConnection GetStation(string id)
     {
         if (stationMap.TryGetValue(id, out OcppClientConnection? result))
@@ -324,6 +326,10 @@ public partial class OcppSharpServer
     internal ResponsePayload RunHandler(OcppClientConnection client, RequestPayload payload)
     {
         Type payloadType = payload.GetType();
+
+        if (payloadType.GetCustomAttribute<OcppMessageAttribute>()?.Dir == OcppMessageAttribute.Direction.CentralToPoint)
+            throw new InvalidOperationException($"Received an OCPP-Message of type '{payloadType.Name}', which cannot be received by a server (central system) as per the OCPP-Specification.");
+
         string? messageTypeName = OcppMessageAttribute.GetMessageIdentifier(payloadType);
         ServerRequestHandler? handler = handlers.FirstOrDefault(x => x.OnType == payloadType)
                                             ?? throw new KeyNotFoundException($"No handler registered for {messageTypeName}.");
@@ -410,7 +416,7 @@ public partial class OcppSharpServer
             // For simplicity lets assume it was a failure on the part of the server and indicate this using 500.
             listenerContext.Response.StatusCode = 500;
             listenerContext.Response.Close();
-            _logger.LogError("WebSocket accept error: {Exception}", ex);
+            _logger.LogError(ex, "WebSocket accept error");
             return;
         }
     }
