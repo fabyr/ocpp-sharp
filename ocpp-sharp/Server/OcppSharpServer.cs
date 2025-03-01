@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using OcppSharp.Abstractions;
 
 namespace OcppSharp.Server;
 
@@ -50,7 +51,7 @@ public partial class OcppSharpServer
     /// Note: Clients won't be removed after they have connected once.
     /// <para>See <see cref="ConnectedClients"/> for more information.</para>
     /// </remarks>
-    public string[] AllStationIds => ConnectedClients.Select(client => client.Id).ToArray();
+    public string[] AllStationIds => [.. ConnectedClients.Select(client => client.Id)];
 
     /// <summary>
     /// A collection of connected clients (<see cref="OcppClientConnection"/>).
@@ -390,8 +391,10 @@ public partial class OcppSharpServer
 
             WebSocket socket = webSocketContext.WebSocket;
 
+            WebSocketTransceiver wrapper = new(socket, _loggerFactory);
+
             // Directly set those properties on connect (no need to wait for first message)
-            OcppClientConnection client = new(this, socket, listenerContext.Request.RemoteEndPoint, stationId, OcppVersion, _loggerFactory);
+            OcppClientConnection client = new(this, wrapper, listenerContext.Request.RemoteEndPoint, stationId, OcppVersion, _loggerFactory);
 
             stationMap.AddOrUpdate(stationId, (key) => client, (key, existing) =>
             {
@@ -408,7 +411,7 @@ public partial class OcppSharpServer
 
             ClientAccepted?.Invoke(this, client);
 
-            client.StartLoop();
+            wrapper.StartMessageLoop(CancellationToken.None);
         }
         catch (Exception ex)
         {

@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Diagnostics.CodeAnalysis;
+using OcppSharp.Abstractions;
 
 namespace OcppSharp.Client;
 
@@ -22,17 +23,9 @@ public class OcppSharpClient : IDisposable
 
     protected virtual int MaxIncomingDataValue => MaxIncomingData ?? 32767;
 
-    public WebSocket? Socket { get; protected set; }
+    public Transceiver? Socket { get; protected set; }
 
     public ProtocolVersion OcppVersion { get; }
-
-    protected bool _stopLoop = false;
-
-    /// <summary>
-    /// The encoding used for encoding and decoding WebSocket data.
-    /// <para>Defaults to <see cref="Encoding.UTF8"/></para>
-    /// </summary>
-    public static Encoding Encoding { get; set; } = Encoding.UTF8;
 
     public ICredentials? Credentials { get; }
 
@@ -57,6 +50,17 @@ public class OcppSharpClient : IDisposable
 
     protected readonly List<ClientRequestHandler> handlers = [];
 
+    public OcppSharpClient(Transceiver transceiver, string id, ProtocolVersion version, ILoggerFactory? loggerFactory = null)
+    {
+        Socket = transceiver;
+        Socket.OnReceive += ProcessMessageAsync;
+        OcppVersion = version;
+        Id = id;
+
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+        _logger = _loggerFactory.CreateLogger<OcppSharpClient>();
+    }
+
     /// <summary>
     /// Create an OCPP-Client using an existing <see cref="WebSocket"/> connection.
     /// This is realistically only needed by a server which is accepting new clients via its websocket logic.
@@ -66,14 +70,8 @@ public class OcppSharpClient : IDisposable
     /// <param name="version">The ocpp protocol version to use.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
     public OcppSharpClient(WebSocket socket, string id, ProtocolVersion version, ILoggerFactory? loggerFactory = null)
-    {
-        Socket = socket;
-        OcppVersion = version;
-        Id = id;
-
-        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
-        _logger = _loggerFactory.CreateLogger<OcppSharpClient>();
-    }
+        : this(new WebSocketTransceiver(socket, loggerFactory), id, version, loggerFactory)
+    { }
 
     /// <summary>
     /// Create an OCPP-Client.
@@ -96,93 +94,11 @@ public class OcppSharpClient : IDisposable
     protected static InvalidOperationException UninitializedException => new("This client has not been initialized yet.");
 
     /// <summary>
-    /// Starts the asynchronous loop.
-    /// </summary>
-    /// <remarks>
-    /// This method should only be used if the client has been initialized
-    /// using an existing WebSocket using this constructor: <see cref="OcppSharpClient(WebSocket, string, ProtocolVersion, ILoggerFactory?)"/>.
-    /// <para>Use <see cref="Connect"/> in the other case instead.</para>
-    /// </remarks>
-    /// <exception cref="ObjectDisposedException">If this client is already disposed.</exception>
-    /// <exception cref="InvalidOperationException">If this client has not yet been initialized with a connection.</exception>
-    public virtual async void StartLoop()
-    {
-        ObjectDisposedException.ThrowIf(Disposed, this);
-
-        if (Socket == null)
-            throw UninitializedException;
-
-        _logger.LogDebug("Client loop start.");
-        _stopLoop = false;
-        byte[]? receiveBuffer = null;
-        try
-        {
-            while (!_stopLoop && Socket.State == WebSocketState.Open)
-            {
-                // update the size of the buffer if MaxIncomingDataValue changes
-                if (receiveBuffer?.Length != MaxIncomingDataValue)
-                    receiveBuffer = new byte[MaxIncomingDataValue];
-
-                WebSocketReceiveResult receiveResult = await Socket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, 0, receiveBuffer.Length), CancellationToken.None);
-
-                if (receiveResult.MessageType == WebSocketMessageType.Close)
-                {
-                    if (Socket.State == WebSocketState.CloseReceived)
-                        await Socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-
-                    // Wait for close-handshake completion
-                    while (Socket.State == WebSocketState.CloseReceived)
-                        await Task.Delay(10);
-
-                    break;
-                }
-                else if (receiveResult.MessageType == WebSocketMessageType.Text)
-                {
-                    string text = Encoding.GetString(receiveBuffer, 0, receiveResult.Count);
-
-                    // Process
-                    await ProcessMessageAsync(text);
-                }
-                else
-                {
-                    await Socket.CloseOutputAsync(WebSocketCloseStatus.InvalidMessageType, "Cannot accept binary data", CancellationToken.None);
-
-                    // Wait for close-handshake completion
-                    while (Socket.State == WebSocketState.CloseSent)
-                        await Task.Delay(10);
-
-                    break;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "WebSocket Error");
-        }
-        finally
-        {
-            // Clean up by disposing the WebSocket once it is closed/aborted.
-            Dispose();
-        }
-        _logger.LogDebug("Client loop stop.");
-    }
-
-    /// <summary>
-    /// Stops the asynchronous loop.
-    /// </summary>
-    /// <remarks>
-    /// This method should only be used if the client has been initialized
-    /// using an existing WebSocket using this constructor: <see cref="OcppSharpClient(WebSocket, string, ProtocolVersion, ILoggerFactory?)"/>.
-    /// <para>Use <see cref="Disconnect"/> in the other case instead.</para>
-    /// </remarks>
-    public virtual void StopLoop()
-    {
-        _stopLoop = true;
-    }
-
-    /// <summary>
     /// Initializes this client with a new WebSocket connection
     /// to some server.
+    /// <para>This method can only be called if the instance of OcppSharpClient 
+    /// has not been initialized with any existing WebSocket or Transceiver object.
+    /// (<see cref="OcppSharpClient(string, ProtocolVersion, ILoggerFactory?)"/>)</para>
     /// </summary>
     /// <param name="url">
     /// The URL of the server to connect to.
@@ -210,34 +126,42 @@ public class OcppSharpClient : IDisposable
 
         await socket.ConnectAsync(new Uri(url), CancellationToken.None);
 
-        Socket = socket;
-        StartLoop();
+        WebSocketTransceiver wrapper = new(socket);
+        wrapper.StartMessageLoop(CancellationToken.None);
+        Socket = wrapper;
     }
 
     /// <summary>
     /// Disconnect from the server and close the connection.
     /// Calls <see cref="Dispose"/>.
     /// </summary>
-    /// <exception cref="InvalidOperationException">If this client has not yet been initialized with a connection.</exception>
+    /// <exception cref="InvalidOperationException">If this client has not yet been initialized with a connection or not by a WebSocket.</exception>
     public virtual async void Disconnect()
     {
         if (Socket == null)
             throw UninitializedException;
 
-        try
+        if (Socket is WebSocketTransceiver wrapper)
         {
-            if (Socket.State == WebSocketState.Open)
+            try
             {
-                await Socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                if (wrapper.Socket.State == WebSocketState.Open)
+                {
+                    await wrapper.Socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
 
-                // Wait for close-handshake completion
-                while (Socket.State == WebSocketState.CloseSent)
-                    await Task.Delay(10);
+                    // Wait for close-handshake completion
+                    while (wrapper.Socket.State == WebSocketState.CloseSent)
+                        await Task.Delay(10);
+                }
             }
-        }
-        catch { }
+            catch { }
 
-        Dispose();
+            Dispose();
+        }
+        else
+        {
+            throw new InvalidOperationException("This instance has not been initialized with a WebSocket connection.");
+        }
     }
 
     /// <summary>
@@ -341,9 +265,7 @@ public class OcppSharpClient : IDisposable
 
         _logger.LogDebug("Request: {Json}", json);
 
-        byte[] bytes = Encoding.GetBytes(json);
-
-        await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None); // Send the request
+        await Socket.Send(json, CancellationToken.None);
 
         RequestSent?.Invoke(this, request);
 
@@ -386,8 +308,7 @@ public class OcppSharpClient : IDisposable
     /// Main method executing when a message is received by the WebSocket connection.
     /// </summary>
     /// <param name="json">The raw ocpp message.</param>
-    /// <returns>The task object representing the asynchronous operation.</returns>
-    protected virtual async Task ProcessMessageAsync(string json)
+    protected virtual async void ProcessMessageAsync(string json, CancellationToken cancellationToken)
     {
         if (Socket == null)
             throw UninitializedException;
@@ -431,8 +352,7 @@ public class OcppSharpClient : IDisposable
                 _logger.LogDebug("Response: {Json}", json);
 
                 // Send json to station
-                byte[] bytes = Encoding.GetBytes(json);
-                await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
+                await Socket.Send(json, cancellationToken);
                 ResponseSent?.Invoke(this, response, messageTypeName);
             }
             else // Responses to our requests are handled differently
@@ -459,10 +379,13 @@ public class OcppSharpClient : IDisposable
             return;
         Disposed = true;
 
-        StopLoop();
-        Socket?.Dispose();
+        if (Socket is WebSocketTransceiver wrapper)
+        {
+            wrapper.StopMessageLoop();
+            wrapper.Dispose();
+            _logger.LogInformation("Closed WebSocket connection of client '{Id}'", Id);
+        }
 
-        _logger.LogInformation("Closed WebSocket connection of client '{Id}'", Id);
         Closed?.Invoke(this, EventArgs.Empty);
 
         GC.SuppressFinalize(this);
