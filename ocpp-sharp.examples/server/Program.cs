@@ -1,8 +1,8 @@
-﻿using OcppSharp.Server;
+﻿using Microsoft.Extensions.Logging;
+using OcppSharp.Protocol;
 using OcppSharp.Protocol.Version16.RequestPayloads;
 using OcppSharp.Protocol.Version16.ResponsePayloads;
-using OcppSharp.Protocol;
-using Microsoft.Extensions.Logging;
+using OcppSharp.Server;
 
 namespace OcppSharp.Examples.Server;
 
@@ -29,8 +29,8 @@ public class Program
         });
 
         // set up a server to listen on port 8000
-        // Stations will be connecting to ws://<Hostname>/ocpp16/<Station ID>
-        OcppSharpServer server = new("/ocpp16", ProtocolVersion.OCPP16, port, loggerFactory);
+        // Stations will be connecting to ws://<Hostname>/ocpp/<Station ID>
+        OcppSharpServer server = new("/ocpp", [ProtocolVersion.OCPP201, ProtocolVersion.OCPP16], port, loggerFactory);
 
         server.RegisterHandler<BootNotificationRequest>((server, sender, request) =>
         {
@@ -57,7 +57,7 @@ public class Program
 
             // Example of sending a request to some station.
             // A delay of 3000ms is supposed to simulate a random event to show usage.
-            // This could also be run outside of any handler/event. 
+            // This could also be run outside of any handler/event.
             // You just need a reference to some station. (OcppClientConnection)
             // e.g. with server.ConnectedClients or server.GetStation(id)
             Task.Run(async () =>

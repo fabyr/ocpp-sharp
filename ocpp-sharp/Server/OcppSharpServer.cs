@@ -1,13 +1,13 @@
-using System.Text;
-using System.Net;
-using System.Collections.Concurrent;
-using System.Net.WebSockets;
-using OcppSharp.Protocol;
-using OcppSharp.Client;
-using System.Text.RegularExpressions;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using OcppSharp.Client;
+using OcppSharp.Protocol;
+using System.Collections.Concurrent;
+using System.Net;
+using System.Net.WebSockets;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OcppSharp.Server;
 
@@ -24,7 +24,7 @@ public partial class OcppSharpServer
     /// </summary>
     public int MaxIncomingData { get; set; } = 32767;
 
-    public ProtocolVersion OcppVersion { get; }
+    public IEnumerable<ProtocolVersion> OcppVersions { get; }
 
     public string SubPath { get; }
 
@@ -72,9 +72,13 @@ public partial class OcppSharpServer
     public ICollection<OcppClientConnection> ConnectedClients => stationMap.Values;
 
     public event ResponseHandlerDelegate? ResponseReceived;
+
     public event ResponseHandlerDelegate? ResponseSent;
+
     public event RequestHandlerDelegate? RequestReceived;
+
     public event RequestHandlerDelegate? RequestSent;
+
     public event EventHandler<OcppClientConnection>? ClientAccepted;
 
     private bool _stopLoop = false;
@@ -94,20 +98,8 @@ public partial class OcppSharpServer
     /// </param>
     /// <param name="version">The ocpp protocol version this server communicates with.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
-    public OcppSharpServer(string urlPrefix, HttpListener listener, ProtocolVersion version, ILoggerFactory? loggerFactory = null)
-    {
-        OcppVersion = version;
-        _server = listener;
-
-        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
-        _logger = _loggerFactory.CreateLogger<OcppSharpServer>();
-
-        if (!urlPrefix.EndsWith('/'))
-            urlPrefix += '/';
-        if (!urlPrefix.StartsWith('/'))
-            urlPrefix = $"/{urlPrefix}";
-        SubPath = urlPrefix;
-    }
+    public OcppSharpServer(string urlPrefix, HttpListener listener, IEnumerable<ProtocolVersion> versions, ILoggerFactory? loggerFactory = null) : this(urlPrefix, versions, 80, listener, loggerFactory)
+    { }
 
     /// <summary>
     /// Sets up an OCPP-Server (WebSocket-Server) to listen on port 80.
@@ -115,7 +107,7 @@ public partial class OcppSharpServer
     /// <param name="urlPrefix">The path for the websocket endpoint.</param>
     /// <param name="version">The ocpp protocol version this server communicates with.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
-    public OcppSharpServer(string urlPrefix, ProtocolVersion version, ILoggerFactory? loggerFactory = null) : this(urlPrefix, version, 80, loggerFactory)
+    public OcppSharpServer(string urlPrefix, IEnumerable<ProtocolVersion> versions, ILoggerFactory? loggerFactory = null) : this(urlPrefix, versions, 80, loggerFactory)
     { }
 
     /// <summary>
@@ -125,10 +117,13 @@ public partial class OcppSharpServer
     /// <param name="version">The ocpp protocol version this server communicates with.</param>
     /// <param name="port">The port to listen on for incoming connections.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
-    public OcppSharpServer(string urlPrefix, ProtocolVersion version, ushort port, ILoggerFactory? loggerFactory = null)
+    public OcppSharpServer(string urlPrefix, IEnumerable<ProtocolVersion> versions, ushort port, ILoggerFactory? loggerFactory = null) : this(urlPrefix, versions, port, null, loggerFactory)
+    { }
+
+    private OcppSharpServer(string urlPrefix, IEnumerable<ProtocolVersion> versions, ushort port = 80, HttpListener? listener = null, ILoggerFactory? loggerFactory = null)
     {
-        OcppVersion = version;
-        _server = new HttpListener();
+        OcppVersions = versions;
+        _server = listener ?? new HttpListener();
 
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         _logger = _loggerFactory.CreateLogger<OcppSharpServer>();
@@ -139,8 +134,11 @@ public partial class OcppSharpServer
             urlPrefix = $"/{urlPrefix}";
         SubPath = urlPrefix;
 
-        // will accept ws:// requests
-        _server.Prefixes.Add($"http://+:{port}{urlPrefix}");
+        if (listener == null)
+        {
+            // will accept ws:// requests
+            _server.Prefixes.Add($"http://localhost:{port}{urlPrefix}");
+        }
     }
 
     /// <summary>
@@ -289,10 +287,10 @@ public partial class OcppSharpServer
     /// Removes a handler for a specific type of OCPP-Request.
     /// </summary>
     /// <param name="handler">
-    /// A reference to a <see cref="ServerRequestHandler"/> which has been created by 
+    /// A reference to a <see cref="ServerRequestHandler"/> which has been created by
     /// <para><see cref="RegisterHandler"/> or <see cref="RegisterHandler{T}"/>.</para>
     /// </param>
-    /// <returns>true if the handler is successfully removed; otherwise, false. 
+    /// <returns>true if the handler is successfully removed; otherwise, false.
     /// <para>This method also returns false if no handler was found.</para>
     /// <para>Or if the handler reference doesn't originate from a call to <see cref="RegisterHandler"/> or <see cref="RegisterHandler{T}"/>.</para>
     /// </returns>
@@ -385,13 +383,33 @@ public partial class OcppSharpServer
 
         try
         {
-            // important: specify sub protocol
-            WebSocketContext webSocketContext = await listenerContext.AcceptWebSocketAsync(subProtocol: OcppVersion.GetWebSocketSubProtocol());
+            ProtocolVersion? ocppVersion = null;
+
+            var subProtocolHeader = listenerContext.Request.Headers["Sec-WebSocket-Protocol"];
+            if (!string.IsNullOrEmpty(subProtocolHeader))
+            {
+                var requestedSubProtocols = subProtocolHeader.Split(',');
+                foreach (var version in OcppVersions)
+                {
+                    if (requestedSubProtocols.Any(x => string.Equals(x.Trim(), version.GetWebSocketSubProtocol(), StringComparison.OrdinalIgnoreCase)))
+                    {
+                        ocppVersion = version;
+                        break;
+                    }
+                }
+            }
+            if (ocppVersion == null)
+            {
+                _logger.LogWarning("OCPP Version not supported, protocol header: ({ProtocolHeader})", subProtocolHeader);
+                ocppVersion = OcppVersions.First();
+            }
+
+            WebSocketContext webSocketContext = await listenerContext.AcceptWebSocketAsync(subProtocol: ocppVersion.Value.GetWebSocketSubProtocol());
 
             WebSocket socket = webSocketContext.WebSocket;
 
             // Directly set those properties on connect (no need to wait for first message)
-            OcppClientConnection client = new(this, socket, listenerContext.Request.RemoteEndPoint, stationId, OcppVersion, _loggerFactory);
+            OcppClientConnection client = new(this, socket, listenerContext.Request.RemoteEndPoint, stationId, ocppVersion.Value, _loggerFactory);
 
             stationMap.AddOrUpdate(stationId, (key) => client, (key, existing) =>
             {
@@ -412,7 +430,7 @@ public partial class OcppSharpServer
         }
         catch (Exception ex)
         {
-            // The upgrade process failed somehow or there was an error creating the OcppClient. 
+            // The upgrade process failed somehow or there was an error creating the OcppClient.
             // For simplicity lets assume it was a failure on the part of the server and indicate this using 500.
             listenerContext.Response.StatusCode = 500;
             listenerContext.Response.Close();
