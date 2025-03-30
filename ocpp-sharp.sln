@@ -11,23 +11,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "client", "ocpp-sharp.exampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "server", "ocpp-sharp.examples\server\server.csproj", "{68B7045E-F0B7-4563-8ADE-8E60A8EB4CFC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FBD5619B-9ADB-4964-B679-C195BA64C7AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FBD5619B-9ADB-4964-B679-C195BA64C7AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBD5619B-9ADB-4964-B679-C195BA64C7AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBD5619B-9ADB-4964-B679-C195BA64C7AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FAE1FFE2-5207-4B41-9F85-F9ECC2945CC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FAE1FFE2-5207-4B41-9F85-F9ECC2945CC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FAE1FFE2-5207-4B41-9F85-F9ECC2945CC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FAE1FFE2-5207-4B41-9F85-F9ECC2945CC3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AAD2A570-DC0B-4C51-808A-2DDB9A978BB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AAD2A570-DC0B-4C51-808A-2DDB9A978BB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAD2A570-DC0B-4C51-808A-2DDB9A978BB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -36,6 +34,9 @@ Global
 		{68B7045E-F0B7-4563-8ADE-8E60A8EB4CFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68B7045E-F0B7-4563-8ADE-8E60A8EB4CFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68B7045E-F0B7-4563-8ADE-8E60A8EB4CFC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AAD2A570-DC0B-4C51-808A-2DDB9A978BB8} = {CBA7312D-CDAB-4BBE-912A-AB1B7D91CA6D}

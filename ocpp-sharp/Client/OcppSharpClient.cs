@@ -1,11 +1,11 @@
-using System.Text;
-using System.Net;
-using System.Net.WebSockets;
-using OcppSharp.Protocol;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using OcppSharp.Protocol;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.WebSockets;
+using System.Reflection;
+using System.Text;
 
 namespace OcppSharp.Client;
 
@@ -40,6 +40,7 @@ public class OcppSharpClient : IDisposable
     /// The ID the station identifies with.
     /// </summary>
     public string Id { get; }
+
     public DateTime? LastCommunication { get; set; }
 
     public bool Disposed { get; protected set; } = false;
@@ -47,10 +48,13 @@ public class OcppSharpClient : IDisposable
     protected delegate void ResponseHandlerDelegateInternal(OcppSharpClient client, Response response);
 
     public event ResponseHandlerDelegate? ResponseReceived;
+
     public event ResponseHandlerDelegate? ResponseSent;
+
     protected event ResponseHandlerDelegateInternal? ResponseReceivedInternal;
 
     public event RequestHandlerDelegate? RequestReceived;
+
     public event RequestHandlerDelegate? RequestSent;
 
     public event EventHandler? Closed;
@@ -125,6 +129,7 @@ public class OcppSharpClient : IDisposable
 
                 WebSocketReceiveResult receiveResult = await Socket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, 0, receiveBuffer.Length), CancellationToken.None);
 
+                if (!receiveResult.EndOfMessage) continue;    // do not proceed if the message is not complete
                 if (receiveResult.MessageType == WebSocketMessageType.Close)
                 {
                     if (Socket.State == WebSocketState.CloseReceived)
@@ -283,10 +288,10 @@ public class OcppSharpClient : IDisposable
     /// Removes a handler for a specific type of OCPP-Request.
     /// </summary>
     /// <param name="handler">
-    /// A reference to a <see cref="ClientRequestHandler"/> which has been created by 
+    /// A reference to a <see cref="ClientRequestHandler"/> which has been created by
     /// <para><see cref="RegisterHandler"/> or <see cref="RegisterHandler{T}"/>.</para>
     /// </param>
-    /// <returns>true if the handler is successfully removed; otherwise, false. 
+    /// <returns>true if the handler is successfully removed; otherwise, false.
     /// <para>This method also returns false if no handler was found.</para>
     /// <para>Or if the handler reference doesn't originate from a call to <see cref="RegisterHandler"/> or <see cref="RegisterHandler{T}"/>.</para>
     /// </returns>
@@ -435,7 +440,7 @@ public class OcppSharpClient : IDisposable
                 await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
                 ResponseSent?.Invoke(this, response, messageTypeName);
             }
-            else // Responses to our requests are handled differently
+            else if (OcppJson.IsResponse(json)) // Responses to our requests are handled differently
             {
                 _logger.LogDebug("Response: {Json}", json);
 
@@ -445,6 +450,10 @@ public class OcppSharpClient : IDisposable
 
                 // Invoke the event (Used in SendRequestAsync)
                 ResponseReceivedInternal?.Invoke(this, response);
+            }
+            else
+            {
+                _logger.LogDebug("Other unhandled message: {Json}", json);  // Notifications have the id 4
             }
         }
         catch (Exception ex)

@@ -49,6 +49,7 @@ public static class OcppJson
                     case OcppMessageAttribute.MessageType.Request:
                         messageRequestTypeMap[attr.Version].Add(attr.Name, type);
                         break;
+
                     case OcppMessageAttribute.MessageType.Response:
                         messageResponseTypeMap[attr.Version].Add(attr.Name, type);
                         break;
@@ -73,7 +74,7 @@ public static class OcppJson
     }
 
     /// <summary>
-    /// Determines if a raw ocpp json message is a request or a response.
+    /// Determines if a raw ocpp json message is a request.
     /// </summary>
     /// <param name="json">The raw ocpp json message.</param>
     /// <returns>true, if the message is a request; false, otherwise.</returns>
@@ -120,6 +121,22 @@ public static class OcppJson
         request.ProtocolVersion = version;
 
         return request;
+    }
+
+    /// <summary>
+    /// Determines if a raw ocpp json message is a response.
+    /// </summary>
+    /// <param name="json">The raw ocpp json message.</param>
+    /// <returns>true, if the message is a request; false, otherwise.</returns>
+    /// <exception cref="FormatException">If the json string cannot be parsed as it is malformed.</exception>
+    public static bool IsResponse(string json)
+    {
+        JArray array = JArray.Parse(json);
+        if (array.Count < 1)
+            throw new FormatException("Empty header structure.");
+        int messageKind = array[0].ToObject<int>();
+
+        return messageKind == Response.MessageKind;
     }
 
     /// <summary>
