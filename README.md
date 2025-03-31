@@ -65,7 +65,7 @@ public class Program
     {
         // Set up a server to listen on port 80
         // Stations will be connecting to ws://<Hostname>/ocpp16/<Station ID>
-        OcppSharpServer server = new("/ocpp16", ProtocolVersion.OCPP16, 80);
+        OcppSharpServer server = new("/ocpp16", [ProtocolVersion.OCPP16], 80);
 
         server.RegisterHandler<BootNotificationRequest>((server, sender, request) =>
         {
