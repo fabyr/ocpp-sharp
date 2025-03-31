@@ -21,7 +21,7 @@ public class Program
         };
 
         const string stationId = "example_id_1234";
-        const string serverUrl = $"ws://localhost:8000/ocpp16/{stationId}";
+        const string serverUrl = $"ws://localhost:8000/ocpp/{stationId}";
 
         using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
         {

@@ -30,7 +30,8 @@ public class Program
 
         // set up a server to listen on port 8000
         // Stations will be connecting to ws://<Hostname>/ocpp/<Station ID>
-        OcppSharpServer server = new("/ocpp", [ProtocolVersion.OCPP201, ProtocolVersion.OCPP16], port, loggerFactory);
+        // You can support multiple protocol versions at once. Be sure to add the corresponding handlers.
+        OcppSharpServer server = new("/ocpp", [ProtocolVersion.OCPP16], port, loggerFactory);
 
         server.RegisterHandler<BootNotificationRequest>((server, sender, request) =>
         {
