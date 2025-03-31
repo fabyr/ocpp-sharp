@@ -127,9 +127,19 @@ public class OcppSharpClient : IDisposable
                 if (receiveBuffer?.Length != MaxIncomingDataValue)
                     receiveBuffer = new byte[MaxIncomingDataValue];
 
-                WebSocketReceiveResult receiveResult = await Socket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, 0, receiveBuffer.Length), CancellationToken.None);
+                int totalBytesReceived = 0;
+                WebSocketReceiveResult? receiveResult = null;
 
-                if (!receiveResult.EndOfMessage) continue;    // do not proceed if the message is not complete
+                // receive all chunks of the message
+                do
+                {
+                    receiveResult = await Socket.ReceiveAsync(
+                        new ArraySegment<byte>(receiveBuffer, totalBytesReceived, receiveBuffer.Length - totalBytesReceived),
+                        CancellationToken.None
+                    );
+                    totalBytesReceived += receiveResult.Count;
+                } while (!receiveResult.EndOfMessage);
+
                 if (receiveResult.MessageType == WebSocketMessageType.Close)
                 {
                     if (Socket.State == WebSocketState.CloseReceived)
@@ -143,7 +153,7 @@ public class OcppSharpClient : IDisposable
                 }
                 else if (receiveResult.MessageType == WebSocketMessageType.Text)
                 {
-                    string text = Encoding.GetString(receiveBuffer, 0, receiveResult.Count);
+                    string text = Encoding.GetString(receiveBuffer, 0, totalBytesReceived);
 
                     // Process
                     await ProcessMessageAsync(text);

@@ -2,7 +2,6 @@ using OcppSharp.Protocol;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Reflection;
-using System.Diagnostics;
 
 namespace OcppSharp;
 
@@ -127,7 +126,7 @@ public static class OcppJson
     /// Determines if a raw ocpp json message is a response.
     /// </summary>
     /// <param name="json">The raw ocpp json message.</param>
-    /// <returns>true, if the message is a request; false, otherwise.</returns>
+    /// <returns>true, if the message is a response; false, otherwise.</returns>
     /// <exception cref="FormatException">If the json string cannot be parsed as it is malformed.</exception>
     public static bool IsResponse(string json)
     {
