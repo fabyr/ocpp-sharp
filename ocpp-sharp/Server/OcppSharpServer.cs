@@ -96,7 +96,7 @@ public partial class OcppSharpServer
     /// Note: This listener must be externally started and stopped
     /// and have its Prefixes correctly configured.
     /// </param>
-    /// <param name="version">The ocpp protocol version this server communicates with.</param>
+    /// <param name="versions">The ocpp protocol versions this server allows.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
     public OcppSharpServer(string urlPrefix, HttpListener listener, IEnumerable<ProtocolVersion> versions, ILoggerFactory? loggerFactory = null) : this(urlPrefix, versions, 80, listener, loggerFactory)
     { }
@@ -105,7 +105,7 @@ public partial class OcppSharpServer
     /// Sets up an OCPP-Server (WebSocket-Server) to listen on port 80.
     /// </summary>
     /// <param name="urlPrefix">The path for the websocket endpoint.</param>
-    /// <param name="version">The ocpp protocol version this server communicates with.</param>
+    /// <param name="versions">The ocpp protocol versions this server allows.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
     public OcppSharpServer(string urlPrefix, IEnumerable<ProtocolVersion> versions, ILoggerFactory? loggerFactory = null) : this(urlPrefix, versions, 80, loggerFactory)
     { }
@@ -114,7 +114,7 @@ public partial class OcppSharpServer
     /// Sets up an OCPP-Server (WebSocket-Server) to listen on the specified port.
     /// </summary>
     /// <param name="urlPrefix">The path for the websocket endpoint.</param>
-    /// <param name="version">The ocpp protocol version this server communicates with.</param>
+    /// <param name="versions">The ocpp protocol versions this server allows.</param>
     /// <param name="port">The port to listen on for incoming connections.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
     public OcppSharpServer(string urlPrefix, IEnumerable<ProtocolVersion> versions, ushort port, ILoggerFactory? loggerFactory = null) : this(urlPrefix, versions, port, null, loggerFactory)
@@ -398,6 +398,7 @@ public partial class OcppSharpServer
                     }
                 }
             }
+
             if (ocppVersion == null)
             {
                 _logger.LogWarning("OCPP Version not supported, protocol header: ({ProtocolHeader})", subProtocolHeader);
