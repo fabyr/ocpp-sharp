@@ -1,0 +1,7 @@
+﻿[*.{cs,vb}]
+
+# IDE0305: Simplify collection initialization
+dotnet_diagnostic.IDE0305.severity = none
+
+# IDE0290: Use primary constructor
+csharp_style_prefer_primary_constructors = false
