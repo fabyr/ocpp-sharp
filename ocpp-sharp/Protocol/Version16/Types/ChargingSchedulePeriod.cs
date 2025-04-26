@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.Types;
 
@@ -6,12 +6,12 @@ public struct ChargingSchedulePeriod
 {
     public static readonly ChargingSchedulePeriod Empty = new();
 
-    [JsonProperty("startPeriod")]
+    [JsonPropertyName("startPeriod")]
     public long StartPeriod { get; set; }
 
-    [JsonProperty("limit")]
+    [JsonPropertyName("limit")]
     public double Limit { get; set; }
 
-    [JsonProperty("numberPhases")]
+    [JsonPropertyName("numberPhases")]
     public long? NumberPhases { get; set; }
 }

@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.ResponsePayloads;
 
@@ -9,9 +9,9 @@ public class DataTransferResponse : ResponsePayload
     /// <summary>
     /// Valid values in <see cref="DataTransferStatus"/>
     /// </summary>
-    [JsonProperty("status")]
+    [JsonPropertyName("status")]
     public DataTransferStatus.Enum Status { get; set; }
 
-    [JsonProperty("data")]
+    [JsonPropertyName("data")]
     public string? Data { get; set; }
 }

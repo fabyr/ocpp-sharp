@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,18 +7,18 @@ public struct Transaction
 {
     public static readonly Transaction Empty = new();
 
-    [JsonProperty("transactionId")]
+    [JsonPropertyName("transactionId")]
     public CiString TransactionId { get; set; }
 
-    [JsonProperty("chargingState")]
+    [JsonPropertyName("chargingState")]
     public ChargingStateType.Enum? ChargingState { get; set; }
 
-    [JsonProperty("timeSpentCharging")]
+    [JsonPropertyName("timeSpentCharging")]
     public int? TimeSpentCharging { get; set; }
 
-    [JsonProperty("stoppedReason")]
+    [JsonPropertyName("stoppedReason")]
     public ReasonType.Enum? StoppedReason { get; set; }
 
-    [JsonProperty("remoteStartId")]
+    [JsonPropertyName("remoteStartId")]
     public long? RemoteStartId { get; set; }
 }

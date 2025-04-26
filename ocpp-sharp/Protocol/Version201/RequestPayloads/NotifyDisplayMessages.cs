@@ -1,17 +1,17 @@
 using OcppSharp.Protocol.Version201.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyDisplayMessages", OcppMessageAttribute.Direction.PointToCentral)]
 public class NotifyDisplayMessagesRequest : RequestPayload
 {
-    [JsonProperty("requestId")]
+    [JsonPropertyName("requestId")]
     public long RequestId { get; set; }
 
-    [JsonProperty("tbc")]
+    [JsonPropertyName("tbc")]
     public bool? Tbc { get; set; }
 
-    [JsonProperty("messageInfo")]
+    [JsonPropertyName("messageInfo")]
     public MessageInfo[]? MessageInfo { get; set; }
 }

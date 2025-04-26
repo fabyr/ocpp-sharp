@@ -1,13 +1,13 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "CostUpdated", OcppMessageAttribute.Direction.CentralToPoint)]
 public class CostUpdatedRequest : RequestPayload
 {
-    [JsonProperty("totalCost")]
+    [JsonPropertyName("totalCost")]
     public decimal TotalCost { get; set; }
 
-    [JsonProperty("transactionId")]
+    [JsonPropertyName("transactionId")]
     public CiString TransactionId { get; set; }
 }

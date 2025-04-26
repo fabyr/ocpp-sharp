@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,12 +7,12 @@ public struct VariableAttribute
 {
     public static readonly VariableAttribute Empty = new();
 
-    [JsonProperty("type")]
+    [JsonPropertyName("type")]
     public AttributeType.Enum? Type { get; set; }
 
-    [JsonProperty("value")]
+    [JsonPropertyName("value")]
     public string? Value { get; set; }
 
-    [JsonProperty("mutability")]
+    [JsonPropertyName("mutability")]
     public MutabilityType.Enum? Mutability { get; set; } // Default = MutabilityType.Enum.ReadWrite
 }

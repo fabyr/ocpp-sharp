@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
@@ -19,6 +19,6 @@ public class SetMonitoringLevelRequest : RequestPayload
         Debug = 9
     }
 
-    [JsonProperty("monitoringBase")]
+    [JsonPropertyName("monitoringBase")]
     public SeverityLevel MonitoringBase { get; set; }
 }

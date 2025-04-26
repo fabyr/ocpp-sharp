@@ -1,22 +1,22 @@
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ClearChargingProfile", OcppMessageAttribute.Direction.CentralToPoint)]
 public class ClearChargingProfileRequest : RequestPayload
 {
-    [JsonProperty("id")]
+    [JsonPropertyName("id")]
     public long? Id { get; set; }
-    [JsonProperty("connectorId")]
+    [JsonPropertyName("connectorId")]
     public long? ConnectorId { get; set; }
 
     /// <summary>
     /// Valid values in <see cref="ChargingProfilePurposeType"/>
     /// </summary>
-    [JsonProperty("chargingProfilePurpose")]
+    [JsonPropertyName("chargingProfilePurpose")]
     public ChargingProfilePurposeType.Enum? ChargingProfilePurpose { get; set; }
 
-    [JsonProperty("stackLevel")]
+    [JsonPropertyName("stackLevel")]
     public long? StackLevel { get; set; }
 }

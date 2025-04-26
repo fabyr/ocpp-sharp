@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -6,15 +6,15 @@ public struct SignedMeterValue
 {
     public static readonly SignedMeterValue Empty = new();
 
-    [JsonProperty("signedMeterData")]
+    [JsonPropertyName("signedMeterData")]
     public string SignedMeterData { get; set; }
 
-    [JsonProperty("signingMethod")]
+    [JsonPropertyName("signingMethod")]
     public string SigningMethod { get; set; }
 
-    [JsonProperty("encodingMethod")]
+    [JsonPropertyName("encodingMethod")]
     public string EncodingMethod { get; set; }
 
-    [JsonProperty("publicKey")]
+    [JsonPropertyName("publicKey")]
     public string PublicKey { get; set; }
 }

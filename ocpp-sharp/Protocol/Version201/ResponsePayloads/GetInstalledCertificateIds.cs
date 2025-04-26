@@ -1,18 +1,18 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
 using OcppSharp.Protocol.Version201.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.ResponsePayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "GetInstalledCertificateIds", OcppMessageAttribute.Direction.PointToCentral)]
 public class GetInstalledCertificateIdsResponse : ResponsePayload
 {
-    [JsonProperty("status")]
+    [JsonPropertyName("status")]
     public GetInstalledCertificateStatusType.Enum Status { get; set; }
 
-    [JsonProperty("certificateHashDataChain")]
+    [JsonPropertyName("certificateHashDataChain")]
     public CertificateHashDataChain[]? CertificateHashDataChain { get; set; }
 
-    [JsonProperty("statusInfo")]
+    [JsonPropertyName("statusInfo")]
     public StatusInfo? StatusInfo { get; set; }
 }

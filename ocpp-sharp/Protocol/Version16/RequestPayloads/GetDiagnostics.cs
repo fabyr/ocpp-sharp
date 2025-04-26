@@ -1,22 +1,22 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "GetDiagnostics", OcppMessageAttribute.Direction.CentralToPoint)]
 public class GetDiagnosticsRequest : RequestPayload
 {
-    [JsonProperty("location")]
+    [JsonPropertyName("location")]
     public string Location { get; set; } = string.Empty;
 
-    [JsonProperty("retries")]
+    [JsonPropertyName("retries")]
     public long? Retries { get; set; }
 
-    [JsonProperty("retryInterval")]
+    [JsonPropertyName("retryInterval")]
     public long? RetryInterval { get; set; }
 
-    [JsonProperty("startTime")]
+    [JsonPropertyName("startTime")]
     public DateTime? StartTime { get; set; }
 
-    [JsonProperty("stopTime")]
+    [JsonPropertyName("stopTime")]
     public DateTime? StopTime { get; set; }
 }

@@ -1,22 +1,22 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "PublishFirmware", OcppMessageAttribute.Direction.CentralToPoint)]
 public class PublishFirmwareRequest : RequestPayload
 {
-    [JsonProperty("location")]
+    [JsonPropertyName("location")]
     public string Location { get; set; } = string.Empty;
 
-    [JsonProperty("retries")]
+    [JsonPropertyName("retries")]
     public int? Retries { get; set; }
 
-    [JsonProperty("checksum")]
+    [JsonPropertyName("checksum")]
     public CiString Checksum { get; set; }  // md5
 
-    [JsonProperty("requestId")]
+    [JsonPropertyName("requestId")]
     public long RequestId { get; set; }
 
-    [JsonProperty("retryInterval")]
+    [JsonPropertyName("retryInterval")]
     public int? RetryInterval { get; set; }
 }

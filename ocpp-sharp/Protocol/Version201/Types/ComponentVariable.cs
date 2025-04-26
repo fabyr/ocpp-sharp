@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,9 +7,9 @@ public struct ComponentVariable
     public static readonly ComponentVariable Empty = new();
 
 
-    [JsonProperty("component")]
+    [JsonPropertyName("component")]
     public Component Component { get; set; }
 
-    [JsonProperty("variable")]
+    [JsonPropertyName("variable")]
     public Variable? Variable { get; set; }
 }

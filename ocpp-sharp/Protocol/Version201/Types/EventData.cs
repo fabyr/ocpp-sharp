@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,42 +7,42 @@ public struct EventData
 {
     public static readonly EventData Empty = new();
 
-    [JsonProperty("eventId")]
+    [JsonPropertyName("eventId")]
     public long EventId { get; set; }
 
-    [JsonProperty("timestamp")]
+    [JsonPropertyName("timestamp")]
     public DateTime Timestamp { get; set; }
 
-    [JsonProperty("trigger")]
+    [JsonPropertyName("trigger")]
     public EventTriggerType.Enum Trigger { get; set; }
 
-    [JsonProperty("cause")]
+    [JsonPropertyName("cause")]
     public long? Cause { get; set; }
 
-    [JsonProperty("actualValue")]
+    [JsonPropertyName("actualValue")]
     public string ActualValue { get; set; }
 
-    [JsonProperty("techCode")]
+    [JsonPropertyName("techCode")]
     public string? TechCode { get; set; }
 
-    [JsonProperty("techInfo")]
+    [JsonPropertyName("techInfo")]
     public string? TechInfo { get; set; }
 
-    [JsonProperty("cleared")]
+    [JsonPropertyName("cleared")]
     public bool? Cleared { get; set; }
 
-    [JsonProperty("transactionId")]
+    [JsonPropertyName("transactionId")]
     public CiString? TransactionId { get; set; }
 
-    [JsonProperty("variableMonitoringId")]
+    [JsonPropertyName("variableMonitoringId")]
     public long VariableMonitoringId { get; set; }
 
-    [JsonProperty("eventNotificationType")]
+    [JsonPropertyName("eventNotificationType")]
     public EventNotificationType.Enum EventNotificationType { get; set; }
 
-    [JsonProperty("component")]
+    [JsonPropertyName("component")]
     public Component Component { get; set; }
 
-    [JsonProperty("variable")]
+    [JsonPropertyName("variable")]
     public Variable Variable { get; set; }
 }

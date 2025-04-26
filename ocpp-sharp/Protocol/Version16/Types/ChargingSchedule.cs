@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.Types;
 
@@ -7,21 +7,21 @@ public struct ChargingSchedule
 {
     public static readonly ChargingSchedule Empty = new();
 
-    [JsonProperty("duration")]
+    [JsonPropertyName("duration")]
     public long? Duration { get; set; }
 
-    [JsonProperty("startSchedule")]
+    [JsonPropertyName("startSchedule")]
     public DateTime? StartSchedule { get; set; }
 
     /// <summary>
     /// Valid values in <see cref="ChargingRateUnitType"/>
     /// </summary>
-    [JsonProperty("chargingRateUnit")]
+    [JsonPropertyName("chargingRateUnit")]
     public ChargingRateUnitType.Enum ChargingRateUnit { get; set; }
 
-    [JsonProperty("chargingSchedulePeriod")]
+    [JsonPropertyName("chargingSchedulePeriod")]
     public ChargingSchedulePeriod[] ChargingSchedulePeriod { get; set; }
 
-    [JsonProperty("minChargingRate")]
+    [JsonPropertyName("minChargingRate")]
     public double? MinChargingRate { get; set; }
 }

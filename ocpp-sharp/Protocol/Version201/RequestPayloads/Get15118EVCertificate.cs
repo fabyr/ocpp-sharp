@@ -1,17 +1,17 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "Get15118EVCertificate", OcppMessageAttribute.Direction.CentralToPoint)]
 public class Get15118EVCertificateRequest : RequestPayload
 {
-    [JsonProperty("iso15118SchemaVersion")]
+    [JsonPropertyName("iso15118SchemaVersion")]
     public string Iso15118SchemaVersion { get; set; } = string.Empty;
 
-    [JsonProperty("action")]
+    [JsonPropertyName("action")]
     public CertificateActionType.Enum Action { get; set; }
 
-    [JsonProperty("exiRequest")]
+    [JsonPropertyName("exiRequest")]
     public string ExiRequest { get; set; } = string.Empty;
 }

@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.ResponsePayloads;
 
@@ -9,6 +9,6 @@ public class ClearCacheResponse : ResponsePayload
     /// <summary>
     /// Valid values in <see cref="ClearCacheStatus"/>
     /// </summary>
-    [JsonProperty("status")]
+    [JsonPropertyName("status")]
     public ClearCacheStatus.Enum Status { get; set; }
 }

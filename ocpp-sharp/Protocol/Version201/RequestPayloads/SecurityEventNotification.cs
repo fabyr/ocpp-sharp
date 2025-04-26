@@ -1,16 +1,16 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "SecurityEventNotification", OcppMessageAttribute.Direction.PointToCentral)]
 public class SecurityEventNotificationRequest : RequestPayload
 {
-    [JsonProperty("type")]
+    [JsonPropertyName("type")]
     public string Type { get; set; } = string.Empty;
 
-    [JsonProperty("timestamp")]
+    [JsonPropertyName("timestamp")]
     public DateTime Timestamp { get; set; }
 
-    [JsonProperty("techInfo")]
+    [JsonPropertyName("techInfo")]
     public string? TechInfo { get; set; }
 }

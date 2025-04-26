@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,12 +7,12 @@ public struct MessageContent
 {
     public static readonly MessageContent Empty = new();
 
-    [JsonProperty("format")]
+    [JsonPropertyName("format")]
     public MessageFormatType.Enum Format { get; set; }
 
-    [JsonProperty("language")]
+    [JsonPropertyName("language")]
     public string? Language { get; set; }
 
-    [JsonProperty("content")]
+    [JsonPropertyName("content")]
     public string Content { get; set; }
 }

@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,18 +7,18 @@ public struct VariableMonitoring
 {
     public static readonly VariableMonitoring Empty = new();
 
-    [JsonProperty("id")]
+    [JsonPropertyName("id")]
     public long Id { get; set; }
 
-    [JsonProperty("transaction")]
+    [JsonPropertyName("transaction")]
     public bool Transaction { get; set; }
 
-    [JsonProperty("value")]
+    [JsonPropertyName("value")]
     public double Value { get; set; }
 
-    [JsonProperty("type")]
+    [JsonPropertyName("type")]
     public MonitorType.Enum Type { get; set; }
 
-    [JsonProperty("severity")]
+    [JsonPropertyName("severity")]
     public int Severity { get; set; }
 }

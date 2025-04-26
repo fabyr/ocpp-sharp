@@ -1,22 +1,22 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "StartTransaction", OcppMessageAttribute.Direction.PointToCentral)]
 public class StartTransactionRequest : RequestPayload
 {
-    [JsonProperty("connectorId")]
+    [JsonPropertyName("connectorId")]
     public long ConnectorId { get; set; }
 
-    [JsonProperty("idTag")]
+    [JsonPropertyName("idTag")]
     public CiString IdTag { get; set; } = string.Empty;
 
-    [JsonProperty("meterStart")]
+    [JsonPropertyName("meterStart")]
     public long MeterStart { get; set; }
 
-    [JsonProperty("reservationId")]
+    [JsonPropertyName("reservationId")]
     public long? ReservationId { get; set; }
 
-    [JsonProperty("timestamp")]
+    [JsonPropertyName("timestamp")]
     public DateTime Timestamp { get; set; }
 }

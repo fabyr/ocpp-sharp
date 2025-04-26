@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,24 +7,24 @@ public struct MessageInfo
 {
     public static readonly MessageInfo Empty = new();
 
-    [JsonProperty("id")]
+    [JsonPropertyName("id")]
     public long Id { get; set; }
 
-    [JsonProperty("priority")]
+    [JsonPropertyName("priority")]
     public MessagePriorityType.Enum Priority { get; set; }
 
-    [JsonProperty("state")]
+    [JsonPropertyName("state")]
     public MessageStateType.Enum? State { get; set; }
 
-    [JsonProperty("startDateTime")]
+    [JsonPropertyName("startDateTime")]
     public DateTime? StartDateTime { get; set; }
 
-    [JsonProperty("endDateTime")]
+    [JsonPropertyName("endDateTime")]
     public DateTime? EndDateTime { get; set; }
 
-    [JsonProperty("transactionId")]
+    [JsonPropertyName("transactionId")]
     public CiString? TransactionId { get; set; }
 
-    [JsonProperty("message")]
+    [JsonPropertyName("message")]
     public MessageContent Message { get; set; }
 }

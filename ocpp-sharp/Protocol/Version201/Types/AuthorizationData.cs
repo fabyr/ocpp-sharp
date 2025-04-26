@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -6,9 +6,9 @@ public struct AuthorizationData
 {
     public static readonly AuthorizationData Empty = new();
 
-    [JsonProperty("idTokenInfo")]
+    [JsonPropertyName("idTokenInfo")]
     public IdTokenInfo? IdTokenInfo { get; set; }
 
-    [JsonProperty("idToken")]
+    [JsonPropertyName("idToken")]
     public IdToken IdToken { get; set; }
 }

@@ -1,19 +1,19 @@
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "GetCompositeSchedule", OcppMessageAttribute.Direction.CentralToPoint)]
 public class GetCompositeScheduleRequest : RequestPayload
 {
-    [JsonProperty("connectorId")]
+    [JsonPropertyName("connectorId")]
     public long ConnectorId { get; set; }
-    [JsonProperty("duration")]
+    [JsonPropertyName("duration")]
     public long Duration { get; set; }
 
     /// <summary>
     /// Valid values in <see cref="ChargingRateUnitType"/>
     /// </summary>
-    [JsonProperty("chargingRateUnit")]
+    [JsonPropertyName("chargingRateUnit")]
     public ChargingRateUnitType.Enum? ChargingRateUnit { get; set; }
 }

@@ -1,27 +1,27 @@
 using OcppSharp.Protocol.Version201.Types;
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "ReportChargingProfiles", OcppMessageAttribute.Direction.PointToCentral)]
 public class ReportChargingProfilesRequest : RequestPayload
 {
-    [JsonProperty("requestId")]
+    [JsonPropertyName("requestId")]
     public long RequestId { get; set; }
 
-    [JsonProperty("chargingLimitSource")]
+    [JsonPropertyName("chargingLimitSource")]
     public ChargingLimitSourceType.Enum ChargingLimitSource { get; set; }
 
-    [JsonProperty("tbc")]
+    [JsonPropertyName("tbc")]
     public bool? Tbc { get; set; }
 
-    [JsonProperty("evseId")]
+    [JsonPropertyName("evseId")]
     public long EvseId { get; set; }
 
     /// <summary>
     /// Must contain atleast one element
     /// </summary>
-    [JsonProperty("chargingProfile")]
+    [JsonPropertyName("chargingProfile")]
     public ChargingProfile[] ChargingProfile { get; set; } = [];
 }

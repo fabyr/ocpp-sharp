@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,15 +7,15 @@ public struct ChargingNeeds
 {
     public static readonly ChargingNeeds Empty = new();
 
-    [JsonProperty("requestedEnergyTransfer")]
+    [JsonPropertyName("requestedEnergyTransfer")]
     public EnergyTransferModeType.Enum RequestedEnergyTransfer { get; set; }
 
-    [JsonProperty("departureTime")]
+    [JsonPropertyName("departureTime")]
     public DateTime? DepartureTime { get; set; }
 
-    [JsonProperty("acChargingParameters")]
+    [JsonPropertyName("acChargingParameters")]
     public ACChargingParameters? AcChargingParameters { get; set; }
 
-    [JsonProperty("dcChargingParameters")]
+    [JsonPropertyName("dcChargingParameters")]
     public DCChargingParameters? DcChargingParameters { get; set; }
 }

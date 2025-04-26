@@ -1,17 +1,17 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "GetCompositeSchedule", OcppMessageAttribute.Direction.CentralToPoint)]
 public class GetCompositeScheduleRequest : RequestPayload
 {
-    [JsonProperty("duration")]
+    [JsonPropertyName("duration")]
     public int Duration { get; set; }
 
-    [JsonProperty("chargingRateUnit")]
+    [JsonPropertyName("chargingRateUnit")]
     public ChargingRateUnitType.Enum? ChargingRateUnit { get; set; }
 
-    [JsonProperty("evseId")]
+    [JsonPropertyName("evseId")]
     public long EvseId { get; set; }
 }

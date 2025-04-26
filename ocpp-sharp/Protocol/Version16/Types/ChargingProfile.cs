@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.Types;
 
@@ -7,39 +7,39 @@ public struct ChargingProfile
 {
     public static readonly ChargingProfile Empty = new();
 
-    [JsonProperty("chargingProfileId")]
+    [JsonPropertyName("chargingProfileId")]
     public long ChargingProfileId { get; set; }
 
-    [JsonProperty("transactionId")]
+    [JsonPropertyName("transactionId")]
     public long? TransactionId { get; set; }
 
-    [JsonProperty("stackLevel")]
+    [JsonPropertyName("stackLevel")]
     public ulong StackLevel { get; set; }
 
     /// <summary>
     /// Valid values in <see cref="ChargingProfilePurposeType"/>
     /// </summary>
-    [JsonProperty("chargingProfilePurpose")]
+    [JsonPropertyName("chargingProfilePurpose")]
     public ChargingProfilePurposeType.Enum ChargingProfilePurpose { get; set; }
 
     /// <summary>
     /// Valid values in <see cref="ChargingProfileKindType"/>
     /// </summary>
-    [JsonProperty("chargingProfileKind")]
+    [JsonPropertyName("chargingProfileKind")]
     public ChargingProfileKindType.Enum ChargingProfileKind { get; set; }
 
     /// <summary>
     /// Valid values in <see cref="RecurrencyKindType"/>
     /// </summary>
-    [JsonProperty("recurrencyKind")]
+    [JsonPropertyName("recurrencyKind")]
     public RecurrencyKindType.Enum? RecurrencyKind { get; set; }
 
-    [JsonProperty("validFrom")]
+    [JsonPropertyName("validFrom")]
     public DateTime? ValidFrom { get; set; }
 
-    [JsonProperty("validTo")]
+    [JsonPropertyName("validTo")]
     public DateTime? ValidTo { get; set; }
 
-    [JsonProperty("chargingSchedule")]
+    [JsonPropertyName("chargingSchedule")]
     public ChargingSchedule ChargingSchedule { get; set; }
 }

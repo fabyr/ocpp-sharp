@@ -1,18 +1,18 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
 using OcppSharp.Protocol.Version201.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.ResponsePayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "DataTransfer", OcppMessageAttribute.Direction.Bidirectional)]
 public class DataTransferResponse : ResponsePayload
 {
-    [JsonProperty("status")]
+    [JsonPropertyName("status")]
     public DataTransferStatusType.Enum Status { get; set; }
 
-    [JsonProperty("data")]
+    [JsonPropertyName("data")]
     public object? Data { get; set; }
 
-    [JsonProperty("statusInfo")]
+    [JsonPropertyName("statusInfo")]
     public StatusInfo? StatusInfo { get; set; }
 }

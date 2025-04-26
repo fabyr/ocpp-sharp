@@ -1,17 +1,17 @@
 using OcppSharp.Protocol.Version16.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "RemoteStartTransaction", OcppMessageAttribute.Direction.CentralToPoint)]
 public class RemoteStartTransactionRequest : RequestPayload
 {
-    [JsonProperty("connectorId")]
+    [JsonPropertyName("connectorId")]
     public long? ConnectorId { get; set; }
 
-    [JsonProperty("idTag")]
+    [JsonPropertyName("idTag")]
     public CiString IdTag { get; set; } = string.Empty;
 
-    [JsonProperty("chargingProfile")]
+    [JsonPropertyName("chargingProfile")]
     public ChargingProfile? ChargingProfile { get; set; }
 }

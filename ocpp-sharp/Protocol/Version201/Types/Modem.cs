@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -6,9 +6,9 @@ public struct Modem
 {
     public static readonly Modem Empty = new();
 
-    [JsonProperty("iccid")]
+    [JsonPropertyName("iccid")]
     public CiString Iccid { get; set; }
 
-    [JsonProperty("imsi")]
+    [JsonPropertyName("imsi")]
     public CiString Imsi { get; set; }
 }

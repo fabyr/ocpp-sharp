@@ -1,39 +1,59 @@
-using Newtonsoft.Json;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using OcppSharp.Protocol;
 
 namespace OcppSharp;
 
-public class OcppEnumJsonConverter : JsonConverter<Enum?>
+public class OcppEnumJsonConverter : JsonConverterFactory
 {
-    public override void WriteJson(JsonWriter writer, Enum? value, JsonSerializer serializer)
+    private JsonNamingPolicy? NamingPolicy { get; }
+    private bool AllowIntegerValues { get; }
+    private JsonStringEnumConverter BaseConverter { get; }
+
+    public OcppEnumJsonConverter() : this(null, false)
+    { }
+
+    public OcppEnumJsonConverter(JsonNamingPolicy? namingPolicy = null, bool allowIntegerValues = false)
     {
-        string? stringValue = value?.GetAttributeOfType<StringValueAttribute>()?.Text ?? value?.ToString();
-        writer.WriteValue(stringValue);
+        NamingPolicy = namingPolicy;
+        AllowIntegerValues = allowIntegerValues;
+        BaseConverter = new JsonStringEnumConverter(namingPolicy, allowIntegerValues);
     }
 
-    public override Enum? ReadJson(JsonReader reader, Type objectType, Enum? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override bool CanConvert(Type typeToConvert) => BaseConverter.CanConvert(typeToConvert);
+
+    public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
-        string? existing = (string?)reader.Value;
-        if (existing == null || existing == "null")
-            return null;
-        if (objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof(Nullable<>))
-        {
-            objectType = Nullable.GetUnderlyingType(objectType)!;
-        }
-        var values = Enum.GetValues(objectType).Cast<Enum>();
+        Dictionary<string, string> dictionary = typeToConvert
+            .GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Select(field => (field.Name, field.GetCustomAttribute<StringValueAttribute>()?.Text))
+            .Where(i => i.Text != null)
+            .ToDictionary(p => p.Name, p => p.Text)!;
 
-        // Iterate through all enum values and check if its StringValue matches the JSON
-        foreach (Enum value in values)
-        {
-            // get the string value, if it doesn't have a StringValueAttribute, use the name of it instead (ToString())
-            CiString? compare = value.GetAttributeOfType<StringValueAttribute>()?.Text ?? value.ToString();
-
-            if (compare == existing)
-            {
-                return value;
-            }
-        }
-
-        throw new FormatException($"Invalid enum value for {objectType.Name}: {reader.Value}");
+        if (dictionary.Count > 0)
+            return new JsonStringEnumConverter(
+                new DictionaryLookupNamingPolicy(dictionary, NamingPolicy),
+                AllowIntegerValues
+            ).CreateConverter(typeToConvert, options);
+        else
+            return BaseConverter.CreateConverter(typeToConvert, options);
     }
+}
+
+internal class DictionaryLookupNamingPolicy : JsonNamingPolicy
+{
+    public Dictionary<string, string> Dictionary { get; }
+    public JsonNamingPolicy? UnderlyingNamingPolicy { get; }
+
+    public DictionaryLookupNamingPolicy(Dictionary<string, string> dictionary, JsonNamingPolicy? underlyingNamingPolicy)
+    {
+        Dictionary = dictionary;
+        UnderlyingNamingPolicy = underlyingNamingPolicy;
+    }
+
+    public override string ConvertName(string name)
+        => Dictionary.TryGetValue(name, out string? value)
+            ? value
+            : (UnderlyingNamingPolicy?.ConvertName(name) ?? name);
 }

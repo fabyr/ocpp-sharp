@@ -1,18 +1,18 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
 using OcppSharp.Protocol.Version201.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.ResponsePayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "GetCertificateStatus", OcppMessageAttribute.Direction.CentralToPoint)]
 public class GetCertificateStatusResponse : ResponsePayload
 {
-    [JsonProperty("status")]
+    [JsonPropertyName("status")]
     public GetCertificateStatusType.Enum Status { get; set; }
 
-    [JsonProperty("ocspResult")]
+    [JsonPropertyName("ocspResult")]
     public string? OcspResult { get; set; }
 
-    [JsonProperty("statusInfo")]
+    [JsonPropertyName("statusInfo")]
     public StatusInfo? StatusInfo { get; set; }
 }

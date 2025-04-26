@@ -1,45 +1,45 @@
 using OcppSharp.Protocol.Version201.Types;
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "TransactionEvent", OcppMessageAttribute.Direction.PointToCentral)]
 public class TransactionEventRequest : RequestPayload
 {
-    [JsonProperty("eventType")]
+    [JsonPropertyName("eventType")]
     public TransactionEventType.Enum EventType { get; set; }
 
-    [JsonProperty("timestamp")]
+    [JsonPropertyName("timestamp")]
     public DateTime Timestamp { get; set; }
 
-    [JsonProperty("triggerReason")]
+    [JsonPropertyName("triggerReason")]
     public TriggerReasonType.Enum TriggerReason { get; set; }
 
-    [JsonProperty("seqNo")]
+    [JsonPropertyName("seqNo")]
     public int SeqNo { get; set; }
 
-    [JsonProperty("offline")]
+    [JsonPropertyName("offline")]
     public bool? Offline { get; set; }
 
-    [JsonProperty("numberOfPhasesUsed")]
+    [JsonPropertyName("numberOfPhasesUsed")]
     public int? NumberOfPhasesUsed { get; set; }
 
-    [JsonProperty("cableMaxCurrent")]
+    [JsonPropertyName("cableMaxCurrent")]
     public int? CableMaxCurrent { get; set; } // Unit is Ampere
 
-    [JsonProperty("reservationId")]
+    [JsonPropertyName("reservationId")]
     public int? ReservationId { get; set; }
 
-    [JsonProperty("transactionInfo")]
+    [JsonPropertyName("transactionInfo")]
     public Transaction TransactionInfo { get; set; }
 
-    [JsonProperty("idToken")]
+    [JsonPropertyName("idToken")]
     public IdToken? IdToken { get; set; }
 
-    [JsonProperty("evse")]
+    [JsonPropertyName("evse")]
     public EVSE? Evse { get; set; }
 
-    [JsonProperty("meterValue")]
+    [JsonPropertyName("meterValue")]
     public MeterValue[]? MeterValue { get; set; }
 }

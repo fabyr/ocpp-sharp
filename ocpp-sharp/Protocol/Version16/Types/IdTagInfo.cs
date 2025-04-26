@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.Types;
 
@@ -7,15 +7,15 @@ public struct IdTagInfo
 {
     public static readonly IdTagInfo Empty = new();
 
-    [JsonProperty("expiryDate")]
+    [JsonPropertyName("expiryDate")]
     public DateTime? ExpiryDate { get; set; }
 
-    [JsonProperty("parentIdTag")]
+    [JsonPropertyName("parentIdTag")]
     public CiString? ParentIdTag { get; set; }
 
     /// <summary>
     /// Valid values in <see cref="AuthorizationStatus"/>
     /// </summary>
-    [JsonProperty("status")]
+    [JsonPropertyName("status")]
     public AuthorizationStatus.Enum Status { get; set; }
 }

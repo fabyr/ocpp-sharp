@@ -1,23 +1,19 @@
 using OcppSharp.Protocol;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp;
 
 public static class OcppJson
 {
     // Default settings for all OCPP related json decode operations
-    private static readonly JsonSerializerSettings jsonSerializerSettings = new()
+    private static readonly JsonSerializerOptions jsonSerializerOptions = new()
     {
-        TypeNameHandling = TypeNameHandling.None,
-        NullValueHandling = NullValueHandling.Ignore
-    };
-
-    private static readonly JsonSerializer jsonSerializer = new()
-    {
-        TypeNameHandling = TypeNameHandling.None,
-        NullValueHandling = NullValueHandling.Ignore
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals,
+        ReferenceHandler = ReferenceHandler.IgnoreCycles
     };
 
     private static readonly Dictionary<ProtocolVersion, Dictionary<CiString, Type>> messageRequestTypeMap; // OCPP request classes
@@ -80,10 +76,10 @@ public static class OcppJson
     /// <exception cref="FormatException">If the json string cannot be parsed as it is malformed.</exception>
     public static bool IsRequest(string json)
     {
-        JArray array = JArray.Parse(json);
-        if (array.Count < 1)
+        using JsonDocument array = JsonDocument.Parse(json);
+        if (array.RootElement.GetArrayLength() < 1)
             throw new FormatException("Empty header structure.");
-        int messageKind = array[0].ToObject<int>();
+        int messageKind = array.RootElement[0].GetInt32();
 
         return messageKind == Request.MessageKind;
     }
@@ -97,22 +93,20 @@ public static class OcppJson
     /// <exception cref="FormatException">If the json string cannot be parsed as it is malformed.</exception>
     public static Request DecodeRequest(string json, ProtocolVersion version)
     {
-        JArray array = JArray.Parse(json);
+        using JsonDocument array = JsonDocument.Parse(json);
 
-        string messageType = array[2].ToObject<string>() ?? throw new FormatException("Malformed message header: missing message type");
-        string messageId = array[1].ToObject<string>() ?? throw new FormatException("Malformed message header: missing message id");
+        string messageType = array.RootElement[2].GetString() ?? throw new FormatException("Malformed message header: missing message type");
+        string messageId = array.RootElement[1].GetString() ?? throw new FormatException("Malformed message header: missing message id");
 
-        if (array.Count != 4)
+        if (array.RootElement.GetArrayLength() != 4)
             throw new FormatException("Invalid length for message header");
 
-        if (array[0].ToObject<int>() != Request.MessageKind)
+        if (array.RootElement[0].GetInt32() != Request.MessageKind)
             throw new FormatException("Invalid message header magic number for request");
 
         Request request = new(messageId, messageType);
 
-        JsonSerializer serializer = new();
-
-        RequestPayload payload = (RequestPayload?)array[3].ToObject(GetMessageType(version, false, messageType), serializer)
+        RequestPayload payload = (RequestPayload?)array.RootElement[3].Deserialize(GetMessageType(version, false, messageType), jsonSerializerOptions)
                                     ?? throw new FormatException("Failed to parse request payload.");
 
         request.Payload = payload;
@@ -127,13 +121,17 @@ public static class OcppJson
     /// </summary>
     /// <param name="json">The raw ocpp json message.</param>
     /// <returns>true, if the message is a response; false, otherwise.</returns>
-    /// <exception cref="FormatException">If the json string cannot be parsed as it is malformed.</exception>
+    /// <exception cref="JsonException">If the json string cannot be parsed as it is malformed.</exception>
+    /// <exception cref="FormatException">If the header has an invalid structure.</exception>
     public static bool IsResponse(string json)
     {
-        JArray array = JArray.Parse(json);
-        if (array.Count < 1)
+        using JsonDocument document = JsonDocument.Parse(json);
+        JsonElement array = document.RootElement;
+
+        if (array.GetArrayLength() < 1)
             throw new FormatException("Empty header structure.");
-        int messageKind = array[0].ToObject<int>();
+
+        int messageKind = array[0].GetInt32();
 
         return messageKind == Response.MessageKind;
     }
@@ -145,18 +143,20 @@ public static class OcppJson
     /// <param name="json">The raw ocpp json message.</param>
     /// <param name="version">The ocpp protocol version of this message.</param>
     /// <returns>A response object with parsed header information but no payload.</returns>
-    /// <exception cref="FormatException">If the json string cannot be parsed as it is malformed.</exception>
+    /// <exception cref="JsonException">If the json string cannot be parsed as it is malformed.</exception>
+    /// <exception cref="FormatException">If the header has an invalid structure.</exception>
     public static Response DecodeResponseCrude(string json, ProtocolVersion version)
     {
-        JArray array = JArray.Parse(json);
+        using JsonDocument document = JsonDocument.Parse(json);
+        JsonElement array = document.RootElement;
 
-        if (array.Count != 3)
+        if (array.GetArrayLength() != 3)
             throw new FormatException("Invalid length for message header");
 
-        if (array[0].ToObject<int>() != Response.MessageKind)
+        if (array[0].GetInt32() != Response.MessageKind)
             throw new FormatException("Invalid message header magic number for response");
 
-        string messageId = array[1].ToObject<string>() ?? throw new FormatException("Malformed message header: missing message id");
+        string messageId = array[1].GetString() ?? throw new FormatException("Malformed message header: missing message id");
 
         Response response = new(messageId)
         {
@@ -172,11 +172,14 @@ public static class OcppJson
     /// </summary>
     /// <param name="crudeResponse">A response object produced by a call to <see cref="DecodeResponseCrude"/>, which will be modified.</param>
     /// <param name="requestMessageType">Since a response does not contain the type of request it originates from, <br/>this parameter needs to be supplied for proper parsing.</param>
+    /// <exception cref="JsonException">If the json string cannot be parsed as it is malformed or does not conform to the payload type.</exception>
+    /// <exception cref="FormatException">Payload is null.</exception>
     public static void DecodeResponseFull(Response crudeResponse, string requestMessageType)
     {
-        JArray array = JArray.Parse(crudeResponse.OriginalJsonBody);
+        using JsonDocument document = JsonDocument.Parse(crudeResponse.OriginalJsonBody);
+        JsonElement array = document.RootElement;
 
-        ResponsePayload payload = (ResponsePayload?)array[2].ToObject(GetMessageType(crudeResponse.ProtocolVersion, true, requestMessageType), jsonSerializer)
+        ResponsePayload payload = (ResponsePayload?)array[2].Deserialize(GetMessageType(crudeResponse.ProtocolVersion, true, requestMessageType), jsonSerializerOptions)
                                     ?? throw new FormatException("Failed to parse response payload.");
         payload.FullResponse = crudeResponse;
 
@@ -196,7 +199,7 @@ public static class OcppJson
             response.Payload
         ];
 
-        return JsonConvert.SerializeObject(array, jsonSerializerSettings);
+        return JsonSerializer.Serialize(array, jsonSerializerOptions);
     }
 
     /// <summary>
@@ -213,6 +216,6 @@ public static class OcppJson
             request.Payload
         ];
 
-        return JsonConvert.SerializeObject(array, jsonSerializerSettings);
+        return JsonSerializer.Serialize(array, jsonSerializerOptions);
     }
 }

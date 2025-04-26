@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using OcppSharp.Protocol.Version201.Types;
 
 namespace OcppSharp.Protocol.Version201.ResponsePayloads;
@@ -6,15 +6,15 @@ namespace OcppSharp.Protocol.Version201.ResponsePayloads;
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "TransactionEvent", OcppMessageAttribute.Direction.CentralToPoint)]
 public class TransactionEventResponse : ResponsePayload
 {
-    [JsonProperty("totalCost")]
+    [JsonPropertyName("totalCost")]
     public decimal? TotalCost { get; set; }
 
-    [JsonProperty("chargingPriority")]
+    [JsonPropertyName("chargingPriority")]
     public int? ChargingPriority { get; set; }
 
-    [JsonProperty("idTokenInfo")]
+    [JsonPropertyName("idTokenInfo")]
     public IdTokenInfo? IdTokenInfo { get; set; }
 
-    [JsonProperty("updatedPersonalMessage")]
+    [JsonPropertyName("updatedPersonalMessage")]
     public MessageContent? UpdatedPersonalMessage { get; set; }
 }

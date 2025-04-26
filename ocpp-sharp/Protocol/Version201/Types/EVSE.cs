@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -6,9 +6,9 @@ public struct EVSE
 {
     public static readonly EVSE Empty = new();
 
-    [JsonProperty("id")]
+    [JsonPropertyName("id")]
     public ulong Id { get; set; }
 
-    [JsonProperty("connectorId")]
+    [JsonPropertyName("connectorId")]
     public long ConnectorId { get; set; }
 }

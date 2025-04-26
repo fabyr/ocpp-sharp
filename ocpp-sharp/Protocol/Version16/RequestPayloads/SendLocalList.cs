@@ -1,21 +1,21 @@
 using OcppSharp.Protocol.Version16.Types;
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "SendLocalList", OcppMessageAttribute.Direction.CentralToPoint)]
 public class SendLocalListRequest : RequestPayload
 {
-    [JsonProperty("listVersion")]
+    [JsonPropertyName("listVersion")]
     public long ListVersion { get; set; }
 
-    [JsonProperty("localAuthorizationList")]
+    [JsonPropertyName("localAuthorizationList")]
     public AuthorizationData[]? LocalAuthorizationList { get; set; }
 
     /// <summary>
     /// Valid values in <see cref="MessageConstants.UpdateType"/>
     /// </summary>
-    [JsonProperty("updateType")]
+    [JsonPropertyName("updateType")]
     public UpdateType.Enum UpdateType { get; set; }
 }

@@ -1,18 +1,18 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
 using OcppSharp.Protocol.Version201.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.ResponsePayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Response, "GetCompositeSchedule", OcppMessageAttribute.Direction.PointToCentral)]
 public class GetCompositeScheduleResponse : ResponsePayload
 {
-    [JsonProperty("status")]
+    [JsonPropertyName("status")]
     public GenericStatusType.Enum Status { get; set; }
 
-    [JsonProperty("schedule")]
+    [JsonPropertyName("schedule")]
     public CompositeSchedule Schedule { get; set; }
 
-    [JsonProperty("statusInfo")]
+    [JsonPropertyName("statusInfo")]
     public StatusInfo? StatusInfo { get; set; }
 }

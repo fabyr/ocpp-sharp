@@ -1,20 +1,20 @@
 using OcppSharp.Protocol.Version201.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "UpdateFirmware", OcppMessageAttribute.Direction.CentralToPoint)]
 public class UpdateFirmwareRequest : RequestPayload
 {
-    [JsonProperty("retries")]
+    [JsonPropertyName("retries")]
     public int? Retries { get; set; }
 
-    [JsonProperty("retryInterval")]
+    [JsonPropertyName("retryInterval")]
     public int? RetryInterval { get; set; }
 
-    [JsonProperty("requestId")]
+    [JsonPropertyName("requestId")]
     public long RequestId { get; set; }
 
-    [JsonProperty("firmware")]
+    [JsonPropertyName("firmware")]
     public Firmware Firmware { get; set; }
 }

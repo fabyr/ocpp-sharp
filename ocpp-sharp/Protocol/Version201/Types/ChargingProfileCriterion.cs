@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,18 +7,18 @@ public struct ChargingProfileCriterion
 {
     public static readonly ChargingProfileCriterion Empty = new();
 
-    [JsonProperty("chargingProfilePurpose")]
+    [JsonPropertyName("chargingProfilePurpose")]
     public ChargingProfilePurposeType.Enum? ChargingProfilePurpose { get; set; }
 
-    [JsonProperty("stackLevel")]
+    [JsonPropertyName("stackLevel")]
     public int? StackLevel { get; set; }
 
-    [JsonProperty("chargingProfileId")]
+    [JsonPropertyName("chargingProfileId")]
     public int[]? ChargingProfileId { get; set; }
 
     /// <summary>
     /// Array length must not exceed 4.
     /// </summary>
-    [JsonProperty("chargingLimitSource")]
+    [JsonPropertyName("chargingLimitSource")]
     public ChargingLimitSourceType.Enum[]? ChargingLimitSource { get; set; }
 }

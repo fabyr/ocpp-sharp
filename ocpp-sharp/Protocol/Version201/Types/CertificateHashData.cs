@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,15 +7,15 @@ public struct CertificateHashData
 {
     public static readonly CertificateHashData Empty = new();
 
-    [JsonProperty("hashAlgorithm")]
+    [JsonPropertyName("hashAlgorithm")]
     public HashAlgorithmType.Enum HashAlgorithm { get; set; }
 
-    [JsonProperty("issuerNameHash")]
+    [JsonPropertyName("issuerNameHash")]
     public CiString IssuerNameHash { get; set; }
 
-    [JsonProperty("issuerKeyHash")]
+    [JsonPropertyName("issuerKeyHash")]
     public string IssuerKeyHash { get; set; }
 
-    [JsonProperty("serialNumber")]
+    [JsonPropertyName("serialNumber")]
     public CiString SerialNumber { get; set; }
 }

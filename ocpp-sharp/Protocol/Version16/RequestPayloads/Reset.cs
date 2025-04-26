@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
@@ -9,6 +9,6 @@ public class ResetRequest : RequestPayload
     /// <summary>
     /// Valid values in <see cref="ResetType"/>
     /// </summary>
-    [JsonProperty("type")]
+    [JsonPropertyName("type")]
     public ResetType.Enum Type { get; set; }
 }

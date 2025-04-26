@@ -1,16 +1,16 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "DataTransfer", OcppMessageAttribute.Direction.Bidirectional)]
 public class DataTransferRequest : RequestPayload
 {
-    [JsonProperty("vendorId")]
+    [JsonPropertyName("vendorId")]
     public CiString VendorId { get; set; } = string.Empty;
 
-    [JsonProperty("messageId")]
+    [JsonPropertyName("messageId")]
     public CiString? MessageId { get; set; }
 
-    [JsonProperty("data")]
+    [JsonPropertyName("data")]
     public string? Data { get; set; }
 }

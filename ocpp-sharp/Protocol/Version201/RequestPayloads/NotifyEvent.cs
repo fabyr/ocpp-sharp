@@ -1,23 +1,23 @@
 using OcppSharp.Protocol.Version201.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyEvent", OcppMessageAttribute.Direction.PointToCentral)]
 public class NotifyEventRequest : RequestPayload
 {
-    [JsonProperty("generatedAt")]
+    [JsonPropertyName("generatedAt")]
     public DateTime GeneratedAt { get; set; }
 
-    [JsonProperty("tbc")]
+    [JsonPropertyName("tbc")]
     public bool? Tbc { get; set; }
 
-    [JsonProperty("seqNo")]
+    [JsonPropertyName("seqNo")]
     public int SeqNo { get; set; }
 
     /// <summary>
     /// Must contain atleast one element.
     /// </summary>
-    [JsonProperty("eventData")]
+    [JsonPropertyName("eventData")]
     public EventData[] EventData { get; set; } = [];
 }

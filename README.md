@@ -17,7 +17,6 @@ Currently supported versions:
   - [Motivation](#motivation)
 
 ## Dependencies
-- Newtonsoft.Json
 - .NET 8
 
 ## Features

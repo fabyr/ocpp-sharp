@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,12 +7,12 @@ public struct ClearMonitoringResult
 {
     public static readonly ClearMonitoringResult Empty = new();
 
-    [JsonProperty("status")]
+    [JsonPropertyName("status")]
     public ClearMonitoringStatusType.Enum Status { get; set; }
 
-    [JsonProperty("id")]
+    [JsonPropertyName("id")]
     public long Id { get; set; }
 
-    [JsonProperty("statusInfo")]
+    [JsonPropertyName("statusInfo")]
     public StatusInfo? StatusInfo { get; set; }
 }

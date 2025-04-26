@@ -1,22 +1,22 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyCustomerInformation", OcppMessageAttribute.Direction.PointToCentral)]
 public class NotifyCustomerInformationRequest : RequestPayload
 {
-    [JsonProperty("data")]
+    [JsonPropertyName("data")]
     public string Data { get; set; } = string.Empty;
 
-    [JsonProperty("tbc")]
+    [JsonPropertyName("tbc")]
     public bool? Tbc { get; set; }
 
-    [JsonProperty("seqNo")]
+    [JsonPropertyName("seqNo")]
     public int SeqNo { get; set; }
 
-    [JsonProperty("generatedAt")]
+    [JsonPropertyName("generatedAt")]
     public DateTime GeneratedAt { get; set; }
 
-    [JsonProperty("requestId")]
+    [JsonPropertyName("requestId")]
     public long RequestId { get; set; }
 }

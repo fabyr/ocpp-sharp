@@ -1,13 +1,13 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "ChangeConfiguration", OcppMessageAttribute.Direction.CentralToPoint)]
 public class ChangeConfigurationRequest : RequestPayload
 {
-    [JsonProperty("key")]
+    [JsonPropertyName("key")]
     public CiString Key { get; set; } = string.Empty;
 
-    [JsonProperty("value")]
+    [JsonPropertyName("value")]
     public CiString Value { get; set; } = string.Empty;
 }

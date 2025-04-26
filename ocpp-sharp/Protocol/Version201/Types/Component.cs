@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -6,12 +6,12 @@ public struct Component
 {
     public static readonly Component Empty = new();
 
-    [JsonProperty("name")]
+    [JsonPropertyName("name")]
     public CiString Name { get; set; }
 
-    [JsonProperty("instance")]
+    [JsonPropertyName("instance")]
     public CiString? Instance { get; set; }
 
-    [JsonProperty("evse")]
+    [JsonPropertyName("evse")]
     public EVSE? Evse { get; set; }
 }

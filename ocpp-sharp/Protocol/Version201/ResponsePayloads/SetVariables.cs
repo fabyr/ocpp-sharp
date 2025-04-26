@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using OcppSharp.Protocol.Version201.Types;
 
 namespace OcppSharp.Protocol.Version201.ResponsePayloads;
@@ -9,6 +9,6 @@ public class SetVariablesResponse : ResponsePayload
     /// <summary>
     /// Must contain atleast one element.
     /// </summary>
-    [JsonProperty("setVariableResult")]
+    [JsonPropertyName("setVariableResult")]
     public SetVariableResult[] SetVariableResult { get; set; } = [];
 }

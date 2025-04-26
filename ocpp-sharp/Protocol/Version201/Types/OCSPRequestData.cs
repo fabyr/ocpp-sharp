@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,18 +7,18 @@ public struct OCSPRequestData
 {
     public static readonly OCSPRequestData Empty = new();
 
-    [JsonProperty("hashAlgorithm")]
+    [JsonPropertyName("hashAlgorithm")]
     public HashAlgorithmType.Enum HashAlgorithm { get; set; }
 
-    [JsonProperty("issuerNameHash")]
+    [JsonPropertyName("issuerNameHash")]
     public CiString IssuerNameHash { get; set; }
 
-    [JsonProperty("issuerKeyHash")]
+    [JsonPropertyName("issuerKeyHash")]
     public string IssuerKeyHash { get; set; }
 
-    [JsonProperty("serialNumber")]
+    [JsonPropertyName("serialNumber")]
     public CiString SerialNumber { get; set; }
 
-    [JsonProperty("responderURL")]
+    [JsonPropertyName("responderURL")]
     public CiString ResponderURL { get; set; }
 }

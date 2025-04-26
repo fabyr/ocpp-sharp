@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
@@ -9,6 +9,6 @@ public class SetVariableMonitoringRequest : RequestPayload
     /// <summary>
     /// Must contain atleast one element.
     /// </summary>
-    [JsonProperty("setMonitoringData")]
+    [JsonPropertyName("setMonitoringData")]
     public SetMonitoringData[] SetMonitoringData { get; set; } = [];
 }

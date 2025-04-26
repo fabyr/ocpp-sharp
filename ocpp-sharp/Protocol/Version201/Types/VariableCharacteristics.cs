@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,21 +7,21 @@ public struct VariableCharacteristics
 {
     public static readonly VariableCharacteristics Empty = new();
 
-    [JsonProperty("unit")]
+    [JsonPropertyName("unit")]
     public CiString? Unit { get; set; }
 
-    [JsonProperty("dataType")]
+    [JsonPropertyName("dataType")]
     public DataType.Enum DataType { get; set; }
 
-    [JsonProperty("minLimit")]
+    [JsonPropertyName("minLimit")]
     public double? MinLimit { get; set; }
 
-    [JsonProperty("maxLimit")]
+    [JsonPropertyName("maxLimit")]
     public double? MaxLimit { get; set; }
 
-    [JsonProperty("valuesList")]
+    [JsonPropertyName("valuesList")]
     public string? ValuesList { get; set; }
 
-    [JsonProperty("supportsMonitoring")]
+    [JsonPropertyName("supportsMonitoring")]
     public bool SupportsMonitoring { get; set; }
 }

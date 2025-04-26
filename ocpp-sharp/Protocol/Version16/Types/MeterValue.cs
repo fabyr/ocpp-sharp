@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.Types;
 
@@ -6,9 +6,9 @@ public struct MeterValue
 {
     public static readonly MeterValue Empty = new();
 
-    [JsonProperty("timestamp")]
+    [JsonPropertyName("timestamp")]
     public DateTime Timestamp { get; set; }
 
-    [JsonProperty("sampledValue")]
+    [JsonPropertyName("sampledValue")]
     public SampledValue[]? SampledValue { get; set; }
 }

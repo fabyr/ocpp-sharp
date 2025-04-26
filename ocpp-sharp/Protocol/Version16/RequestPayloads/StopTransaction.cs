@@ -1,30 +1,30 @@
 using OcppSharp.Protocol.Version16.Types;
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "StopTransaction", OcppMessageAttribute.Direction.PointToCentral)]
 public class StopTransactionRequest : RequestPayload
 {
-    [JsonProperty("idTag")]
+    [JsonPropertyName("idTag")]
     public CiString? IdTag { get; set; }
 
-    [JsonProperty("meterStop")]
+    [JsonPropertyName("meterStop")]
     public long MeterStop { get; set; }
 
-    [JsonProperty("timestamp")]
+    [JsonPropertyName("timestamp")]
     public DateTime Timestamp { get; set; }
 
-    [JsonProperty("transactionId")]
+    [JsonPropertyName("transactionId")]
     public long TransactionId { get; set; }
 
     /// <summary>
     /// Valid values in <see cref="MessageConstants.Reason"/>
     /// </summary>
-    [JsonProperty("reason")]
+    [JsonPropertyName("reason")]
     public Reason.Enum? Reason { get; set; }
 
-    [JsonProperty("transactionData")]
+    [JsonPropertyName("transactionData")]
     public MeterValue[]? TransactionData { get; set; }
 }

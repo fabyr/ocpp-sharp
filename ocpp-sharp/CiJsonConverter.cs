@@ -1,23 +1,22 @@
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp;
 
 /*
-This is needed so Newtonsoft.Json doesn't serialize/deserialize a CiString 
+This is needed so a CiString doesn't serialize/deserialize to an object.
 as "something": { "RawValue": "...", "Value": "..." } but only outputs/can read it as a single string literal "something": "..."
 */
-public class CiJsonConverter : JsonConverter<CiString?>
+public class CiJsonConverter : JsonConverter<CiString>
 {
-    public override CiString? ReadJson(JsonReader reader, Type objectType, CiString? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override void Write(Utf8JsonWriter writer, CiString value, JsonSerializerOptions options)
     {
-        string? s = (string?)reader.Value;
-        if (s == null)
-            return null;
-        return new CiString(s);
+        writer.WriteStringValue(value.RawValue);
     }
 
-    public override void WriteJson(JsonWriter writer, CiString? value, JsonSerializer serializer)
+    public override CiString Read(ref Utf8JsonReader reader, Type objectType, JsonSerializerOptions serializer)
     {
-        writer.WriteValue(value?.RawValue);
+        string? s = reader.GetString() ?? throw new FormatException("Invalid null value for CiString");
+        return new CiString(s);
     }
 }

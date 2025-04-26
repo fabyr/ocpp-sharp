@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -6,18 +6,18 @@ public struct Firmware
 {
     public static readonly Firmware Empty = new();
 
-    [JsonProperty("location")]
+    [JsonPropertyName("location")]
     public string Location { get; set; }
 
-    [JsonProperty("retrieveDateTime")]
+    [JsonPropertyName("retrieveDateTime")]
     public DateTime RetrieveDateTime { get; set; }
 
-    [JsonProperty("installDateTime")]
+    [JsonPropertyName("installDateTime")]
     public DateTime? InstallDateTime { get; set; }
 
-    [JsonProperty("signingCertificate")]
+    [JsonPropertyName("signingCertificate")]
     public string? SigningCertificate { get; set; }
 
-    [JsonProperty("signature")]
+    [JsonPropertyName("signature")]
     public string? Signature { get; set; }
 }

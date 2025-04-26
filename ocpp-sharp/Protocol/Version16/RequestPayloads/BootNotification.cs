@@ -1,34 +1,34 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "BootNotification", OcppMessageAttribute.Direction.PointToCentral)]
 public class BootNotificationRequest : RequestPayload
 {
-    [JsonProperty("chargeBoxSerialNumber")]
+    [JsonPropertyName("chargeBoxSerialNumber")]
     public CiString? ChargeBoxSerialNumber { get; set; }
 
-    [JsonProperty("chargePointModel")]
+    [JsonPropertyName("chargePointModel")]
     public CiString ChargePointModel { get; set; } = string.Empty;
 
-    [JsonProperty("chargePointSerialNumber")]
+    [JsonPropertyName("chargePointSerialNumber")]
     public CiString? ChargePointSerialNumber { get; set; }
 
-    [JsonProperty("chargePointVendor")]
+    [JsonPropertyName("chargePointVendor")]
     public CiString ChargePointVendor { get; set; } = string.Empty;
 
-    [JsonProperty("firmwareVersion")]
+    [JsonPropertyName("firmwareVersion")]
     public CiString? FirmwareVersion { get; set; }
 
-    [JsonProperty("iccid")]
+    [JsonPropertyName("iccid")]
     public CiString? Iccid { get; set; }
 
-    [JsonProperty("imsi")]
+    [JsonPropertyName("imsi")]
     public CiString? Imsi { get; set; }
 
-    [JsonProperty("meterSerialNumber")]
+    [JsonPropertyName("meterSerialNumber")]
     public CiString? MeterSerialNumber { get; set; }
 
-    [JsonProperty("meterType")]
+    [JsonPropertyName("meterType")]
     public CiString? MeterType { get; set; }
 }

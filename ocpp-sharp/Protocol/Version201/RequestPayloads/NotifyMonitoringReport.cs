@@ -1,23 +1,23 @@
 using OcppSharp.Protocol.Version201.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyMonitoringReport", OcppMessageAttribute.Direction.PointToCentral)]
 public class NotifyMonitoringReportRequest : RequestPayload
 {
-    [JsonProperty("requestId")]
+    [JsonPropertyName("requestId")]
     public long RequestId { get; set; }
 
-    [JsonProperty("tbc")]
+    [JsonPropertyName("tbc")]
     public bool? Tbc { get; set; }
 
-    [JsonProperty("seqNo")]
+    [JsonPropertyName("seqNo")]
     public int SeqNo { get; set; }
 
-    [JsonProperty("generatedAt")]
+    [JsonPropertyName("generatedAt")]
     public DateTime GeneratedAt { get; set; }
 
-    [JsonProperty("monitor")]
+    [JsonPropertyName("monitor")]
     public MonitoringData[]? Monitor { get; set; }
 }

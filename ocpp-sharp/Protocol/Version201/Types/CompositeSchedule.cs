@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,21 +7,21 @@ public struct CompositeSchedule
 {
     public static readonly CompositeSchedule Empty = new();
 
-    [JsonProperty("evseId")]
+    [JsonPropertyName("evseId")]
     public long EvseId { get; set; }
 
-    [JsonProperty("duration")]
+    [JsonPropertyName("duration")]
     public int Duration { get; set; }
 
-    [JsonProperty("scheduleStart")]
+    [JsonPropertyName("scheduleStart")]
     public DateTime ScheduleStart { get; set; }
 
-    [JsonProperty("chargingRateUnit")]
+    [JsonPropertyName("chargingRateUnit")]
     public ChargingRateUnitType.Enum ChargingRateUnit { get; set; }
 
     /// <summary>
     /// Must be at least one.
     /// </summary>
-    [JsonProperty("chargingSchedulePeriod")]
+    [JsonPropertyName("chargingSchedulePeriod")]
     public ChargingSchedulePeriod[] ChargingSchedulePeriod { get; set; }
 }

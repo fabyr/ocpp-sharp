@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,18 +7,18 @@ public struct SetVariableResult
 {
     public static readonly SetVariableResult Empty = new();
 
-    [JsonProperty("attributeType")]
+    [JsonPropertyName("attributeType")]
     public AttributeType.Enum? AttributeType { get; set; }
 
-    [JsonProperty("attributeStatus")]
+    [JsonPropertyName("attributeStatus")]
     public SetVariableStatusType.Enum AttributeStatus { get; set; }
 
-    [JsonProperty("component")]
+    [JsonPropertyName("component")]
     public Component Component { get; set; }
 
-    [JsonProperty("variable")]
+    [JsonPropertyName("variable")]
     public Variable Variable { get; set; }
 
-    [JsonProperty("attributeStatusInfo")]
+    [JsonPropertyName("attributeStatusInfo")]
     public StatusInfo? AttributeStatusInfo { get; set; }
 }

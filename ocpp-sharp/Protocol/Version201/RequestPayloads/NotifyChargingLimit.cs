@@ -1,17 +1,17 @@
 using OcppSharp.Protocol.Version201.Types;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "NotifyChargingLimit", OcppMessageAttribute.Direction.PointToCentral)]
 public class NotifyChargingLimitRequest : RequestPayload
 {
-    [JsonProperty("evseId")]
+    [JsonPropertyName("evseId")]
     public long? EvseId { get; set; }
 
-    [JsonProperty("chargingLimit")]
+    [JsonPropertyName("chargingLimit")]
     public ChargingLimit ChargingLimit { get; set; } = ChargingLimit.Empty;
 
-    [JsonProperty("chargingSchedule")]
+    [JsonPropertyName("chargingSchedule")]
     public ChargingSchedule[]? ChargingSchedule { get; set; }
 }

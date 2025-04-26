@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -6,9 +6,9 @@ public struct StatusInfo
 {
     public static readonly StatusInfo Empty = new();
 
-    [JsonProperty("reasonCode")]
+    [JsonPropertyName("reasonCode")]
     public CiString ReasonCode { get; set; }
 
-    [JsonProperty("additionalInfo")]
+    [JsonPropertyName("additionalInfo")]
     public string? AdditionalInfo { get; set; }
 }

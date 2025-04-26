@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,24 +7,24 @@ public struct SampledValue
 {
     public static readonly SampledValue Empty = new();
 
-    [JsonProperty("value")]
+    [JsonPropertyName("value")]
     public double Value { get; set; }
 
-    [JsonProperty("context")]
+    [JsonPropertyName("context")]
     public ReadingContextType.Enum? Context { get; set; } // Default = Sample.Periodic
 
-    [JsonProperty("measurand")]
+    [JsonPropertyName("measurand")]
     public MeasurandType.Enum? Measurand { get; set; }
 
-    [JsonProperty("phase")]
+    [JsonPropertyName("phase")]
     public PhaseType.Enum? Phase { get; set; }
 
-    [JsonProperty("location")]
+    [JsonPropertyName("location")]
     public LocationType.Enum? Location { get; set; }
 
-    [JsonProperty("signedMeterValue")]
+    [JsonPropertyName("signedMeterValue")]
     public SignedMeterValue? SignedMeterValue { get; set; }
 
-    [JsonProperty("unitOfMeasure")]
+    [JsonPropertyName("unitOfMeasure")]
     public UnitOfMeasure? UnitOfMeasure { get; set; }
 }

@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -6,18 +6,18 @@ public struct ReportData
 {
     public static readonly ReportData Empty = new();
 
-    [JsonProperty("component")]
+    [JsonPropertyName("component")]
     public Component Component { get; set; }
 
-    [JsonProperty("variable")]
+    [JsonPropertyName("variable")]
     public Variable Variable { get; set; }
 
     /// <summary>
     /// Must contain at least one entry.
     /// </summary>
-    [JsonProperty("variableAttribute")]
+    [JsonPropertyName("variableAttribute")]
     public VariableAttribute[] VariableAttribute { get; set; }
 
-    [JsonProperty("variableCharacteristics")]
+    [JsonPropertyName("variableCharacteristics")]
     public VariableCharacteristics? VariableCharacteristics { get; set; }
 }

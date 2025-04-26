@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -6,12 +6,12 @@ public struct LogParameters
 {
     public static readonly LogParameters Empty = new();
 
-    [JsonProperty("remoteLocation")]
+    [JsonPropertyName("remoteLocation")]
     public string RemoteLocation { get; set; }
 
-    [JsonProperty("oldestTimestamp")]
+    [JsonPropertyName("oldestTimestamp")]
     public DateTime? OldestTimestamp { get; set; }
 
-    [JsonProperty("latestTimestamp")]
+    [JsonPropertyName("latestTimestamp")]
     public DateTime? LatestTimestamp { get; set; }
 }

@@ -1,21 +1,21 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP201, OcppMessageAttribute.MessageType.Request, "StatusNotification", OcppMessageAttribute.Direction.PointToCentral)]
 public class StatusNotificationRequest : RequestPayload
 {
-    [JsonProperty("timestamp")]
+    [JsonPropertyName("timestamp")]
     public DateTime Timestamp { get; set; }
 
-    [JsonProperty("connectorStatus")]
+    [JsonPropertyName("connectorStatus")]
     public ConnectorStatusType.Enum ConnectorStatus { get; set; }
 
-    [JsonProperty("evseId")]
+    [JsonPropertyName("evseId")]
     public long EvseId { get; set; }
 
-    [JsonProperty("connectorId")]
+    [JsonPropertyName("connectorId")]
     public long ConnectorId { get; set; }
 
 }

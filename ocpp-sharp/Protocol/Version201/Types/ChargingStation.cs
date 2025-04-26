@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -6,18 +6,18 @@ public struct ChargingStation
 {
     public static readonly ChargingStation Empty = new();
 
-    [JsonProperty("serialNumber")]
+    [JsonPropertyName("serialNumber")]
     public string? SerialNumber { get; set; }
 
-    [JsonProperty("model")]
+    [JsonPropertyName("model")]
     public string Model { get; set; }
 
-    [JsonProperty("vendorName")]
+    [JsonPropertyName("vendorName")]
     public string VendorName { get; set; }
 
-    [JsonProperty("firmwareVersion")]
+    [JsonPropertyName("firmwareVersion")]
     public string? FirmwareVersion { get; set; }
 
-    [JsonProperty("modem")]
+    [JsonPropertyName("modem")]
     public Modem? Modem { get; set; }
 }

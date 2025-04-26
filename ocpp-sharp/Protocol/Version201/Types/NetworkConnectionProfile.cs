@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,27 +7,27 @@ public struct NetworkConnectionProfile
 {
     public static readonly NetworkConnectionProfile Empty = new();
 
-    [JsonProperty("ocppVersion")]
+    [JsonPropertyName("ocppVersion")]
     public OCPPVersionType.Enum OcppVersion { get; set; }
 
-    [JsonProperty("ocppTransport")]
+    [JsonPropertyName("ocppTransport")]
     public OCPPTransportType.Enum OcppTransport { get; set; }
 
-    [JsonProperty("ocppCsmsUrl")]
+    [JsonPropertyName("ocppCsmsUrl")]
     public string OcppCsmsUrl { get; set; }
 
-    [JsonProperty("messageTimeout")]
+    [JsonPropertyName("messageTimeout")]
     public int MessageTimeout { get; set; }
 
-    [JsonProperty("securityProfile")]
+    [JsonPropertyName("securityProfile")]
     public int SecurityProfile { get; set; }
 
-    [JsonProperty("ocppInterface")]
+    [JsonPropertyName("ocppInterface")]
     public OCPPInterfaceType.Enum OcppInterface { get; set; }
 
-    [JsonProperty("vpn")]
+    [JsonPropertyName("vpn")]
     public VPN? Vpn { get; set; }
 
-    [JsonProperty("apn")]
+    [JsonPropertyName("apn")]
     public APN? Apn { get; set; }
 }

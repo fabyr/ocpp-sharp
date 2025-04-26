@@ -1,6 +1,6 @@
 using OcppSharp.Protocol.Version16.Types;
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.ResponsePayloads;
 
@@ -10,15 +10,15 @@ public class GetCompositeScheduleResponse : ResponsePayload
     /// <summary>
     /// Valid values in <see cref="GetCompositeScheduleStatus"/>
     /// </summary>
-    [JsonProperty("status")]
+    [JsonPropertyName("status")]
     public GetCompositeScheduleStatus.Enum Status { get; set; }
 
-    [JsonProperty("connectorId")]
+    [JsonPropertyName("connectorId")]
     public long? ConnectorId { get; set; }
 
-    [JsonProperty("scheduleStart")]
+    [JsonPropertyName("scheduleStart")]
     public DateTime? ScheduleStart { get; set; }
 
-    [JsonProperty("chargingSchedule")]
+    [JsonPropertyName("chargingSchedule")]
     public ChargingSchedule? ChargingSchedule { get; set; }
 }

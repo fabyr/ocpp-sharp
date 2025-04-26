@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version201.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version201.Types;
 
@@ -7,21 +7,21 @@ public struct VPN
 {
     public static readonly VPN Empty = new();
 
-    [JsonProperty("server")]
+    [JsonPropertyName("server")]
     public string Server { get; set; }
 
-    [JsonProperty("user")]
+    [JsonPropertyName("user")]
     public string User { get; set; }
 
-    [JsonProperty("group")]
+    [JsonPropertyName("group")]
     public string? Group { get; set; }
 
-    [JsonProperty("password")]
+    [JsonPropertyName("password")]
     public string Password { get; set; }
 
-    [JsonProperty("key")]
+    [JsonPropertyName("key")]
     public string Key { get; set; }
 
-    [JsonProperty("type")]
+    [JsonPropertyName("type")]
     public VPNType.Enum Type { get; set; }
 }

@@ -1,19 +1,19 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 
 [OcppMessage(ProtocolVersion.OCPP16, OcppMessageAttribute.MessageType.Request, "UpdateFirmware", OcppMessageAttribute.Direction.CentralToPoint)]
 public class UpdateFirmwareRequest : RequestPayload
 {
-    [JsonProperty("location")]
+    [JsonPropertyName("location")]
     public string Location { get; set; } = string.Empty;
 
-    [JsonProperty("retries")]
+    [JsonPropertyName("retries")]
     public long? Retries { get; set; }
 
-    [JsonProperty("retrieveDate")]
+    [JsonPropertyName("retrieveDate")]
     public DateTime RetrieveDate { get; set; }
 
-    [JsonProperty("retryInterval")]
+    [JsonPropertyName("retryInterval")]
     public long? RetryInterval { get; set; }
 }

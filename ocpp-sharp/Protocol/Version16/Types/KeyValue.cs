@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.Types;
 
@@ -6,12 +6,12 @@ public struct KeyValue
 {
     public static readonly KeyValue Empty = new();
 
-    [JsonProperty("key")]
+    [JsonPropertyName("key")]
     public CiString Key { get; set; }
 
-    [JsonProperty("readonly")]
+    [JsonPropertyName("readonly")]
     public bool ReadOnly { get; set; }
 
-    [JsonProperty("value")]
+    [JsonPropertyName("value")]
     public CiString? Value { get; set; }
 }

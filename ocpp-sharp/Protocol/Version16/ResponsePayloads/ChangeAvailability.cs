@@ -1,5 +1,5 @@
 using OcppSharp.Protocol.Version16.MessageConstants;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.ResponsePayloads;
 
@@ -9,6 +9,6 @@ public class ChangeAvailabilityResponse : ResponsePayload
     /// <summary>
     /// Valid values in <see cref="AvailabilityStatus"/>
     /// </summary>
-    [JsonProperty("status")]
+    [JsonPropertyName("status")]
     public AvailabilityStatus.Enum Status { get; set; }
 }

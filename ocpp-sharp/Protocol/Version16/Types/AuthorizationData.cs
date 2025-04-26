@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace OcppSharp.Protocol.Version16.Types;
 
@@ -6,9 +6,9 @@ public struct AuthorizationData
 {
     public static readonly AuthorizationData Empty = new();
 
-    [JsonProperty("idTag")]
+    [JsonPropertyName("idTag")]
     public CiString IdTag { get; set; }
 
-    [JsonProperty("idTagInfo")]
+    [JsonPropertyName("idTagInfo")]
     public IdTagInfo? IdTagInfo { get; set; }
 }
