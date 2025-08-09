@@ -7,7 +7,7 @@ namespace OcppSharp;
 
 public static class OcppJson
 {
-    // Default settings for all OCPP related json decode operations
+    // Default settings for all OCPP related json encode and decode operations
     private static readonly JsonSerializerOptions jsonSerializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
