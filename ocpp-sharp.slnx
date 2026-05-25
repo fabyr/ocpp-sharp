@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/ocpp-sharp.examples/">
+    <Project Path="ocpp-sharp.examples/client/client.csproj" />
+    <Project Path="ocpp-sharp.examples/server/server.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="ocpp-sharp/ocpp-sharp.csproj" />
+</Solution>
