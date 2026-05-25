@@ -255,15 +255,7 @@ public class OcppSharpClient : IDisposable
         Dispose();
     }
 
-    /// <summary>
-    /// Registers a handler to this client instance for a specific type of OCPP-Request.
-    /// </summary>
-    /// <param name="payloadType">The type of request the handler is supposed to process. Must be a derived class of <see cref="RequestPayload"/>.</param>
-    /// <param name="handler">The handler to be executed upon receival of a request matching the type.</param>
-    /// <returns>A reference to the created <see cref="ClientRequestHandler"/>. This can be used to call <see cref="UnregisterHandler"/>.</returns>
-    /// <exception cref="ArgumentException">If a handler for this specific type has already been registered or an invalid type was given.</exception>
-    /// <exception cref="InvalidOperationException">If the payload is not meant to be received by a client (OCPP-Specification).</exception>
-    public virtual ClientRequestHandler RegisterHandler(Type payloadType, RequestPayloadHandlerDelegate handler)
+    private void CheckBeforeRegisteringHandler(Type payloadType)
     {
         if (handlers.Any(x => x.OnType == payloadType))
             throw new ArgumentException("A handler has already been registered for this type.", nameof(payloadType));
@@ -274,6 +266,27 @@ public class OcppSharpClient : IDisposable
         if (attr.Dir == OcppMessageAttribute.Direction.PointToCentral)
             throw new InvalidOperationException($"An OCPP-Message of type '{payloadType.Name}' cannot be received by a client (charge point) as per the OCPP-Specification.");
 
+    }
+    /// <summary>
+    /// Registers a handler to this client instance for a specific type of OCPP-Request.
+    /// </summary>
+    /// <param name="payloadType">The type of request the handler is supposed to process. Must be a derived class of <see cref="RequestPayload"/>.</param>
+    /// <param name="handler">The handler to be executed upon receival of a request matching the type.</param>
+    /// <returns>A reference to the created <see cref="ClientRequestHandler"/>. This can be used to call <see cref="UnregisterHandler"/>.</returns>
+    /// <exception cref="ArgumentException">If a handler for this specific type has already been registered or an invalid type was given.</exception>
+    /// <exception cref="InvalidOperationException">If the payload is not meant to be received by a client (OCPP-Specification).</exception>
+    public virtual ClientRequestHandler RegisterHandler(Type payloadType, RequestPayloadHandlerDelegate handler)
+    {
+        CheckBeforeRegisteringHandler(payloadType);
+        ClientRequestHandler result = new(payloadType, handler);
+        handlers.Add(result);
+
+        return result;
+    }
+
+    public virtual ClientRequestHandler RegisterAsyncHandler(Type payloadType, RequestPayloadHandlerDelegateAsync handler)
+    {
+        CheckBeforeRegisteringHandler(payloadType);
         ClientRequestHandler result = new(payloadType, handler);
         handlers.Add(result);
 
@@ -289,6 +302,14 @@ public class OcppSharpClient : IDisposable
     public virtual ClientRequestHandler RegisterHandler<T>(RequestPayloadHandlerDelegateGeneric<T> handler) where T : RequestPayload
     {
         return RegisterHandler(typeof(T), (server, request) =>
+        {
+            return handler(server, (T)request);
+        });
+    }
+
+    public virtual ClientRequestHandler RegisterAsyncHandler<T>(RequestPayloadHandlerDelegateGenericAsync<T> handler) where T : RequestPayload
+    {
+        return RegisterAsyncHandler(typeof(T), (server, request) =>
         {
             return handler(server, (T)request);
         });
@@ -383,7 +404,7 @@ public class OcppSharpClient : IDisposable
     /// <returns>The response payload resulting from the processing by the handler.</returns>
     /// <exception cref="KeyNotFoundException">If no handler for this OCPP message type has been registered.</exception>
     /// <exception cref="InvalidOperationException">If the payload is not meant to be received by a client (OCPP-Specification).</exception>
-    protected virtual ResponsePayload RunHandler(RequestPayload payload)
+    protected virtual async Task<ResponsePayload> RunHandler(RequestPayload payload)
     {
         Type payloadType = payload.GetType();
 
@@ -393,8 +414,7 @@ public class OcppSharpClient : IDisposable
         string? messageTypeName = OcppMessageAttribute.GetMessageIdentifier(payloadType);
         ClientRequestHandler? handler = handlers.FirstOrDefault(x => x.OnType == payloadType)
                                             ?? throw new KeyNotFoundException($"No handler registered for {messageTypeName}.");
-
-        return handler.Handle(this, payload);
+        return await handler.HandleAsync(this, payload);
     }
 
     /// <summary>
@@ -430,7 +450,7 @@ public class OcppSharpClient : IDisposable
                 }
 
                 // Handle the request
-                ResponsePayload payload = RunHandler(request.Payload);
+                ResponsePayload payload = await RunHandler(request.Payload);
 
                 // Make and send Response
                 Response response = new(request.MessageId)

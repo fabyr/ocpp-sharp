@@ -28,8 +28,8 @@ public class OcppClientConnection : OcppSharpClient
     public override void UnregisterHandler(ClientRequestHandler handler) => throw HandlerException;
 
     // Remove the original RunHandler logic and instead pass it to the parent server
-    protected override ResponsePayload RunHandler(RequestPayload payload)
+    protected override async Task<ResponsePayload> RunHandler(RequestPayload payload)
     {
-        return ParentServer.RunHandler(this, payload);
+        return await ParentServer.RunHandler(this, payload);
     }
 }

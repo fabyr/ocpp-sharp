@@ -244,15 +244,8 @@ public partial class OcppSharpServer
             throw new KeyNotFoundException($"The Station with id '{id}' does not exist.");
     }
 
-    /// <summary>
-    /// Registers a handler to this server instance for a specific type of OCPP-Request.
-    /// </summary>
-    /// <param name="payloadType">The type of request the handler is supposed to process. Must be a derived class of <see cref="RequestPayload"/>.</param>
-    /// <param name="handler">The handler to be executed upon receival of a request matching the type.</param>
-    /// <returns>A reference to the created <see cref="ServerRequestHandler"/>. This can be used to call <see cref="UnregisterHandler"/>.</returns>
-    /// <exception cref="ArgumentException">If a handler for this specific type has already been registered or an invalid type was given.</exception>
-    /// <exception cref="InvalidOperationException">If the payload is not meant to be received by a server (OCPP-Specification).</exception>
-    public ServerRequestHandler RegisterHandler(Type payloadType, RequestPayloadHandlerDelegate handler)
+
+    private bool CheckBeforeRegisteringHandler(Type payloadType)
     {
         if (handlers.Any(x => x.OnType == payloadType))
             throw new ArgumentException("A handler has already been registered for this type.", nameof(payloadType));
@@ -263,10 +256,40 @@ public partial class OcppSharpServer
         if (attr.Dir == OcppMessageAttribute.Direction.CentralToPoint)
             throw new InvalidOperationException($"An OCPP-Message of type '{payloadType.Name}' cannot be received by a server (central system) as per the OCPP-Specification.");
 
-        ServerRequestHandler result = new(payloadType, handler);
-        handlers.Add(result);
+        return true;
+    }
+    /// <summary>
+    /// Registers a handler to this server instance for a specific type of OCPP-Request.
+    /// </summary>
+    /// <param name="payloadType">The type of request the handler is supposed to process. Must be a derived class of <see cref="RequestPayload"/>.</param>
+    /// <param name="handler">The handler to be executed upon receival of a request matching the type.</param>
+    /// <returns>A reference to the created <see cref="ServerRequestHandler"/>. This can be used to call <see cref="UnregisterHandler"/>.</returns>
+    /// <exception cref="ArgumentException">If a handler for this specific type has already been registered or an invalid type was given.</exception>
+    /// <exception cref="InvalidOperationException">If the payload is not meant to be received by a server (OCPP-Specification).</exception>
+    public ServerRequestHandler RegisterHandler(Type payloadType, RequestPayloadHandlerDelegate handler)
+    {
+        if (CheckBeforeRegisteringHandler(payloadType))
+        {
+            ServerRequestHandler result = new(payloadType, handler);
+            handlers.Add(result);
 
-        return result;
+            return result;
+        }
+        else
+            throw new InvalidOperationException("Unknown error while registering handler.");
+    }
+
+    public ServerRequestHandler RegisterAsyncHandler(Type payloadType, RequestPayloadHandlerDelegateAsync handlerAsync)
+    {
+        if (CheckBeforeRegisteringHandler(payloadType))
+        {
+            ServerRequestHandler result = new(payloadType, handlerAsync);
+            handlers.Add(result);
+
+            return result;
+        }
+        else
+            throw new InvalidOperationException("Unknown error while registering handler.");
     }
 
     /// <summary>
@@ -278,6 +301,14 @@ public partial class OcppSharpServer
     public ServerRequestHandler RegisterHandler<T>(RequestPayloadHandlerDelegateGeneric<T> handler) where T : RequestPayload
     {
         return RegisterHandler(typeof(T), (server, sender, request) =>
+        {
+            return handler(server, sender, (T)request);
+        });
+    }
+
+    public ServerRequestHandler RegisterAsyncHandler<T>(RequestPayloadHandlerDelegateGenericAsync<T> handler) where T : RequestPayload
+    {
+        return RegisterAsyncHandler(typeof(T), (server, sender, request) =>
         {
             return handler(server, sender, (T)request);
         });
@@ -321,7 +352,7 @@ public partial class OcppSharpServer
         UnregisterEvents((OcppClientConnection)sender!);
     }
 
-    internal ResponsePayload RunHandler(OcppClientConnection client, RequestPayload payload)
+    internal async Task<ResponsePayload> RunHandler(OcppClientConnection client, RequestPayload payload)
     {
         Type payloadType = payload.GetType();
 
@@ -332,7 +363,7 @@ public partial class OcppSharpServer
         ServerRequestHandler? handler = handlers.FirstOrDefault(x => x.OnType == payloadType)
                                             ?? throw new KeyNotFoundException($"No handler registered for {messageTypeName}.");
 
-        return handler.Handle(this, client, payload);
+        return await handler.HandleAsync(this, client, payload);
     }
 
     private void RegisterEvents(OcppClientConnection client)
