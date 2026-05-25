@@ -284,6 +284,7 @@ public class OcppSharpClient : IDisposable
         return result;
     }
 
+    /// <inheritdoc cref="RegisterHandler(Type, RequestPayloadHandlerDelegate)"/>
     public virtual ClientRequestHandler RegisterAsyncHandler(Type payloadType, RequestPayloadHandlerDelegateAsync handler)
     {
         CheckBeforeRegisteringHandler(payloadType);
@@ -307,6 +308,7 @@ public class OcppSharpClient : IDisposable
         });
     }
 
+    /// <inheritdoc cref="RegisterHandler{T}(RequestPayloadHandlerDelegateGeneric{T})"/>
     public virtual ClientRequestHandler RegisterAsyncHandler<T>(RequestPayloadHandlerDelegateGenericAsync<T> handler) where T : RequestPayload
     {
         return RegisterAsyncHandler(typeof(T), (server, request) =>

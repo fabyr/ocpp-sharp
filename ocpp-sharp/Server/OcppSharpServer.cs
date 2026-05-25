@@ -279,6 +279,7 @@ public partial class OcppSharpServer
             throw new InvalidOperationException("Unknown error while registering handler.");
     }
 
+    /// <inheritdoc cref="RegisterHandler(Type, RequestPayloadHandlerDelegate)" />
     public ServerRequestHandler RegisterAsyncHandler(Type payloadType, RequestPayloadHandlerDelegateAsync handlerAsync)
     {
         if (CheckBeforeRegisteringHandler(payloadType))
@@ -306,6 +307,7 @@ public partial class OcppSharpServer
         });
     }
 
+    /// <inheritdoc cref="RegisterHandler{T}(RequestPayloadHandlerDelegateGeneric{T})" />
     public ServerRequestHandler RegisterAsyncHandler<T>(RequestPayloadHandlerDelegateGenericAsync<T> handler) where T : RequestPayload
     {
         return RegisterAsyncHandler(typeof(T), (server, sender, request) =>
