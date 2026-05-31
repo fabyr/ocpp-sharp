@@ -17,7 +17,9 @@ Currently supported versions:
   - [Motivation](#motivation)
 
 ## Dependencies
-- .NET 8
+The library itself targets all dotnet versions from .NET 8 up to .NET 10
+
+The example projects target .NET 8
 
 ## Features
 - C# classes for all messages of the OCPP-Protocol.
