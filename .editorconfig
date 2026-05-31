@@ -1,4 +1,21 @@
-﻿[*.{cs,vb}]
+﻿root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{xml,json,yml}]
+indent_size = 2
+
+[*.{csproj,slnx,props}]
+indent_size = 2
+
+[*.{cs,vb}]
+max_line_length = 140
 
 # IDE0305: Simplify collection initialization
 dotnet_diagnostic.IDE0305.severity = none
