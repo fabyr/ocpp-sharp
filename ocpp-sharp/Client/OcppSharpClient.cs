@@ -1,15 +1,15 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using OcppSharp.Protocol;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.WebSockets;
 using System.Reflection;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using OcppSharp.Protocol;
 
 namespace OcppSharp.Client;
 
-public class OcppSharpClient : IDisposable
+public class OcppSharpClient : IAsyncDisposable, IDisposable
 {
     private readonly ILogger<OcppSharpClient> _logger;
     private readonly ILoggerFactory _loggerFactory;
@@ -19,14 +19,13 @@ public class OcppSharpClient : IDisposable
     /// <para>If it is set to null, the default of 32767 will be used.</para>
     /// </summary>
     public int? MaxIncomingData { get; set; } = null;
-
     protected virtual int MaxIncomingDataValue => MaxIncomingData ?? 32767;
 
+    [MemberNotNullWhen(true, nameof(_loopCancellation))]
+    public bool Active => (!_loopCancellation?.IsCancellationRequested) ?? false;
+
     public WebSocket? Socket { get; protected set; }
-
     public ProtocolVersion OcppVersion { get; }
-
-    protected bool _stopLoop = false;
 
     /// <summary>
     /// The encoding used for encoding and decoding WebSocket data.
@@ -43,23 +42,22 @@ public class OcppSharpClient : IDisposable
 
     public DateTime? LastCommunication { get; set; }
 
-    public bool Disposed { get; protected set; } = false;
-
-    protected delegate void ResponseHandlerDelegateInternal(OcppSharpClient client, Response response);
+    public bool IsDisposed { get; protected set; } = false;
 
     public event ResponseHandlerDelegate? ResponseReceived;
-
     public event ResponseHandlerDelegate? ResponseSent;
-
-    protected event ResponseHandlerDelegateInternal? ResponseReceivedInternal;
-
     public event RequestHandlerDelegate? RequestReceived;
-
     public event RequestHandlerDelegate? RequestSent;
-
     public event EventHandler? Closed;
 
     protected readonly List<ClientRequestHandler> handlers = [];
+
+    protected delegate void ResponseHandlerDelegateInternal(OcppSharpClient client, Response response);
+    protected event ResponseHandlerDelegateInternal? ResponseReceivedInternal;
+
+    private Task? _loopTask;
+    private CancellationTokenSource? _loopCancellation;
+    private readonly bool _ownsSocket;
 
     /// <summary>
     /// Create an OCPP-Client using an existing <see cref="WebSocket"/> connection.
@@ -70,13 +68,10 @@ public class OcppSharpClient : IDisposable
     /// <param name="version">The ocpp protocol version to use.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
     public OcppSharpClient(WebSocket socket, string id, ProtocolVersion version, ILoggerFactory? loggerFactory = null)
+        : this(id, version, loggerFactory)
     {
+        _ownsSocket = false;
         Socket = socket;
-        OcppVersion = version;
-        Id = id;
-
-        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
-        _logger = _loggerFactory.CreateLogger<OcppSharpClient>();
     }
 
     /// <summary>
@@ -90,11 +85,12 @@ public class OcppSharpClient : IDisposable
     /// <param name="loggerFactory">Optional logger factory.</param>
     public OcppSharpClient(string id, ProtocolVersion version, ILoggerFactory? loggerFactory = null)
     {
-        OcppVersion = version;
-        Id = id;
-
+        _ownsSocket = true;
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         _logger = _loggerFactory.CreateLogger<OcppSharpClient>();
+
+        OcppVersion = version;
+        Id = id;
     }
 
     protected static InvalidOperationException UninitializedException => new("This client has not been initialized yet.");
@@ -109,19 +105,30 @@ public class OcppSharpClient : IDisposable
     /// </remarks>
     /// <exception cref="ObjectDisposedException">If this client is already disposed.</exception>
     /// <exception cref="InvalidOperationException">If this client has not yet been initialized with a connection.</exception>
-    public virtual async void StartLoop()
+    public virtual void StartLoop()
     {
-        ObjectDisposedException.ThrowIf(Disposed, this);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (Socket == null)
             throw UninitializedException;
 
+        if (Active)
+            throw new InvalidOperationException("Already started.");
+
+        // reset cancellation token
+        _loopCancellation?.Dispose();
+        _loopCancellation = new();
+
+        _loopTask = StartLoopInternal();
+    }
+
+    protected virtual async Task StartLoopInternal()
+    {
         _logger.LogDebug("Client loop start.");
-        _stopLoop = false;
         byte[]? receiveBuffer = null;
         try
         {
-            while (!_stopLoop && Socket.State == WebSocketState.Open)
+            while (Active && Socket != null && Socket.State == WebSocketState.Open)
             {
                 // update the size of the buffer if MaxIncomingDataValue changes
                 if (receiveBuffer?.Length != MaxIncomingDataValue)
@@ -135,7 +142,7 @@ public class OcppSharpClient : IDisposable
                 {
                     receiveResult = await Socket.ReceiveAsync(
                         new ArraySegment<byte>(receiveBuffer, totalBytesReceived, receiveBuffer.Length - totalBytesReceived),
-                        CancellationToken.None
+                        _loopCancellation.Token
                     );
                     totalBytesReceived += receiveResult.Count;
                 } while (!receiveResult.EndOfMessage);
@@ -143,11 +150,15 @@ public class OcppSharpClient : IDisposable
                 if (receiveResult.MessageType == WebSocketMessageType.Close)
                 {
                     if (Socket.State == WebSocketState.CloseReceived)
-                        await Socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                        await Socket.CloseOutputAsync(
+                            WebSocketCloseStatus.NormalClosure,
+                            string.Empty,
+                            _loopCancellation.Token
+                        );
 
                     // Wait for close-handshake completion
                     while (Socket.State == WebSocketState.CloseReceived)
-                        await Task.Delay(10);
+                        await Task.Delay(10, _loopCancellation.Token);
 
                     break;
                 }
@@ -160,16 +171,22 @@ public class OcppSharpClient : IDisposable
                 }
                 else
                 {
-                    await Socket.CloseOutputAsync(WebSocketCloseStatus.InvalidMessageType, "Cannot accept binary data", CancellationToken.None);
+                    await Socket.CloseOutputAsync(
+                        WebSocketCloseStatus.InvalidMessageType,
+                        "Cannot accept binary data",
+                        _loopCancellation.Token
+                    );
 
                     // Wait for close-handshake completion
                     while (Socket.State == WebSocketState.CloseSent)
-                        await Task.Delay(10);
+                        await Task.Delay(10, _loopCancellation.Token);
 
                     break;
                 }
             }
         }
+        catch (OperationCanceledException)
+        { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "WebSocket Error");
@@ -177,8 +194,14 @@ public class OcppSharpClient : IDisposable
         finally
         {
             // Clean up by disposing the WebSocket once it is closed/aborted.
-            Dispose();
+            if (_ownsSocket)
+            {
+                Socket?.Dispose();
+            }
+
+            StopLoop();
         }
+
         _logger.LogDebug("Client loop stop.");
     }
 
@@ -192,7 +215,12 @@ public class OcppSharpClient : IDisposable
     /// </remarks>
     public virtual void StopLoop()
     {
-        _stopLoop = true;
+        if (!Active)
+            return;
+
+        _loopCancellation.Cancel();
+
+        Closed?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -215,15 +243,21 @@ public class OcppSharpClient : IDisposable
     /// </example>
     /// </para>
     /// </param>
+    /// <param name="cancellationToken">The cancellation token to observe.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public virtual async Task Connect(string url, ICredentials? credentials = null)
+    public virtual async Task Connect(string url, ICredentials? credentials = null, CancellationToken cancellationToken = default)
     {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
+
+        if (Active)
+            throw new InvalidOperationException("Client is already active.");
+
         ClientWebSocket socket = new();
 
         socket.Options.Credentials = credentials;
         socket.Options.AddSubProtocol(OcppVersion.GetWebSocketSubProtocol());
 
-        await socket.ConnectAsync(new Uri(url), CancellationToken.None);
+        await socket.ConnectAsync(new Uri(url), cancellationToken);
 
         Socket = socket;
         StartLoop();
@@ -231,10 +265,12 @@ public class OcppSharpClient : IDisposable
 
     /// <summary>
     /// Disconnect from the server and close the connection.
-    /// Calls <see cref="Dispose"/>.
+    /// Tries to close the connection gracefully. If that does not succees within a specified timeout,
+    /// the connection will be closed forcefully.
     /// </summary>
+    /// <param name="timeoutMsForConnectionKill">Time to wait before killing the connection.</param>
     /// <exception cref="InvalidOperationException">If this client has not yet been initialized with a connection.</exception>
-    public virtual async void Disconnect()
+    public virtual async Task DisconnectAsync(int timeoutMsForConnectionKill = 5000, CancellationToken cancellationToken = default)
     {
         if (Socket == null)
             throw UninitializedException;
@@ -243,19 +279,31 @@ public class OcppSharpClient : IDisposable
         {
             if (Socket.State == WebSocketState.Open)
             {
-                await Socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                using CancellationTokenSource timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+                await Socket.CloseOutputAsync(
+                    WebSocketCloseStatus.NormalClosure,
+                    string.Empty,
+                    timeoutSource.Token
+                );
 
                 // Wait for close-handshake completion
-                while (Socket.State == WebSocketState.CloseSent)
-                    await Task.Delay(10);
+                while (!timeoutSource.IsCancellationRequested && Socket.State == WebSocketState.CloseSent)
+                    await Task.Delay(10, timeoutSource.Token);
             }
         }
         catch { }
 
-        Dispose();
+        _logger.LogInformation("Closed WebSocket connection of client '{Id}'", Id);
+
+        StopLoop();
     }
 
-    private void CheckBeforeRegisteringHandler(Type payloadType)
+    /// <inheritdoc cref="DisconnectAsync" />
+    public void Disconnect(int timeoutMsForConnectionKill = 5000)
+        => Task.Run(() => DisconnectAsync(timeoutMsForConnectionKill)).GetAwaiter().GetResult();
+
+    protected virtual bool CheckBeforeRegisteringHandler(Type payloadType)
     {
         if (handlers.Any(x => x.OnType == payloadType))
             throw new ArgumentException("A handler has already been registered for this type.", nameof(payloadType));
@@ -266,7 +314,9 @@ public class OcppSharpClient : IDisposable
         if (attr.Dir == OcppMessageAttribute.Direction.PointToCentral)
             throw new InvalidOperationException($"An OCPP-Message of type '{payloadType.Name}' cannot be received by a client (charge point) as per the OCPP-Specification.");
 
+        return true;
     }
+
     /// <summary>
     /// Registers a handler to this client instance for a specific type of OCPP-Request.
     /// </summary>
@@ -277,21 +327,29 @@ public class OcppSharpClient : IDisposable
     /// <exception cref="InvalidOperationException">If the payload is not meant to be received by a client (OCPP-Specification).</exception>
     public virtual ClientRequestHandler RegisterHandler(Type payloadType, RequestPayloadHandlerDelegate handler)
     {
-        CheckBeforeRegisteringHandler(payloadType);
-        ClientRequestHandler result = new(payloadType, handler);
-        handlers.Add(result);
+        if (CheckBeforeRegisteringHandler(payloadType))
+        {
+            ClientRequestHandler result = new(payloadType, handler);
+            handlers.Add(result);
 
-        return result;
+            return result;
+        }
+
+        throw new InvalidOperationException("Handler registration checks failed.");
     }
 
     /// <inheritdoc cref="RegisterHandler(Type, RequestPayloadHandlerDelegate)"/>
     public virtual ClientRequestHandler RegisterAsyncHandler(Type payloadType, RequestPayloadHandlerDelegateAsync handler)
     {
-        CheckBeforeRegisteringHandler(payloadType);
-        ClientRequestHandler result = new(payloadType, handler);
-        handlers.Add(result);
+        if (CheckBeforeRegisteringHandler(payloadType))
+        {
+            ClientRequestHandler result = new(payloadType, handler);
+            handlers.Add(result);
 
-        return result;
+            return result;
+        }
+
+        throw new InvalidOperationException("Handler registration checks failed.");
     }
 
     /// <summary>
@@ -335,10 +393,13 @@ public class OcppSharpClient : IDisposable
     /// </summary>
     /// <typeparam name="T">The type of the request payload. Must derive from <see cref="RequestPayload"/>. See parameter <paramref name="payload"/>.</typeparam>
     /// <param name="payload">The payload to be sent.</param>
-    /// <param name="timeoutMs">The timeout in milliseconds after which an exception is raised. (Defaults to 5000)</param>
+    /// <param name="timeoutMs">The timeout in milliseconds after which an exception is raised. (Defaults to 5000). Pass in <see cref="Timeout.Infinite"/> for no timeout.</param>
+    /// <param name="cancellationToken"></param>
     /// <exception cref="TimeoutException">If no response is received after <paramref name="timeoutMs"/> milliseconds.</exception>
+    /// <exception cref="OperationCanceledException">If the provided <paramref name="cancellationToken"/> is cancelled before completion.</exception>
     /// <exception cref="InvalidOperationException">If this client has not yet been initialized with a connection.</exception>
-    public virtual async Task<Response> SendRequestAsync<T>(T payload, int timeoutMs = 5000) where T : RequestPayload
+    public virtual async Task<Response> SendRequestAsync<T>(T payload, int timeoutMs = 5000, CancellationToken cancellationToken = default)
+        where T : RequestPayload
     {
         if (Socket == null)
             throw UninitializedException;
@@ -360,8 +421,10 @@ public class OcppSharpClient : IDisposable
         string json = OcppJson.SerializeRequest(request);
         request.OriginalJsonBody = json;
 
-        bool received = false;
         Response? response = null;
+
+        using SemaphoreSlim semaphore = new(0, 1);
+        using CancellationTokenSource timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         ResponseHandlerDelegateInternal handler = (client, r) => // A temporary (local scope) event handler to wait for incoming packets
         {
@@ -370,27 +433,41 @@ public class OcppSharpClient : IDisposable
             {
                 response = r;
                 OcppJson.DecodeResponseFull(response, payloadType); // We can now decode the full response payload because we know the payload type
-                received = true; // Set to true to exit while loop below
+                semaphore.Release();
 
                 ResponseReceived?.Invoke(client, r, payloadType);
             }
         };
-        ResponseReceivedInternal += handler;
 
-        _logger.LogDebug("Request: {Json}", json);
+        try
+        {
+            ResponseReceivedInternal += handler;
 
-        byte[] bytes = Encoding.GetBytes(json);
+            _logger.LogDebug("Request: {Json}", json);
 
-        await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None); // Send the request
+            byte[] bytes = Encoding.GetBytes(json);
 
-        RequestSent?.Invoke(this, request);
+            await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, cancellationToken); // Send the request
 
-        // Wait until it is received or abort if it takes too long
-        long startTime = Environment.TickCount64;
-        while (!received && Environment.TickCount64 - startTime < timeoutMs)
-            await Task.Delay(10); // Wait until the loop condition terminates
+            if (timeoutMs != Timeout.Infinite)
+                timeoutSource.CancelAfter(timeoutMs);
 
-        ResponseReceivedInternal -= handler; // Important: unregister; otherwise they would stack the more Requests are sent
+            RequestSent?.Invoke(this, request);
+
+            // Wait until it is received or abort if it takes too long
+            await semaphore.WaitAsync(timeoutSource.Token);
+        }
+        catch (OperationCanceledException)
+        { }
+        finally
+        {
+            // Important: unregister; otherwise they would stack the more Requests are sent
+            ResponseReceivedInternal -= handler;
+        }
+
+        // If the cancellation is not due to a timeout, we want to make sure to properly raise
+        // an OperationCanceledException
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (response == null)
             throw new TimeoutException($"Station did not answer back within {timeoutMs}ms");
@@ -415,7 +492,7 @@ public class OcppSharpClient : IDisposable
 
         string? messageTypeName = OcppMessageAttribute.GetMessageIdentifier(payloadType);
         ClientRequestHandler? handler = handlers.FirstOrDefault(x => x.OnType == payloadType)
-                                            ?? throw new KeyNotFoundException($"No handler registered for {messageTypeName}.");
+            ?? throw new KeyNotFoundException($"No handler registered for {messageTypeName}.");
         return await handler.HandleAsync(this, payload);
     }
 
@@ -496,15 +573,35 @@ public class OcppSharpClient : IDisposable
 
     public virtual void Dispose()
     {
-        if (Disposed)
+        if (IsDisposed)
             return;
-        Disposed = true;
 
-        StopLoop();
-        Socket?.Dispose();
+        Task.Run(() => DisposeAsync().AsTask()).GetAwaiter().GetResult();
 
-        _logger.LogInformation("Closed WebSocket connection of client '{Id}'", Id);
-        Closed?.Invoke(this, EventArgs.Empty);
+        GC.SuppressFinalize(this);
+    }
+
+    public virtual async ValueTask DisposeAsync()
+    {
+        if (IsDisposed)
+            return;
+        IsDisposed = true;
+
+        if (_ownsSocket && Active && Socket != null)
+            await DisconnectAsync();
+        else
+            StopLoop();
+
+        if (_ownsSocket)
+            Socket?.Dispose();
+
+        if (_loopTask != null)
+        {
+            await _loopTask;
+            _loopTask = null;
+        }
+
+        _loopCancellation?.Dispose();
 
         GC.SuppressFinalize(this);
     }

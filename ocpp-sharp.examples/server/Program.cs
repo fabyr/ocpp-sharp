@@ -8,15 +8,15 @@ namespace OcppSharp.Examples.Server;
 
 public class Program
 {
-    private static readonly ManualResetEvent _closeEvent = new(false);
+    private static readonly SemaphoreSlim _close = new(0, 1);
 
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         Console.CancelKeyPress += (s, e) =>
         {
             e.Cancel = true;
             Console.WriteLine("Ctrl+C detected. Shutting down...");
-            _closeEvent.Set();
+            _close.Release();
         };
 
         const int port = 8000;
@@ -31,7 +31,7 @@ public class Program
         // set up a server to listen on port 8000
         // Stations will be connecting to ws://<Hostname>/ocpp/<Station ID>
         // You can support multiple protocol versions at once. Be sure to add the corresponding handlers.
-        OcppSharpServer server = new("/ocpp", [ProtocolVersion.OCPP16], port, loggerFactory);
+        await using OcppSharpServer server = new("/ocpp", [ProtocolVersion.OCPP16], port, loggerFactory);
 
         server.RegisterHandler<BootNotificationRequest>((server, sender, request) =>
         {
@@ -63,25 +63,34 @@ public class Program
             // e.g. with server.ConnectedClients or server.GetStation(id)
             Task.Run(async () =>
             {
-                await Task.Delay(3000);
-                Console.WriteLine($"Fetching configuration for '{station.Id}'...");
+                try
+                {
+                    await Task.Delay(3000);
+                    Console.WriteLine($"Fetching configuration for '{station.Id}'...");
 
-                Response rawResponse = await station.SendRequestAsync(new GetConfigurationRequest());
-                GetConfigurationResponse response = (GetConfigurationResponse)rawResponse.Payload!;
+                    Response rawResponse = await station.SendRequestAsync(new GetConfigurationRequest());
+                    GetConfigurationResponse response = (GetConfigurationResponse)rawResponse.Payload!;
 
-                Console.WriteLine(
-                    "Got configuration for '{0}': {1}",
-                    station.Id,
-                    string.Join(", ",
-                        response.ConfigurationKey?.Select(entry => $"{entry.Key}={entry.Value}") ?? []
-                    )
-                );
+                    Console.WriteLine(
+                        "Got configuration for '{0}': {1}",
+                        station.Id,
+                        string.Join(", ",
+                            response.ConfigurationKey?.Select(entry => $"{entry.Key}={entry.Value}") ?? []
+                        )
+                    );
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while fetching: {ex}");
+                }
             });
         };
 
         server.Start();
+
         Console.WriteLine($"Server started on port {port}!");
-        _closeEvent.WaitOne();
-        server.Stop();
+
+        await _close.WaitAsync();
+        await server.StopAsync();
     }
 }

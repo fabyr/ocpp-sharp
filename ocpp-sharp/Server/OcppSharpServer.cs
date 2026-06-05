@@ -1,17 +1,18 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using OcppSharp.Client;
-using OcppSharp.Protocol;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.WebSockets;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using OcppSharp.Client;
+using OcppSharp.Protocol;
 
 namespace OcppSharp.Server;
 
-public partial class OcppSharpServer
+public partial class OcppSharpServer : IAsyncDisposable, IDisposable
 {
     [GeneratedRegex(@"^(\/?(?:.*?\/)+?)([^\/]*?)\/?$", RegexOptions.Singleline)]
     private static partial Regex PathRegex();
@@ -23,10 +24,9 @@ public partial class OcppSharpServer
     /// The number of bytes the server will accept in a single WebSocket message.
     /// </summary>
     public int MaxIncomingData { get; set; } = 32767;
-
     public IEnumerable<ProtocolVersion> OcppVersions { get; }
-
     public string SubPath { get; }
+    public bool IsDisposed { get; private set; } = false;
 
     /// <summary>
     /// true, if the server has been started; false, if it is in a stopped state.
@@ -35,7 +35,8 @@ public partial class OcppSharpServer
     /// If this server has been initialized with an existing <see cref="HttpListener"/>,
     /// this property will always stay false.
     /// </remarks>
-    public bool Active { get; private set; } = false;
+    [MemberNotNullWhen(true, nameof(_loopCancellation))]
+    public bool Active => (!_loopCancellation?.IsCancellationRequested) ?? false;
 
     /// <summary>
     /// The encoding used for encoding and decoding WebSocket data.
@@ -72,19 +73,18 @@ public partial class OcppSharpServer
     public ICollection<OcppClientConnection> ConnectedClients => stationMap.Values;
 
     public event ResponseHandlerDelegate? ResponseReceived;
-
     public event ResponseHandlerDelegate? ResponseSent;
-
     public event RequestHandlerDelegate? RequestReceived;
-
     public event RequestHandlerDelegate? RequestSent;
-
     public event EventHandler<OcppClientConnection>? ClientAccepted;
 
-    private bool _stopLoop = false;
+    private readonly bool _ownsListener;
     private readonly HttpListener _server;
     private readonly ConcurrentDictionary<string, OcppClientConnection> stationMap = new();
     private readonly List<ServerRequestHandler> handlers = [];
+
+    private CancellationTokenSource? _loopCancellation;
+    private Task? _loopTask;
 
     /// <summary>
     /// Sets up an OCPP-Server (WebSocket-Server) using an existing <see cref="HttpListener"/> instance.
@@ -98,7 +98,8 @@ public partial class OcppSharpServer
     /// </param>
     /// <param name="versions">The ocpp protocol versions this server allows.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
-    public OcppSharpServer(string urlPrefix, HttpListener listener, IEnumerable<ProtocolVersion> versions, ILoggerFactory? loggerFactory = null) : this(urlPrefix, versions, 80, listener, loggerFactory)
+    public OcppSharpServer(string urlPrefix, HttpListener listener, IEnumerable<ProtocolVersion> versions, ILoggerFactory? loggerFactory = null)
+        : this(urlPrefix, versions, 80, listener, loggerFactory)
     { }
 
     /// <summary>
@@ -107,7 +108,8 @@ public partial class OcppSharpServer
     /// <param name="urlPrefix">The path for the websocket endpoint.</param>
     /// <param name="versions">The ocpp protocol versions this server allows.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
-    public OcppSharpServer(string urlPrefix, IEnumerable<ProtocolVersion> versions, ILoggerFactory? loggerFactory = null) : this(urlPrefix, versions, 80, loggerFactory)
+    public OcppSharpServer(string urlPrefix, IEnumerable<ProtocolVersion> versions, ILoggerFactory? loggerFactory = null)
+        : this(urlPrefix, versions, 80, loggerFactory)
     { }
 
     /// <summary>
@@ -117,13 +119,15 @@ public partial class OcppSharpServer
     /// <param name="versions">The ocpp protocol versions this server allows.</param>
     /// <param name="port">The port to listen on for incoming connections.</param>
     /// <param name="loggerFactory">Optional logger factory.</param>
-    public OcppSharpServer(string urlPrefix, IEnumerable<ProtocolVersion> versions, ushort port, ILoggerFactory? loggerFactory = null) : this(urlPrefix, versions, port, null, loggerFactory)
+    public OcppSharpServer(string urlPrefix, IEnumerable<ProtocolVersion> versions, ushort port, ILoggerFactory? loggerFactory = null)
+        : this(urlPrefix, versions, port, null, loggerFactory)
     { }
 
     private OcppSharpServer(string urlPrefix, IEnumerable<ProtocolVersion> versions, ushort port = 80, HttpListener? listener = null, ILoggerFactory? loggerFactory = null)
     {
         OcppVersions = versions;
         _server = listener ?? new HttpListener();
+        _ownsListener = listener == null;
 
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         _logger = _loggerFactory.CreateLogger<OcppSharpServer>();
@@ -147,34 +151,53 @@ public partial class OcppSharpServer
     /// <exception cref="InvalidOperationException">If the server has already been started.</exception>
     public void Start()
     {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
+
         if (Active)
             throw new InvalidOperationException("Already started.");
+
         _server.Start();
         StartLoop();
-        Active = true;
     }
 
     /// <summary>
     /// Stops listening for incoming connections.
+    /// Disconnects all clients, which may take time.
     /// <para>This method can be called multiple times, even if the server has already been stopped.</para>
     /// </summary>
-    public void Stop()
+    /// <param name="timeoutMsForConnectionKill">Milliseconds to wait before terminating a connection forcefully, if it could not be closed gracefully.</param>
+    public async Task StopAsync(int timeoutMsForConnectionKill = 5000, CancellationToken cancellationToken = default)
     {
         if (!Active)
             return;
 
         try
         {
-            foreach (OcppClientConnection client in ConnectedClients)
+            await Task.WhenAll(ConnectedClients.Select(async (client) =>
             {
-                client.Disconnect();
-            }
+                if (client.Active)
+                    await client.DisconnectAsync(timeoutMsForConnectionKill, cancellationToken);
+                await client.DisposeAsync();
+            }));
         }
-        catch { }
+        catch
+        { }
+
+        if (_ownsListener)
+            _server.Stop();
 
         StopLoop();
-        _server.Stop();
-        Active = false;
+    }
+
+    /// <inheritdoc cref="StopAsync" />
+    public void Stop(bool wait = true, int timeoutMsForConnectionKill = 5000)
+    {
+        Task stopTask = Task.Run(() => StopAsync(timeoutMsForConnectionKill));
+
+        if (wait)
+        {
+            stopTask.GetAwaiter().GetResult();
+        }
     }
 
     /// <summary>
@@ -185,14 +208,29 @@ public partial class OcppSharpServer
     /// using an existing <see cref="HttpListener"/>.
     /// <para>Use <see cref="Start"/> in the other case instead.</para>
     /// </remarks>
-    public async void StartLoop()
+    /// <exception cref="ObjectDisposedException">If this server is disposed.</exception>
+    /// <exception cref="InvalidOperationException">If the server's processing loop has already been started.</exception>
+    public void StartLoop()
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
+
+        if (Active)
+            throw new InvalidOperationException("Already started.");
+
+        // reset cancellation token
+        _loopCancellation?.Dispose();
+        _loopCancellation = new();
+
+        _loopTask = StartLoopInternal();
+    }
+
+    protected async Task StartLoopInternal()
     {
         _logger.LogDebug("Server loop start.");
         stationMap.Clear();
-        _stopLoop = false;
         try
         {
-            while (!_stopLoop && _server.IsListening)
+            while (Active && _server.IsListening)
             {
                 HttpListenerContext listenerContext = await _server.GetContextAsync();
                 if (listenerContext.Request.IsWebSocketRequest)
@@ -208,9 +246,13 @@ public partial class OcppSharpServer
                 }
             }
         }
+        catch (OperationCanceledException)
+        { }
+        catch (ObjectDisposedException)
+        { }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "WebSocket Server Error");
+            _logger.LogError(ex, "WebSocket server error.");
         }
 
         _logger.LogDebug("Server loop stop.");
@@ -226,26 +268,27 @@ public partial class OcppSharpServer
     /// </remarks>
     public void StopLoop()
     {
-        _stopLoop = true;
+        if (!Active)
+            return;
+
+        _loopCancellation.Cancel();
     }
 
     /// <summary>
     /// Returns a station object by its id.
     /// </summary>
     /// <exception cref="KeyNotFoundException">If no station with that id exists.</exception>
-
     public OcppClientConnection GetStation(string id)
     {
         if (stationMap.TryGetValue(id, out OcppClientConnection? result))
         {
             return result;
         }
-        else
-            throw new KeyNotFoundException($"The Station with id '{id}' does not exist.");
+
+        throw new KeyNotFoundException($"The Station with id '{id}' does not exist.");
     }
 
-
-    private bool CheckBeforeRegisteringHandler(Type payloadType)
+    protected virtual bool CheckBeforeRegisteringHandler(Type payloadType)
     {
         if (handlers.Any(x => x.OnType == payloadType))
             throw new ArgumentException("A handler has already been registered for this type.", nameof(payloadType));
@@ -258,6 +301,7 @@ public partial class OcppSharpServer
 
         return true;
     }
+
     /// <summary>
     /// Registers a handler to this server instance for a specific type of OCPP-Request.
     /// </summary>
@@ -275,8 +319,8 @@ public partial class OcppSharpServer
 
             return result;
         }
-        else
-            throw new InvalidOperationException("Unknown error while registering handler.");
+
+        throw new InvalidOperationException("Handler registration checks failed.");
     }
 
     /// <inheritdoc cref="RegisterHandler(Type, RequestPayloadHandlerDelegate)" />
@@ -289,8 +333,8 @@ public partial class OcppSharpServer
 
             return result;
         }
-        else
-            throw new InvalidOperationException("Unknown error while registering handler.");
+
+        throw new InvalidOperationException("Handler registration checks failed.");
     }
 
     /// <summary>
@@ -363,7 +407,7 @@ public partial class OcppSharpServer
 
         string? messageTypeName = OcppMessageAttribute.GetMessageIdentifier(payloadType);
         ServerRequestHandler? handler = handlers.FirstOrDefault(x => x.OnType == payloadType)
-                                            ?? throw new KeyNotFoundException($"No handler registered for {messageTypeName}.");
+            ?? throw new KeyNotFoundException($"No handler registered for {messageTypeName}.");
 
         return await handler.HandleAsync(this, client, payload);
     }
@@ -438,7 +482,9 @@ public partial class OcppSharpServer
                 ocppVersion = OcppVersions.First();
             }
 
-            WebSocketContext webSocketContext = await listenerContext.AcceptWebSocketAsync(subProtocol: ocppVersion.Value.GetWebSocketSubProtocol());
+            WebSocketContext webSocketContext = await listenerContext.AcceptWebSocketAsync(
+                subProtocol: ocppVersion.Value.GetWebSocketSubProtocol()
+            );
 
             WebSocket socket = webSocketContext.WebSocket;
 
@@ -447,10 +493,14 @@ public partial class OcppSharpServer
 
             stationMap.AddOrUpdate(stationId, (key) => client, (key, existing) =>
             {
-                if (!existing.Disposed)
+                if (existing.Active)
                 {
                     _logger.LogWarning("Station ({StationId}) connected with a duplicate id or the old connection was not terminated gracefully!", key);
-                    existing.Disconnect();
+                    _ = Task.Run(async () =>
+                    {
+                        await existing.DisconnectAsync();
+                        await existing.DisposeAsync();
+                    });
                 }
 
                 return client;
@@ -471,5 +521,39 @@ public partial class OcppSharpServer
             _logger.LogError(ex, "WebSocket accept error");
             return;
         }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (IsDisposed)
+            return;
+        IsDisposed = true;
+
+        Stop();
+
+        if (_loopTask != null)
+        {
+            await _loopTask;
+            _loopTask = null;
+        }
+
+        if (_ownsListener)
+        {
+            _server.Close();
+        }
+
+        _loopCancellation?.Dispose();
+
+        GC.SuppressFinalize(this);
+    }
+
+    public void Dispose()
+    {
+        if (IsDisposed)
+            return;
+
+        Task.Run(() => DisposeAsync().AsTask()).GetAwaiter().GetResult();
+
+        GC.SuppressFinalize(this);
     }
 }

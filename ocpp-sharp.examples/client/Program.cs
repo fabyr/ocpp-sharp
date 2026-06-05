@@ -9,7 +9,7 @@ namespace OcppSharp.Examples.Client;
 
 public class Program
 {
-    private static readonly ManualResetEvent _closeEvent = new(false);
+    private static readonly SemaphoreSlim _close = new(0, 1);
 
     public static async Task Main(string[] args)
     {
@@ -17,7 +17,7 @@ public class Program
         {
             e.Cancel = true;
             Console.WriteLine("Ctrl+C detected. Shutting down...");
-            _closeEvent.Set();
+            _close.Release();
         };
 
         const string stationId = "example_id_1234";
@@ -29,52 +29,52 @@ public class Program
             builder.SetMinimumLevel(LogLevel.Debug);
         });
 
-        using (OcppSharpClient client = new(stationId, ProtocolVersion.OCPP16, loggerFactory))
+        await using OcppSharpClient client = new(stationId, ProtocolVersion.OCPP16, loggerFactory);
+
+        // Example handler
+        client.RegisterHandler<GetConfigurationRequest>((client, response) =>
         {
-            // Example handler
-            client.RegisterHandler<GetConfigurationRequest>((client, response) =>
+            Console.WriteLine("Got a GetConfiguration request from the server.");
+
+            if (response.Key != null)
+                throw new NotImplementedException();
+
+            return new GetConfigurationResponse()
             {
-                Console.WriteLine("Got a GetConfiguration request from the server.");
-
-                if (response.Key != null)
-                    throw new NotImplementedException();
-
-                return new GetConfigurationResponse()
-                {
-                    ConfigurationKey = [
-                        new KeyValue() { Key = "ExampleKey", Value = "ConfigValue" },
-                        new KeyValue() { Key = "ExampleKey2", Value = "ExampleValue2", ReadOnly = true }
-                    ]
-                };
-            });
-
-            client.Closed += (sender, e) =>
-            {
-                Console.WriteLine("Client connection has been closed.");
-                _closeEvent.Set();
+                ConfigurationKey = [
+                    new KeyValue() { Key = "ExampleKey", Value = "ConfigValue" },
+                    new KeyValue() { Key = "ExampleKey2", Value = "ExampleValue2", ReadOnly = true }
+                ]
             };
+        });
 
-            await client.Connect(serverUrl);
+        client.Closed += (sender, e) =>
+        {
+            Console.WriteLine("Client connection has been closed.");
+            _close.Release();
+        };
 
-            // Send a boot notification
-            Response response = await client.SendRequestAsync(new BootNotificationRequest()
-            {
-                ChargePointVendor = "example",
-                ChargePointModel = "example-model",
-                FirmwareVersion = "1.0",
-                ChargePointSerialNumber = "Test Serial"
-            });
+        await client.Connect(serverUrl);
 
-            BootNotificationResponse? payload = response.Payload as BootNotificationResponse;
+        // Send a boot notification
+        Response response = await client.SendRequestAsync(new BootNotificationRequest()
+        {
+            ChargePointVendor = "example",
+            ChargePointModel = "example-model",
+            FirmwareVersion = "1.0",
+            ChargePointSerialNumber = "Test Serial"
+        });
 
-            // Do something with the payload...
+        BootNotificationResponse? payload = response.Payload as BootNotificationResponse;
 
-            // Example output of full json
-            Console.WriteLine($"Got BootNotification response: {response.OriginalJsonBody}");
+        // Do something with the payload...
 
-            _closeEvent.WaitOne();
-            client.Disconnect();
-            Console.WriteLine("Stopped.");
-        }
+        // Example output of full json
+        Console.WriteLine($"Got BootNotification response: {response.OriginalJsonBody}");
+
+        await _close.WaitAsync();
+        await client.DisconnectAsync();
+
+        Console.WriteLine("Stopped.");
     }
 }
