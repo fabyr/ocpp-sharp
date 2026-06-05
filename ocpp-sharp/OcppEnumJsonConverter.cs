@@ -36,8 +36,8 @@ public class OcppEnumJsonConverter : JsonConverterFactory
                 new DictionaryLookupNamingPolicy(dictionary, NamingPolicy),
                 AllowIntegerValues
             ).CreateConverter(typeToConvert, options);
-        else
-            return BaseConverter.CreateConverter(typeToConvert, options);
+
+        return BaseConverter.CreateConverter(typeToConvert, options);
     }
 }
 

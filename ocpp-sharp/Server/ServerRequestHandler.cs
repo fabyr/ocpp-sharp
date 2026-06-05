@@ -8,7 +8,6 @@ public class ServerRequestHandler
     public RequestPayloadHandlerDelegate? Handler { get; } = null;
     public RequestPayloadHandlerDelegateAsync? HandlerAsync { get; } = null;
 
-
     public ServerRequestHandler(Type payloadType, RequestPayloadHandlerDelegate handler)
     {
         OnType = payloadType;
@@ -29,8 +28,10 @@ public class ServerRequestHandler
             {
                 throw new InvalidOperationException("No handler is set for this request type.");
             }
+
             return await HandlerAsync(server, station, request);
         }
+
         return Handler(server, station, request);
     }
 }

@@ -9,7 +9,7 @@ public static class Extensions
     /// Gets an attribute on an enum field value
     /// <example><para>For example:
     /// <code><![CDATA[
-    /// string desc = myEnumVariable.GetAttributeOfType<DescriptionAttribute>().Description; 
+    /// string desc = myEnumVariable.GetAttributeOfType<DescriptionAttribute>().Description;
     /// ]]></code></para>
     /// </example>
     /// </summary>
@@ -21,8 +21,8 @@ public static class Extensions
         // https://stackoverflow.com/questions/1799370/getting-attributes-of-enums-value
         // https://stackoverflow.com/a/9276348
         Type type = enumValue.GetType();
-        MemberInfo[] memInfo = type.GetMember(enumValue.ToString());
-        var attributes = memInfo[0].GetCustomAttributes<T>(false);
+        MemberInfo[] members = type.GetMember(enumValue.ToString());
+        var attributes = members[0].GetCustomAttributes<T>(false);
         return attributes.FirstOrDefault();
     }
 
@@ -35,6 +35,6 @@ public static class Extensions
     public static string GetWebSocketSubProtocol(this ProtocolVersion version)
     {
         return version.GetAttributeOfType<StringValueAttribute>()?.Text
-                ?? throw new ArgumentException("OCPP protocol version does not define a StringValueAttribute.", nameof(version));
+            ?? throw new ArgumentException("OCPP protocol version does not define a StringValueAttribute.", nameof(version));
     }
 }

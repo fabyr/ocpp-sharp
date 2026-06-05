@@ -1,7 +1,7 @@
-using OcppSharp.Protocol;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OcppSharp.Protocol;
 
 namespace OcppSharp;
 
