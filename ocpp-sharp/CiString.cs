@@ -5,11 +5,21 @@ namespace OcppSharp;
 
 /// <summary>
 /// Provides an easy to work with type of which Equality and GetHashCode ignore case.
+/// ("case insensitive string")
 /// However, the original representation is still stored for other use. (<see cref="RawValue"/>)
 /// </summary>
 [JsonConverter(typeof(CiJsonConverter))]
-public readonly struct CiString
+public readonly struct CiString : IEquatable<CiString>, IEquatable<CiString?>, IEquatable<string>
 {
+    public string RawValue { get; }
+    public string Value { get; }
+
+    public CiString(string value)
+    {
+        RawValue = value;
+        Value = RawValue.ToLower();
+    }
+
     public char this[int i]
     {
         get
@@ -18,30 +28,44 @@ public readonly struct CiString
         }
     }
 
-    public string RawValue { get; }
-    public string Value => RawValue.ToLower();
-    public CiString(string rw)
+    public bool Equals(CiString other)
     {
-        RawValue = rw;
+        return other.Value.Equals(Value);
+    }
+
+    public bool Equals([NotNullWhen(true)] CiString? other)
+    {
+        if (other is null)
+            return false;
+
+        return Equals(other.Value);
+    }
+
+    public bool Equals([NotNullWhen(true)] string? other)
+    {
+        return Value.Equals(other, StringComparison.InvariantCultureIgnoreCase);
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null)
+        if (obj is null)
             return false;
+
         if (obj is string stringValue)
-            return stringValue.Equals(Value, StringComparison.OrdinalIgnoreCase);
+            return Equals(stringValue);
+
         if (obj is CiString ciStringValue)
-        {
-            return ciStringValue.Value.Equals(Value);
-        }
+            return Equals(ciStringValue);
 
         return false;
     }
 
     public override int GetHashCode()
     {
-        return Value?.GetHashCode() ?? 0;
+        HashCode code = new();
+        code.Add(Value);
+
+        return code.ToHashCode();
     }
 
     public override string ToString()
@@ -56,7 +80,7 @@ public readonly struct CiString
 
     public static implicit operator CiString(string str)
     {
-        return new CiString(str);
+        return new(str);
     }
 
     public static implicit operator string?(CiString? obj)
@@ -66,17 +90,32 @@ public readonly struct CiString
 
     public static implicit operator CiString?(string? str)
     {
-        if (str == null)
+        if (str is null)
             return null;
-        return new CiString(str);
+
+        return new(str);
     }
 
     public static bool operator ==(CiString a, CiString b)
     {
         return a.Equals(b);
     }
+
     public static bool operator !=(CiString a, CiString b)
     {
-        return !a.Equals(b);
+        return !(a == b);
+    }
+
+    public static bool operator ==(CiString? a, CiString? b)
+    {
+        if (a is null || b is null)
+            return a is null && b is null;
+
+        return a.Value == b.Value;
+    }
+
+    public static bool operator !=(CiString? a, CiString? b)
+    {
+        return !(a == b);
     }
 }
