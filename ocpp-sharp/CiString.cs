@@ -11,13 +11,16 @@ namespace OcppSharp;
 [JsonConverter(typeof(CiJsonConverter))]
 public readonly struct CiString : IEquatable<CiString>, IEquatable<CiString?>, IEquatable<string>
 {
+    public static StringComparison StringComparisonMode { get; } = StringComparison.InvariantCultureIgnoreCase;
+
     public string RawValue { get; }
-    public string Value { get; }
+
+    public string Value => RawValue.ToLowerInvariant();
+    public string ValueUpper => RawValue.ToUpperInvariant();
 
     public CiString(string value)
     {
         RawValue = value;
-        Value = RawValue.ToLower();
     }
 
     public char this[int i]
@@ -30,7 +33,12 @@ public readonly struct CiString : IEquatable<CiString>, IEquatable<CiString?>, I
 
     public bool Equals(CiString other)
     {
-        return other.Value.Equals(Value);
+        return RawValue.Equals(other.RawValue, StringComparisonMode);
+    }
+
+    public bool Equals([NotNullWhen(true)] string? other)
+    {
+        return RawValue.Equals(other, StringComparisonMode);
     }
 
     public bool Equals([NotNullWhen(true)] CiString? other)
@@ -39,11 +47,6 @@ public readonly struct CiString : IEquatable<CiString>, IEquatable<CiString?>, I
             return false;
 
         return Equals(other.Value);
-    }
-
-    public bool Equals([NotNullWhen(true)] string? other)
-    {
-        return Value.Equals(other, StringComparison.InvariantCultureIgnoreCase);
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
