@@ -7,6 +7,7 @@
     <Authors>fabyr and contributors</Authors>
     <AssemblyName>OcppSharp</AssemblyName>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/fabyr/ocpp-sharp</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
@@ -23,6 +24,7 @@
 
   <ItemGroup>
     <None Include="$(MSBuildProjectDirectory)\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="$(MSBuildProjectDirectory)\..\LICENSE" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
