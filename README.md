@@ -8,6 +8,7 @@ Currently supported versions:
 ## Table of contents
 - [ocpp-sharp](#ocpp-sharp)
   - [Table of contents](#table-of-contents)
+  - [Installation](#installation)
   - [Dependencies](#dependencies)
   - [Features](#features)
   - [What it isn't](#what-it-isnt)
@@ -15,6 +16,22 @@ Currently supported versions:
   - [Running the examples](#running-the-examples)
   - [Basic server code](#basic-server-code)
   - [Motivation](#motivation)
+
+## Installation
+This project is published to NuGet under the name `OcppSharp`.
+
+See the relevant nuget page for more information:
+https://www.nuget.org/packages/OcppSharp
+
+Installation via the [dotnet CLI](https://learn.microsoft.com/en-us/dotnet/core/tools):
+```sh
+dotnet add package OcppSharp
+```
+
+Or within the [Visual Studio Package Manager Console](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-powershell) (PMC):
+```ps
+PM> Install-Package OcppSharp
+```
 
 ## Dependencies
 The library itself targets all dotnet versions from .NET 8 up to .NET 10
