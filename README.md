@@ -51,17 +51,17 @@ It's not a ready-to-go backend server. You still have to implement what happens 
 - Implementation of a basic backend server for charge points
 
 ## Running the examples
-A minimalistic client and server example can be found under [/ocpp-sharp.examples](/ocpp-sharp.examples)
+A minimalistic client and server example can be found under [/OcppSharp.Examples](/OcppSharp.Examples)
 
 Start the server:
 ```shell
-cd ./ocpp-sharp.examples/server
+cd ./OcppSharp.Examples/Server
 dotnet run
 ```
 
 And then a client:
 ```shell
-cd ./ocpp-sharp.examples/client
+cd ./OcppSharp.Examples/Client
 dotnet run
 ```
 

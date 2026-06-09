@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ocpp-sharp\ocpp-sharp.csproj" />
+    <ProjectReference Include="..\OcppSharp\OcppSharp.csproj" />
   </ItemGroup>
 
 </Project>

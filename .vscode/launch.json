@@ -6,9 +6,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/ocpp-sharp.examples/server/bin/Debug/net8.0/server.dll",
+      "program": "${workspaceFolder}/OcppSharp.Examples/Server/bin/Debug/net8.0/server.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/ocpp-sharp.examples/server",
+      "cwd": "${workspaceFolder}/OcppSharp.Examples/Server",
       "console": "internalConsole",
       "stopAtEntry": false
     },
@@ -17,9 +17,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/ocpp-sharp.examples/client/bin/Debug/net8.0/client.dll",
+      "program": "${workspaceFolder}/OcppSharp.Examples/Client/bin/Debug/net8.0/client.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/ocpp-sharp.examples/client",
+      "cwd": "${workspaceFolder}/OcppSharp.Examples/Client",
       "console": "internalConsole",
       "stopAtEntry": false
     },
