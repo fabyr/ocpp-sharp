@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Implementation of the Open Charge Point Protocol (OCPP).</Description>
     <PackageTags>ocpp;ocpp-j;ocpp-json;websockets;e-mobility</PackageTags>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>fabyr and contributors</Authors>
     <AssemblyName>OcppSharp</AssemblyName>
     <PackageReadmeFile>README.md</PackageReadmeFile>
