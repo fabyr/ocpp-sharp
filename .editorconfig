@@ -22,3 +22,6 @@ dotnet_diagnostic.IDE0305.severity = none
 
 # IDE0290: Use primary constructor
 csharp_style_prefer_primary_constructors = false
+
+# IDE0005: Remove unnecessary using directives
+dotnet_diagnostic.IDE0005.severity = warning
