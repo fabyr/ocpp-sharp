@@ -1,5 +1,5 @@
-using OcppSharp.Protocol.Version201.Types;
 using System.Text.Json.Serialization;
+using OcppSharp.Protocol.Version201.Types;
 
 namespace OcppSharp.Protocol.Version201.RequestPayloads;
 

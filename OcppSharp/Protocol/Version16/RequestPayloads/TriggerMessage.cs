@@ -1,5 +1,5 @@
-using OcppSharp.Protocol.Version16.MessageConstants;
 using System.Text.Json.Serialization;
+using OcppSharp.Protocol.Version16.MessageConstants;
 
 namespace OcppSharp.Protocol.Version16.RequestPayloads;
 

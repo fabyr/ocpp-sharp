@@ -22,7 +22,7 @@ public static class Util
 
     /// <summary>
     /// Converts a String Unit to its corresponding <see cref="UnitOfMeasure"/> Value.<br/>
-    /// Returns null if the string does not match any known unit. 
+    /// Returns null if the string does not match any known unit.
     /// </summary>
     public static UnitOfMeasure? GetUnitFromString(string? s)
     {

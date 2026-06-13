@@ -4,7 +4,7 @@ namespace OcppSharp.Protocol.Version16.MessageConstants;
 
 
 /// <summary>
-/// Relates to <see cref="ChargingRateUnitType"/> 
+/// Relates to <see cref="ChargingRateUnitType"/>
 /// </summary>
 public static class ChargingRateQuantityType
 {

@@ -27,7 +27,7 @@ public class OcppClientConnection : OcppSharpClient
     public override ClientRequestHandler RegisterHandler<T>(Client.RequestPayloadHandlerDelegateGeneric<T> handler) => throw HandlerException;
     public override ClientRequestHandler RegisterAsyncHandler(Type payloadType, Client.RequestPayloadHandlerDelegateAsync handler) => throw HandlerException;
     public override ClientRequestHandler RegisterAsyncHandler<T>(Client.RequestPayloadHandlerDelegateGenericAsync<T> handler) => throw HandlerException;
-    
+
     public override void UnregisterHandler(ClientRequestHandler handler) => throw HandlerException;
 
     // Remove the original RunHandler logic and instead pass it to the parent server
