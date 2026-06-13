@@ -5,33 +5,25 @@ namespace OcppSharp.Server;
 public class ServerRequestHandler
 {
     public Type OnType { get; }
-    public RequestPayloadHandlerDelegate? Handler { get; } = null;
-    public RequestPayloadHandlerDelegateAsync? HandlerAsync { get; } = null;
+    public RequestPayloadHandlerDelegateAsync Handler { get; }
 
     public ServerRequestHandler(Type payloadType, RequestPayloadHandlerDelegate handler)
     {
         OnType = payloadType;
-        Handler = handler;
+        Handler = (server, sender, request) =>
+        {
+            return Task.FromResult(handler(server, sender, request));
+        };
     }
 
     public ServerRequestHandler(Type payloadType, RequestPayloadHandlerDelegateAsync handlerAsync)
     {
         OnType = payloadType;
-        HandlerAsync = handlerAsync;
+        Handler = handlerAsync;
     }
 
-    public async Task<ResponsePayload> HandleAsync(OcppSharpServer server, OcppClientConnection station, RequestPayload request)
+    public Task<ResponsePayload> HandleAsync(OcppSharpServer server, OcppClientConnection station, RequestPayload request)
     {
-        if (Handler == null)
-        {
-            if (HandlerAsync == null)
-            {
-                throw new InvalidOperationException("No handler is set for this request type.");
-            }
-
-            return await HandlerAsync(server, station, request);
-        }
-
         return Handler(server, station, request);
     }
 }
